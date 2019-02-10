@@ -18,6 +18,8 @@ MENU_KEYBOARD = [['Проверить Email', 'Расписание', 'Подп�
 
 
 def menu(bot, update):
+    user = update.message.from_user
+    logger.info('User {} have started conversation.'.format(user.first_name))
     update.message.reply_text(
         'Привет, че как? '
         'Че делать будем?',
@@ -65,18 +67,9 @@ def can_spam(bot, update):
 def skip_email(bot, update):
     user = update.message.from_user
     logger.info("User %s did not send an email.", user.first_name)
-    update.message.reply_text('You seem a bit paranoid!')
-
+    update.message.reply_text('You seem a bit paranoid!'
+                              , reply_markup=ReplyKeyboardMarkup(MENU_KEYBOARD, one_time_keyboard=True))
     return CHOOSING
-
-
-def bio(bot, update):
-    user = update.message.from_user
-    logger.info("Bio of %s: %s", user.first_name, update.message.text)
-    update.message.reply_text('Thank you! I hope we can talk again some day.')
-
-    return ConversationHandler.END
-
 
 def cancel(bot, update):
     user = update.message.from_user
@@ -85,7 +78,6 @@ def cancel(bot, update):
                               reply_markup=ReplyKeyboardRemove())
 
     return ConversationHandler.END
-
 
 def error(bot, update, error):
     """Log Errors caused by Updates."""
