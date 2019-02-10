@@ -19,3 +19,11 @@ TEXT_SUBSCRIBE = 'Подписаться на обновления'
 TEXT_VIEW_SCEDULE = 'Расписание'
 
 TEXT_CHECK_EMAIL = 'Проверить Email'
+
+TEXT_CREATE_BROADCAST = 'Херануть броадкаст'
+
+TEXT_NOT_ADMIN = 'Руки убрал, ты не админ'
+
+TEXT_ENTER_BROADCAST = 'Введите сообщение'
+
+TEXT_BROADCAST_DONE = 'готово'
