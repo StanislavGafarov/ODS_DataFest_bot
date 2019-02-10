@@ -27,8 +27,9 @@ def menu(bot, update):
 
 
 def check_email(bot, update):
-    # user = update.message.from_user
-    # logger.info('')
+    user = update.message.from_user
+    logger.info('User {} have chosen {} '.format(user.first_name, update.message.text))
+
     update.message.reply_text('Please type your email, or send /skip if you don\'t want to',
                               reply_markup=ReplyKeyboardRemove())
     email = update.message.text
