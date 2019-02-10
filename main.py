@@ -23,27 +23,30 @@ def menu(bot, update):
         'Привет, че как? '
         'Че делать будем?',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-    user = update.message.from_user
-    logger.info('User {} have chosen {} '.format(user.first_name, update.message.text))
+
     return CHOOSING
 
 
 def check_email(bot, update):
+    user = update.message.from_user
+    logger.info('User {} have chosen {} '.format(user.first_name, update.message.text))
     update.message.reply_text('Please type your email, or send /skip if you don\'t want to',
                               reply_markup=ReplyKeyboardRemove())
+    return CHECK_EMAIL
 
+def email_in_list(update):
     email = update.message.text[-1]
     logger.info('{}', email)
     if email in APPROVED_EMAIL_LIST:
         update.message.reply_text('Fuck yeah, you are in!')
     else:
         update.message.reply_text('Go away looser, you are not in the list')
-    return CHOOSING
+    return ConversationHandler.START
 
 
 def table_sheet(bot, update):
     update.message.reply_text('{}'.format('there will be spread sheet with timing'))
-    return CHOOSING
+    return ConversationHandler.START
 
 
 def can_spam(bot, update):
@@ -51,7 +54,7 @@ def can_spam(bot, update):
     chat_id = bot.get_updates()[-1].message.chat_id
     logger.info('User:{}, Chat_id:{} subscribed for notification'.format(user.first_name,chat_id))
     update.message.reply_text('Thank for sub, bro')
-    return CHOOSING
+    return ConversationHandler.START
 
 
 def skip_email(bot, update):
@@ -98,7 +101,10 @@ def main():
         states={
             CHOOSING: [RegexHandler('^(Проверить Email)$', check_email),
                    RegexHandler('^(Расписание)$', table_sheet),
-                   RegexHandler('^(Подписаться на обновления)$', can_spam)]
+                   RegexHandler('^(Подписаться на обновления)$', can_spam)],
+
+            CHECK_EMAIL: [MessageHandler(Filters.text, email_in_list),
+                       CommandHandler('skip', skip_email)],
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
