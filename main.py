@@ -32,7 +32,7 @@ def check_email(bot, update):
     update.message.reply_text('Please type your email, or send /skip if you don\'t want to',
                               reply_markup=ReplyKeyboardRemove())
 
-    email = bot.get_updates().message.text[-1]
+    email = update.message.text[-1]
     logger.info('{}', email)
     if email in APPROVED_EMAIL_LIST:
         update.message.reply_text('Fuck yeah, you are in!')
