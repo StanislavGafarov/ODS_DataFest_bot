@@ -1,0 +1,45 @@
+version: '2.2'
+
+volumes:
+  pgdata:
+    driver: local
+
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    volumes:
+     - pgdata:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tgbot
+
+  backend:
+    build: src
+    image: tgbot
+    restart: always
+    environment:
+      - DOCKER=true
+    command: bash -c "cd src && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+#    command: bash -c "cd /src; python3 manage.py migrate && python3 manage.py collectstatic -c --noinput && uwsgi -p 4 --http :8000 --module config.wsgi --static-map /static=./static"
+    ports:
+      - 8080:8000
+    depends_on:
+      - postgres
+
+  dealer_bot:
+    image: tgbot
+    restart: always
+    environment:
+     - DOCKER=true
+     - BOT_TOKEN=???
+     - DEALER_BOT_WEBHOOK=false
+     - DEALER_BOT_WEBHOOK_PORT=8443
+    command: bash -c "cd src && python manage.py start_bot "
+    depends_on:
+     - postgres
+     - backend
+    ports:
+      - 8443:8443
