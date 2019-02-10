@@ -14,15 +14,14 @@ logger = logging.getLogger(__name__)
 CHOOSING = 0
 CHECK_EMAIL = 1
 
+MENU_KEYBOARD = [['Проверить Email', 'Расписание', 'Подписаться на обновления']]
+
 
 def menu(bot, update):
-    reply_keyboard = [['Проверить Email', 'Расписание','Подписаться на обновления']]
-    # reply_keyboard = [['Boy', 'Girl', 'Other']]
-
     update.message.reply_text(
         'Привет, че как? '
         'Че делать будем?',
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+        reply_markup=ReplyKeyboardMarkup(MENU_KEYBOARD, one_time_keyboard=True))
 
     return CHOOSING
 
@@ -40,22 +39,26 @@ def email_in_list(bot, update):
     email = update.message.text
     logger.info('{}'.format(email))
     if email in APPROVED_EMAIL_LIST:
-        update.message.reply_text('Fuck yeah, you are in!')
+        update.message.reply_text('Fuck yeah, you are in!'
+                                  , reply_markup=ReplyKeyboardMarkup(MENU_KEYBOARD, one_time_keyboard=True))
     else:
-        update.message.reply_text('Go away looser, you are not in the list')
+        update.message.reply_text('Go away looser, you are not in the list'
+                                  , reply_markup=ReplyKeyboardMarkup(MENU_KEYBOARD, one_time_keyboard=True))
     return CHOOSING
 
 
 def table_sheet(bot, update):
-    update.message.reply_text('{}'.format('there will be spread sheet with timing'))
+    update.message.reply_text('{}'.format('there will be spread sheet with timing')
+                              , reply_markup=ReplyKeyboardMarkup(MENU_KEYBOARD, one_time_keyboard=True))
     return CHOOSING
 
 
 def can_spam(bot, update):
     user = update.message.from_user
-    chat_id = bot.get_updates()[-1].message.chat_id
-    logger.info('User:{}, Chat_id:{} subscribed for notification'.format(user.first_name,chat_id))
-    update.message.reply_text('Thank for sub, bro')
+    chat_id = update.message.chat_id
+    logger.info('User:{}, Chat_id:{} subscribed for notification'.format(user.first_name, chat_id))
+    update.message.reply_text('Thank for sub, bro',
+                              reply_markup=ReplyKeyboardMarkup(MENU_KEYBOARD, one_time_keyboard=True))
     return CHOOSING
 
 
