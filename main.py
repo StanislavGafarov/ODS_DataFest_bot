@@ -34,19 +34,20 @@ def check_email(bot, update):
                               reply_markup=ReplyKeyboardRemove())
     return CHECK_EMAIL
 
-def email_in_list(update):
-    email = update.message.text[-1]
-    logger.info('{}', email)
+
+def email_in_list(bot, update):
+    email = update.message.text
+    logger.info('{}'.format(email))
     if email in APPROVED_EMAIL_LIST:
         update.message.reply_text('Fuck yeah, you are in!')
     else:
         update.message.reply_text('Go away looser, you are not in the list')
-    return ConversationHandler.START
+    return CHOOSING
 
 
 def table_sheet(bot, update):
     update.message.reply_text('{}'.format('there will be spread sheet with timing'))
-    return ConversationHandler.START
+    return CHOOSING
 
 
 def can_spam(bot, update):
@@ -54,7 +55,7 @@ def can_spam(bot, update):
     chat_id = bot.get_updates()[-1].message.chat_id
     logger.info('User:{}, Chat_id:{} subscribed for notification'.format(user.first_name,chat_id))
     update.message.reply_text('Thank for sub, bro')
-    return ConversationHandler.START
+    return CHOOSING
 
 
 def skip_email(bot, update):
