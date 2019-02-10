@@ -23,16 +23,17 @@ def menu(bot, update):
         'Привет, че как? '
         'Че делать будем?',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    user = update.message.from_user
+    logger.info('User {} have chosen {} '.format(user.first_name, update.message.text))
     return CHOOSING
 
 
 def check_email(bot, update):
-    user = update.message.from_user
-    logger.info('User {} have chosen {} '.format(user.first_name, update.message.text))
-
     update.message.reply_text('Please type your email, or send /skip if you don\'t want to',
                               reply_markup=ReplyKeyboardRemove())
-    email = update.message.text
+
+    email = bot.get_updates().message.text[-1]
+    logger.info('{}', email)
     if email in APPROVED_EMAIL_LIST:
         update.message.reply_text('Fuck yeah, you are in!')
     else:
