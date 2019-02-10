@@ -12,7 +12,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 CHOOSING = 0
-CHECK_EMAIL, LOCATION, BIO = range(3)
+CHECK_EMAIL = 1
 
 
 def menu(bot, update):
@@ -29,7 +29,8 @@ def menu(bot, update):
 
 def check_email(bot, update):
     user = update.message.from_user
-    logger.info('User {} have chosen {} '.format(user.first_name, update.message.text))
+    text = update.message.text
+    logger.info('User {} have chosen {} '.format(user.first_name, text))
     update.message.reply_text('Please type your email, or send /skip if you don\'t want to',
                               reply_markup=ReplyKeyboardRemove())
     return CHECK_EMAIL
