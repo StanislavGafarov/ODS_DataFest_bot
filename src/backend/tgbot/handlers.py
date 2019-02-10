@@ -89,6 +89,7 @@ def table_sheet(api: TelegramBotApi, update):
 @with_user
 def can_spam(api: TelegramBotApi, user: TGUser, update):
     user.is_subscribed = True
+    user.save()
     logger.info('{} subscribed for notification'.format(user))
     update.message.reply_text(TEXT_AFTER_SUB,
                               reply_markup=ReplyKeyboardMarkup(MENU_KEYBOARD, one_time_keyboard=True))
