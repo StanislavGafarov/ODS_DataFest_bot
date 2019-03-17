@@ -15,7 +15,7 @@ CHECK_EMAIL = 1
 BROADCAST = 2
 SCHEDULE = 3
 
-schedule_table = Google_spread_sheet(client_secret_path='')
+schedule_table = Google_spread_sheet()
 
 
 NOT_REGISTERED_KEYBOARD = [[BUTTON_CHECK_EMAIL, BUTTON_SHEDULE, BUTTON_REGISTRATION]]
