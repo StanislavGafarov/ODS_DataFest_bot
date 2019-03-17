@@ -1,1 +1,7 @@
 config.py
+
+*.json
+
+*.ipynb
+
+venv/

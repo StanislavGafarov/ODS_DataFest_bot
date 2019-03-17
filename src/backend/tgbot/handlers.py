@@ -8,17 +8,24 @@ from backend.models import Message, Invite, TGUser, Event
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.utils import logger
+from backend.get_google_files import Google_spread_sheet
 
 CHOOSING = 0
 CHECK_EMAIL = 1
 BROADCAST = 2
+SCHEDULE = 3
 
-MENU_KEYBOARD = [[TEXT_CHECK_EMAIL, TEXT_VIEW_SCEDULE, TEXT_SUBSCRIBE]]
-ADMIN_KEYBOARD = [[TEXT_CHECK_EMAIL, TEXT_VIEW_SCEDULE, TEXT_SUBSCRIBE, TEXT_CREATE_BROADCAST]]
+schedule_table = Google_spread_sheet(client_secret_path='')
+
+
+NOT_REGISTERED_KEYBOARD = [[BUTTON_CHECK_EMAIL, BUTTON_SHEDULE, BUTTON_REGISTRATION]]
+SHEDULE_KEYBOARD = [[BUTTON_10_MAY_SHEDULE, BUTTON_11_MAY_SHEDULE]]
+REGISTRED_KEYBOARD = [[]]
+ADMIN_KEYBOARD = [[BUTTON_CHECK_EMAIL, BUTTON_SHEDULE, BUTTON_REGISTRATION, BUTTON_CREATE_BROADCAST]]
 
 
 def kb(user: TGUser):
-    return ReplyKeyboardMarkup(ADMIN_KEYBOARD if user.is_admin else MENU_KEYBOARD, one_time_keyboard=True)
+    return ReplyKeyboardMarkup(ADMIN_KEYBOARD if user.is_admin else NOT_REGISTERED_KEYBOARD, one_time_keyboard=True)
 
 
 def save_msg(f):
@@ -85,9 +92,19 @@ def email_in_list(api: TelegramBotApi, user: TGUser, update):
 @run_async
 @save_msg
 @with_user
-def table_sheet(api: TelegramBotApi, user: TGUser, update):
-    schedule = '\n'.join(str(e) for e in Event.objects.all())
-    update.message.reply_text('{}\n\n{}'.format(TEXT_SHOW_SCHEDULE, schedule)
+def show_schedule(api: TelegramBotApi, user: TGUser, update):
+    #schedule = '\n'.join(str(e) for e in Event.objects.all())
+    custom_keyboard = ReplyKeyboardMarkup(SHEDULE_KEYBOARD, one_time_keyboard=True)
+    update.message.reply_text(TEXT_SHOW_SCHEDULE
+                              , reply_markup=custom_keyboard)
+    return SCHEDULE
+
+@run_async
+@save_msg
+@with_user
+def schedule_day(api: TelegramBotApi, user: TGUser, update):
+    day_table = schedule_table.get_data()
+    update.message.reply_text('{}'.format(day_table.to_string(index=False))
                               , reply_markup=kb(user))
     return CHOOSING
 
@@ -157,10 +174,15 @@ handlers = [
 
         states={
             CHOOSING: [
-                rhandler(TEXT_CHECK_EMAIL, check_email),
-                rhandler(TEXT_VIEW_SCEDULE, table_sheet),
-                rhandler(TEXT_SUBSCRIBE, can_spam),
-                rhandler(TEXT_CREATE_BROADCAST, create_broadcast)
+                rhandler(BUTTON_CHECK_EMAIL, check_email),
+                rhandler(BUTTON_SHEDULE, show_schedule),
+                rhandler(BUTTON_REGISTRATION, can_spam),
+                rhandler(BUTTON_CREATE_BROADCAST, create_broadcast)
+            ],
+
+            SCHEDULE:[
+                rhandler(BUTTON_10_MAY_SHEDULE, schedule_day),
+                rhandler(BUTTON_11_MAY_SHEDULE, schedule_day)
             ],
 
             CHECK_EMAIL: [MessageHandler(Filters.text, email_in_list),
