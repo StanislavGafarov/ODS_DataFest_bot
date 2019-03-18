@@ -8,14 +8,14 @@ from backend.models import Message, Invite, TGUser, Event
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.utils import logger
-from backend.get_google_files import Google_spread_sheet
+# from backend.get_google_files import Google_spread_sheet
 
 CHOOSING = 0
 CHECK_EMAIL = 1
 BROADCAST = 2
-SCHEDULE = 3
+# SCHEDULE = 3
 
-schedule_table = Google_spread_sheet()
+# schedule_table = Google_spread_sheet()
 
 
 NOT_REGISTERED_KEYBOARD = [[BUTTON_CHECK_EMAIL, BUTTON_SHEDULE, BUTTON_REGISTRATION]]
@@ -93,20 +93,20 @@ def email_in_list(api: TelegramBotApi, user: TGUser, update):
 @save_msg
 @with_user
 def show_schedule(api: TelegramBotApi, user: TGUser, update):
-    #schedule = '\n'.join(str(e) for e in Event.objects.all())
-    custom_keyboard = ReplyKeyboardMarkup(SHEDULE_KEYBOARD, one_time_keyboard=True)
+    schedule = '\n'.join(str(e) for e in Event.objects.all())
+    # custom_keyboard = ReplyKeyboardMarkup(SHEDULE_KEYBOARD, one_time_keyboard=True)
     update.message.reply_text(TEXT_SHOW_SCHEDULE
-                              , reply_markup=custom_keyboard)
-    return SCHEDULE
-
-@run_async
-@save_msg
-@with_user
-def schedule_day(api: TelegramBotApi, user: TGUser, update):
-    day_table = schedule_table.get_data()
-    update.message.reply_text('{}'.format(day_table.to_string(index=False))
                               , reply_markup=kb(user))
     return CHOOSING
+
+# @run_async
+# @save_msg
+# @with_user
+# def schedule_day(api: TelegramBotApi, user: TGUser, update):
+#     day_table = schedule_table.get_data()
+#     update.message.reply_text('{}'.format(day_table.to_string(index=False))
+#                               , reply_markup=kb(user))
+#     return CHOOSING
 
 
 @run_async
@@ -180,10 +180,10 @@ handlers = [
                 rhandler(BUTTON_CREATE_BROADCAST, create_broadcast)
             ],
 
-            SCHEDULE:[
-                rhandler(BUTTON_10_MAY_SHEDULE, schedule_day),
-                rhandler(BUTTON_11_MAY_SHEDULE, schedule_day)
-            ],
+            # SCHEDULE:[
+            #     rhandler(BUTTON_10_MAY_SHEDULE, schedule_day),
+            #     rhandler(BUTTON_11_MAY_SHEDULE, schedule_day)
+            # ],
 
             CHECK_EMAIL: [MessageHandler(Filters.text, email_in_list),
                           CommandHandler('skip', skip_email)],
