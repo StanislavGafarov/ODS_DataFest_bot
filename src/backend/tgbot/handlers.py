@@ -90,7 +90,7 @@ def show_schedule( api: TelegramBotApi, user: TGUser, update):
     custom_keyboard = ReplyKeyboardMarkup(SHEDULE_KEYBOARD, one_time_keyboard=True)
     update.message.reply_text(TEXT_SHOW_SCHEDULE
                               , reply_markup=custom_keyboard)
-    return CHOOSING
+    return SCHEDULE
 
 @run_async
 @save_msg
