@@ -1,43 +1,31 @@
 import time
-from functools import wraps
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
-from telegram.ext import MessageHandler, Filters, run_async, ConversationHandler, CommandHandler, RegexHandler
+from telegram.ext import MessageHandler, Filters, run_async, ConversationHandler, CommandHandler
 
-from backend.models import Message, Invite, TGUser, Event
+from backend.models import Invite, TGUser
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
-from backend.tgbot.utils import logger
-from backend.get_google_files import GoogleSpreadsheet
+from backend.tgbot.utils import logger, save_msg, with_user, rhandler
+from backend.google_spreadsheet_client import GoogleSpreadsheet
+from backend.tgbot.states.main_menu import make_keyboard
+from backend.tgbot.states.main_menu import MAIN_MENU, check_registration_status, authorization
 
 
-def save_msg( f):
-    @wraps(f)
-    def save(api: TelegramBotApi, update):
-        Message.from_update(api, update)
-        return f(api, update)
+GSS_CLIENT = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
 
-    return save
-
-def with_user( f):
-    @wraps(f)
-    def get_user(api: TelegramBotApi, update):
-        user = api.get_user(update.message.chat_id)
-        return f(api, user, update)
-
-    return get_user
+# MAIN_MENU = 1
+# CHECK_REGISTRATION_STATUS = 2
+# AUTHORIZATION = 3
+BROADCAST = 4
+SCHEDULE = 5
+CHECK_EMAIL = 6
 
 
-gss_client = GoogleSpreadsheet(client_secret_path='')
-CHOOSING = 0
-CHECK_EMAIL = 1
-BROADCAST = 2
-SCHEDULE = 3
+NOT_REGISTERED_KEYBOARD = [[BUTTON_CHECK_EMAIL, BUTTON_SCHEDULE, BUTTON_REGISTRATION]]
+SHEDULE_KEYBOARD = [[BUTTON_10_MAY_SCHEDULE, BUTTON_11_MAY_SCHEDULE]]
 
-NOT_REGISTERED_KEYBOARD = [[BUTTON_CHECK_EMAIL, BUTTON_SHEDULE, BUTTON_REGISTRATION]]
-SHEDULE_KEYBOARD = [[BUTTON_10_MAY_SHEDULE, BUTTON_11_MAY_SHEDULE]]
-
-ADMIN_KEYBOARD = [[BUTTON_CHECK_EMAIL, BUTTON_SHEDULE, BUTTON_REGISTRATION, BUTTON_CREATE_BROADCAST]]
+ADMIN_KEYBOARD = [[BUTTON_CHECK_EMAIL, BUTTON_SCHEDULE, BUTTON_REGISTRATION, BUTTON_POST_NEWS]]
 
 
 def kb(user: TGUser):
@@ -47,28 +35,20 @@ def kb(user: TGUser):
 @run_async
 @save_msg
 @with_user
-def menu(api: TelegramBotApi, user: TGUser, update):
+def start(api: TelegramBotApi, user: TGUser, update):
     logger.info('User {} have started conversation.'.format(user))
     update.message.reply_text(
         TEXT_HELLO,
         reply_markup=kb(user))
 
-    return CHOOSING
+    return MAIN_MENU
+
+
 
 @run_async
 @save_msg
 @with_user
 def check_email(api: TelegramBotApi, user: TGUser, update):
-    text = update.message.text
-    logger.info('User {} have chosen {} '.format(user, text))
-    update.message.reply_text(TEXT_ENTER_EMAIL,
-                              reply_markup=ReplyKeyboardRemove())
-    return CHECK_EMAIL
-
-@run_async
-@save_msg
-@with_user
-def email_in_list(api: TelegramBotApi, user: TGUser, update):
     email = update.message.text
     logger.info('{}'.format(email))
     if Invite.objects.filter(email=email).first() is not None:
@@ -82,7 +62,15 @@ def email_in_list(api: TelegramBotApi, user: TGUser, update):
         user.is_notified = False  # todo ????
         user.last_checked_email = email
         user.save()
-    return CHOOSING
+    return MAIN_MENU
+
+@run_async
+@save_msg
+@with_user
+def skip_email(api: TelegramBotApi, user: TGUser, update):
+    logger.info("User %s did not send an email.", user)
+    update.message.reply_text(TEXT_SKIP_EMAIL, reply_markup=make_keyboard(user))
+    return MAIN_MENU
 
 @run_async
 @save_msg
@@ -98,10 +86,10 @@ def show_schedule(api: TelegramBotApi, user: TGUser, update):
 @save_msg
 @with_user
 def schedule_day(api: TelegramBotApi, user: TGUser, update):
-    day_table = gss_client.get_data('SCHEDULE_TEST')
+    day_table = GSS_CLIENT.get_data('SCHEDULE_TEST')
     update.message.reply_text('{}'.format(day_table.to_string(index=False))
                               , reply_markup=kb(user))
-    return CHOOSING
+    return MAIN_MENU
 
 @run_async
 @save_msg
@@ -112,15 +100,9 @@ def can_spam(api: TelegramBotApi, user: TGUser, update):
     logger.info('{} subscribed for notification'.format(user))
     update.message.reply_text(TEXT_AFTER_SUB,
                               reply_markup=kb(user))
-    return CHOOSING
+    return MAIN_MENU
 
-@run_async
-@save_msg
-@with_user
-def skip_email(api: TelegramBotApi, user: TGUser, update):
-    logger.info("User %s did not send an email.", user)
-    update.message.reply_text(TEXT_SKIP_EMAIL, reply_markup=kb(user))
-    return CHOOSING
+
 
 @run_async
 @save_msg
@@ -153,27 +135,25 @@ def cancel(api: TelegramBotApi, user: TGUser, update):
     update.message.reply_text(TEXT_BYE,
                               reply_markup=ReplyKeyboardRemove())
 
-def rhandler(text, callback):
-    return RegexHandler('^({})$'.format(text), callback)
 
 handlers = [
     ConversationHandler(
-        entry_points=[CommandHandler('start', menu)],
+        entry_points=[CommandHandler('start', start)],
 
         states={
-            CHOOSING: [
-                rhandler(BUTTON_CHECK_EMAIL, check_email),
-                rhandler(BUTTON_SHEDULE, show_schedule),
-                rhandler(BUTTON_REGISTRATION, can_spam),
-                rhandler(BUTTON_CREATE_BROADCAST, create_broadcast)
+            MAIN_MENU: [
+                rhandler(BUTTON_CHECK_REGISTRATION, check_registration_status),
+                rhandler(BUTTON_AUTHORISATION, authorization),
+                # rhandler(BUTTON_REGISTRATION, can_spam),
+                # rhandler(BUTTON_POST_NEWS, create_broadcast)
             ],
 
             SCHEDULE:[
-                rhandler(BUTTON_10_MAY_SHEDULE, schedule_day),
-                rhandler(BUTTON_11_MAY_SHEDULE, schedule_day)
+                rhandler(BUTTON_10_MAY_SCHEDULE, schedule_day),
+                rhandler(BUTTON_11_MAY_SCHEDULE, schedule_day)
             ],
 
-            CHECK_EMAIL: [MessageHandler(Filters.text, email_in_list),
+            CHECK_EMAIL: [MessageHandler(Filters.text, check_email),
                           CommandHandler('skip', skip_email)],
 
             BROADCAST: [MessageHandler(Filters.text, send_broadcast),

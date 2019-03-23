@@ -1,7 +1,12 @@
 import logging
 import os
+from functools import wraps
 
 import requests
+from telegram.ext import RegexHandler
+
+from backend.models import Message
+from backend.tgbot.base import TelegramBotApi
 
 from bot import settings
 
@@ -31,3 +36,25 @@ def check_certs():
 
 
 logger = logging.getLogger('bot')
+
+
+def save_msg( f):
+    @wraps(f)
+    def save(api: TelegramBotApi, update):
+        Message.from_update(api, update)
+        return f(api, update)
+
+    return save
+
+
+def with_user( f):
+    @wraps(f)
+    def get_user(api: TelegramBotApi, update):
+        user = api.get_user(update.message.chat_id)
+        return f(api, user, update)
+
+    return get_user
+
+
+def rhandler(text, callback):
+    return RegexHandler('^({})$'.format(text), callback)

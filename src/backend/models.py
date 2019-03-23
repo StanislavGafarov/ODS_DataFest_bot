@@ -25,7 +25,7 @@ class TGUser(models.Model):
     username = models.TextField(blank=True)
 
     is_admin = models.BooleanField(default=False)
-    is_subscribed = models.BooleanField(default=False)
+    is_authorized = models.BooleanField(default=False)
     is_notified = models.BooleanField(default=False)
     last_checked_email = models.TextField(null=True, default=None)
 
@@ -52,6 +52,7 @@ class Message(models.Model):
 @make_str('email')
 class Invite(models.Model):
     email = models.TextField(unique=True)
+    code = models.IntegerField()
 
 
 EVENT_TYPES = {
