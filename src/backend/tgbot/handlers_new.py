@@ -28,13 +28,13 @@ class Decorators(object):
 
         return get_user
 
-    @classmethod
-    def main_decorator(cls, f):
-        @Decorators.save_msg
-        @Decorators.with_user
-        def fun(cls, api, user, update):
-            return f(cls, api, user, update)
-        return fun
+    def composed(*decs):
+        def deco(f):
+            for dec in reversed(decs):
+                f = dec(f)
+            return f
+
+        return deco
 
 
 class TGHandlers():
@@ -62,8 +62,9 @@ class TGHandlers():
     def rhandler(self, text, callback):
         return RegexHandler('^({})$'.format(text), callback)
 
-    @run_async
-    @Decorators.main_decorator
+    @Decorators.composed(run_async, Decorators.with_user, Decorators.save_msg)
+    # @run_async
+    # @Decorators.main_decorator
     def menu(self, api: TelegramBotApi, user: TGUser, update):
         logger.info('User {} have started conversation.'.format(user))
         update.message.reply_text(
@@ -71,75 +72,84 @@ class TGHandlers():
             reply_markup=self.kb(user))
         return self.CHOOSING
 
-    @run_async
-    @Decorators.main_decorator
+    @Decorators.composed(run_async, Decorators.with_user, Decorators.save_msg)
+    # @run_async
+    # @Decorators.main_decorator
     def check_email(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
         update.message.reply_text(TEXT_ENTER_EMAIL,
                                   reply_markup=ReplyKeyboardRemove())
         return self.CHECK_EMAIL
-    @run_async
-    @Decorators.main_decorator
+
+    @Decorators.composed(run_async, Decorators.with_user, Decorators.save_msg)
+    # @run_async
+    # @Decorators.main_decorator
     def email_in_list(self, api: TelegramBotApi, user: TGUser, update):
         email = update.message.text
         logger.info('{}'.format(email))
         if Invite.objects.filter(email=email).first() is not None:
             update.message.reply_text(TEXT_EMAIL_OK,
-                                      reply_markup=self.kb(user))
+                                      reply_markup=self.define_keyboard(user))
         else:
             update.message.reply_text(TEXT_EMAIL_NOT_OK,
-                                      reply_markup=self.kb(user))
+                                      reply_markup=self.define_keyboard(user))
         if user.last_checked_email != email:
             user.is_notified = False  # todo ????
             user.last_checked_email = email
             user.save()
         return self.CHOOSING
 
-    @run_async
-    @Decorators.main_decorator
+    @Decorators.composed(run_async, Decorators.with_user, Decorators.save_msg)
+    # @run_async
+    # @Decorators.main_decorator
     def show_schedule(self, api: TelegramBotApi, user: TGUser, update):
         custom_keyboard = ReplyKeyboardMarkup(self.SHEDULE_KEYBOARD, one_time_keyboard=True)
         update.message.reply_text(TEXT_SHOW_SCHEDULE
                                   , reply_markup=custom_keyboard)
         return self.SCHEDULE
 
-    @run_async
-    @Decorators.main_decorator
+    @Decorators.composed(run_async, Decorators.with_user, Decorators.save_msg)
+    # @run_async
+    # @Decorators.main_decorator
     def schedule_day(self, api: TelegramBotApi, user: TGUser, update):
         day_table = self.gss_client.get_data('SCHEDULE_TEST')
         update.message.reply_text('{}'.format(day_table.to_string(index=False))
-                                  , reply_markup=self.kb(user))
+                                  , reply_markup=self.define_keyboard(user))
         return self.CHOOSING
 
-    @run_async
-    @Decorators.main_decorator
+    @Decorators.composed(run_async, Decorators.with_user, Decorators.save_msg)
+    # @run_async
+    # @Decorators.main_decorator
     def can_spam(self, api: TelegramBotApi, user: TGUser, update):
         user.is_subscribed = True
         user.save()
         logger.info('{} subscribed for notification'.format(user))
         update.message.reply_text(TEXT_AFTER_SUB,
-                                  reply_markup=self.kb(user))
+                                  reply_markup=self.define_keyboard(user))
         return self.CHOOSING
 
-    @run_async
-    @Decorators.main_decorator
+    @Decorators.composed(run_async, Decorators.with_user, Decorators.save_msg)
+    # @run_async
+    # @Decorators.main_decorator
     def skip_email(self, api: TelegramBotApi, user: TGUser, update):
         logger.info("User %s did not send an email.", user)
-        update.message.reply_text(TEXT_SKIP_EMAIL, reply_markup=self.kb(user))
+        update.message.reply_text(TEXT_SKIP_EMAIL, reply_markup=self.define_keyboard(user))
         return self.CHOOSING
 
-    @run_async
-    @Decorators.main_decorator
+    @Decorators.composed(run_async, Decorators.with_user, Decorators.save_msg)
+    # @run_async
+    # @Decorators.main_decorator
     def create_broadcast(self, api: TelegramBotApi, user: TGUser, update):
         logger.info("User %s initiated broadcast.", user)
         if not user.is_admin:
-            update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.kb(user))
+            update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
         update.message.reply_text(TEXT_ENTER_BROADCAST)
         return self.BROADCAST
 
-    @run_async
-    @Decorators.main_decorator
+    @Decorators.composed(run_async, Decorators.with_user, Decorators.save_msg)
+    # @run_async
+    # @Decorators.main_decorator
     def send_broadcast(self, api: TelegramBotApi, user: TGUser, update):
         broadcast_text = update.message.text
         for u in TGUser.objects.all():
@@ -148,10 +158,11 @@ class TGHandlers():
                 time.sleep(.1)
             except:
                 logger.exception('Error sending broadcast to user {}'.format(u))
-        update.message.reply_text(TEXT_BROADCAST_DONE, reply_markup=self.kb(user))
+        update.message.reply_text(TEXT_BROADCAST_DONE, reply_markup=self.define_keyboard(user))
 
-    @run_async
-    @Decorators.main_decorator
+    @Decorators.composed(run_async, Decorators.with_user, Decorators.save_msg)
+    # @run_async
+    # @Decorators.main_decorator
     def cancel(self, api: TelegramBotApi, user: TGUser, update):
         logger.info("User %s canceled the conversation.", user)
         update.message.reply_text(TEXT_BYE,
