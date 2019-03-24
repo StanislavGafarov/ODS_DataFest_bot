@@ -38,23 +38,29 @@ def check_certs():
 logger = logging.getLogger('bot')
 
 
-def save_msg( f):
-    @wraps(f)
-    def save(api: TelegramBotApi, update):
-        Message.from_update(api, update)
-        return f(api, update)
 
-    return save
+class Decorators(object):
+    @classmethod
+    def save_msg(cls, f):
+        @wraps(f)
+        def save(cls, api: TelegramBotApi, update):
+            Message.from_update(api, update)
+            return f(cls, api, update)
 
+        return save
 
-def with_user( f):
-    @wraps(f)
-    def get_user(api: TelegramBotApi, update):
-        user = api.get_user(update.message.chat_id)
-        return f(api, user, update)
+    @classmethod
+    def with_user(cls, f):
+        @wraps(f)
+        def get_user(cls, api: TelegramBotApi, update):
+            user = api.get_user(update.message.chat_id)
+            return f(cls, api, user, update)
 
-    return get_user
+        return get_user
 
-
-def rhandler(text, callback):
-    return RegexHandler('^({})$'.format(text), callback)
+def composed(*decs):
+    def deco(f):
+        for dec in reversed(decs):
+            f = dec(f)
+        return f
+    return deco
