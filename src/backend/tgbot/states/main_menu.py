@@ -5,11 +5,11 @@ from backend.tgbot.utils import logger, save_msg, with_user, rhandler
 from backend.models import Invite, TGUser
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
-# from backend.tgbot.handlers import CHECK_REGISTRATION_STATUS, AUTHORIZATION
+from backend.tgbot.handlers import CHECK_REGISTRATION_STATUS, AUTHORIZATION
 
 MAIN_MENU = 1
-CHECK_REGISTRATION_STATUS = 2
-AUTHORIZATION = 3
+# CHECK_REGISTRATION_STATUS = 2
+# AUTHORIZATION = 3
 
 #Keyboards
 ADMIN_KEYBOARD = [BUTTON_REFRESH_SCHEDULE, BUTTON_SEND_INVITES, BUTTON_START_RANDOM_PRIZE, BUTTON_POST_NEWS]
@@ -21,7 +21,7 @@ UNAUTHORIZED_USER_KEYBOARD = [BUTTON_CHECK_REGISTRATION, BUTTON_AUTHORISATION, B
 def make_keyboard(user: TGUser):
     if user.is_admin:
         keyboard = ADMIN_KEYBOARD
-    elif user.authorized:
+    elif user.is_authorized:
         keyboard = AUTHORIZED_USER_KEYBOARD
     else:
         keyboard = UNAUTHORIZED_USER_KEYBOARD

@@ -15,8 +15,8 @@ from backend.tgbot.states.main_menu import MAIN_MENU, check_registration_status,
 GSS_CLIENT = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
 
 # MAIN_MENU = 1
-# CHECK_REGISTRATION_STATUS = 2
-# AUTHORIZATION = 3
+CHECK_REGISTRATION_STATUS = 2
+AUTHORIZATION = 3
 BROADCAST = 4
 SCHEDULE = 5
 CHECK_EMAIL = 6

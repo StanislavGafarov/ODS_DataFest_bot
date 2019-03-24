@@ -52,7 +52,7 @@ class Message(models.Model):
 @make_str('email')
 class Invite(models.Model):
     email = models.TextField(unique=True)
-    code = models.IntegerField()
+    code = models.IntegerField(unique=True, default=False)
 
 
 EVENT_TYPES = {
