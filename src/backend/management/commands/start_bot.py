@@ -4,6 +4,7 @@ import sys
 from django.core.management.base import BaseCommand
 
 from backend.tgbot.handlers import handlers
+from backend.tgbot.handlers_new import TGHandlers
 from backend.tgbot.sync_api import SyncBotApi
 from backend.tgbot.utils import logger
 from bot import settings
@@ -26,5 +27,6 @@ class Command(BaseCommand):
         else:
             token = options['token']
         logger.info('Using token {}'.format(token))
-        #telegram_handlers = TGHandlers()
+        telegram_handlers = TGHandlers()
         SyncBotApi(token).start_bot(handlers)
+        SyncBotApi(token).start_bot(telegram_handlers.get_handlers())

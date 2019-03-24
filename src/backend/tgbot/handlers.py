@@ -32,6 +32,7 @@ def kb(user: TGUser):
     return ReplyKeyboardMarkup(ADMIN_KEYBOARD if user.is_admin else NOT_REGISTERED_KEYBOARD
                                , one_time_keyboard=True)
 
+
 @run_async
 @save_msg
 @with_user
@@ -42,7 +43,6 @@ def start(api: TelegramBotApi, user: TGUser, update):
         reply_markup=kb(user))
 
     return MAIN_MENU
-
 
 
 @run_async
@@ -64,6 +64,7 @@ def check_email(api: TelegramBotApi, user: TGUser, update):
         user.save()
     return MAIN_MENU
 
+
 @run_async
 @save_msg
 @with_user
@@ -71,6 +72,7 @@ def skip_email(api: TelegramBotApi, user: TGUser, update):
     logger.info("User %s did not send an email.", user)
     update.message.reply_text(TEXT_SKIP_EMAIL, reply_markup=make_keyboard(user))
     return MAIN_MENU
+
 
 @run_async
 @save_msg
@@ -82,6 +84,7 @@ def show_schedule(api: TelegramBotApi, user: TGUser, update):
                               , reply_markup=custom_keyboard)
     return SCHEDULE
 
+
 @run_async
 @save_msg
 @with_user
@@ -90,6 +93,7 @@ def schedule_day(api: TelegramBotApi, user: TGUser, update):
     update.message.reply_text('{}'.format(day_table.to_string(index=False))
                               , reply_markup=kb(user))
     return MAIN_MENU
+
 
 @run_async
 @save_msg
@@ -103,7 +107,6 @@ def can_spam(api: TelegramBotApi, user: TGUser, update):
     return MAIN_MENU
 
 
-
 @run_async
 @save_msg
 @with_user
@@ -113,6 +116,7 @@ def create_broadcast( api: TelegramBotApi, user: TGUser, update):
         update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=kb(user))
     update.message.reply_text(TEXT_ENTER_BROADCAST)
     return BROADCAST
+
 
 @run_async
 @save_msg
@@ -126,6 +130,7 @@ def send_broadcast(api: TelegramBotApi, user: TGUser, update):
         except:
             logger.exception('Error sending broadcast to user {}'.format(u))
     update.message.reply_text(TEXT_BROADCAST_DONE, reply_markup=kb(user))
+
 
 @run_async
 @save_msg
