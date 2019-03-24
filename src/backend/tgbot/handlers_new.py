@@ -1,5 +1,4 @@
 import time
-from functools import wraps
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import MessageHandler, Filters, run_async, ConversationHandler, CommandHandler, RegexHandler
 from backend.models import Message, Invite, TGUser, Event
@@ -34,7 +33,7 @@ class TGHandlers():
     def rhandler(self, text, callback):
         return RegexHandler('^({})$'.format(text), callback)
 
-    @composed(run_async, Decorators.with_user,Decorators.save_msg)
+    @composed(run_async, Decorators.save_msg, Decorators.with_user)
     # @run_async
     # @Decorators.with_user
     # @Decorators.save_msg
@@ -45,7 +44,7 @@ class TGHandlers():
             reply_markup=self.kb(user))
         return self.CHOOSING
 
-    @composed(run_async, Decorators.with_user, Decorators.save_msg)
+    @composed(run_async, Decorators.save_msg, Decorators.with_user)
     # @run_async
     # @Decorators.with_user
     # @Decorators.save_msg
@@ -56,7 +55,7 @@ class TGHandlers():
                                   reply_markup=ReplyKeyboardRemove())
         return self.CHECK_EMAIL
 
-    @composed(run_async, Decorators.with_user, Decorators.save_msg)
+    @composed(run_async,Decorators.save_msg, Decorators.with_user)
     # @run_async
     # @Decorators.with_user
     # @Decorators.save_msg
@@ -75,7 +74,7 @@ class TGHandlers():
             user.save()
         return self.CHOOSING
 
-    @composed(run_async, Decorators.with_user, Decorators.save_msg)
+    @composed(run_async, Decorators.save_msg, Decorators.with_user)
     # @run_async
     # @Decorators.with_user
     # @Decorators.save_msg
@@ -85,7 +84,7 @@ class TGHandlers():
                                   , reply_markup=custom_keyboard)
         return self.SCHEDULE
 
-    @composed(run_async, Decorators.with_user, Decorators.save_msg)
+    @composed(run_async, Decorators.save_msg, Decorators.with_user)
     # @run_async
     # @Decorators.with_user
     # @Decorators.save_msg
@@ -95,7 +94,7 @@ class TGHandlers():
                                   , reply_markup=self.define_keyboard(user))
         return self.CHOOSING
 
-    @composed(run_async, Decorators.with_user, Decorators.save_msg)
+    @composed(run_async, Decorators.save_msg, Decorators.with_user)
     # @run_async
     # @Decorators.with_user
     # @Decorators.save_msg
@@ -107,7 +106,7 @@ class TGHandlers():
                                   reply_markup=self.define_keyboard(user))
         return self.CHOOSING
 
-    @composed(run_async, Decorators.with_user, Decorators.save_msg)
+    @composed(run_async, Decorators.save_msg, Decorators.with_user)
     # @run_async
     # @Decorators.with_user
     # @Decorators.save_msg
@@ -116,7 +115,7 @@ class TGHandlers():
         update.message.reply_text(TEXT_SKIP_EMAIL, reply_markup=self.define_keyboard(user))
         return self.CHOOSING
 
-    @composed(run_async, Decorators.with_user, Decorators.save_msg)
+    @composed(run_async, Decorators.save_msg, Decorators.with_user)
     # @run_async
     # @Decorators.with_user
     # @Decorators.save_msg
@@ -127,7 +126,7 @@ class TGHandlers():
         update.message.reply_text(TEXT_ENTER_BROADCAST)
         return self.BROADCAST
 
-    @composed(run_async, Decorators.with_user, Decorators.save_msg)
+    @composed(run_async, Decorators.save_msg, Decorators.with_user)
     # @run_async
     # @Decorators.with_user
     # @Decorators.save_msg
@@ -141,7 +140,7 @@ class TGHandlers():
                 logger.exception('Error sending broadcast to user {}'.format(u))
         update.message.reply_text(TEXT_BROADCAST_DONE, reply_markup=self.define_keyboard(user))
 
-    @composed(run_async, Decorators.with_user, Decorators.save_msg)
+    @composed(run_async, Decorators.save_msg, Decorators.with_user)
     # @run_async
     # @Decorators.with_user
     # @Decorators.save_msg
