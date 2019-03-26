@@ -258,8 +258,8 @@ class TGHandlers(object):
                         CommandHandler('skip', self.skip_email)
                     ],
 
-                    self.AUTHORIZATION: MessageHandler(Filters.text, self.auth_check_email),
-                    self.CHECK_CODE: MessageHandler(Filters.text, self.auth_check_code),
+                    self.AUTHORIZATION: [MessageHandler(Filters.text, self.auth_check_email)],
+                    self.CHECK_CODE: [MessageHandler(Filters.text, self.auth_check_code)],
 
                     self.GET_NEWS: [
                         self.rhandler(BUTTON_NEWS_UNSUBSCRIPTION, self.unsubscribe_for_news),
@@ -269,7 +269,7 @@ class TGHandlers(object):
 
                     self.CHECK_EMAIL: [MessageHandler(Filters.text, self.email_in_list),
                                        CommandHandler('skip', self.skip_email)],
-                    self.BROADCAST: MessageHandler(Filters.text, self.send_broadcast)  # fixme
+                    self.BROADCAST: [MessageHandler(Filters.text, self.send_broadcast)]  # fixme
                 },
                 fallbacks=[CommandHandler('cancel', self.cancel)]
             )
