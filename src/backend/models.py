@@ -53,6 +53,12 @@ class Message(models.Model):
 class Invite(models.Model):
     email = models.TextField(unique=True)
     code = models.IntegerField(unique=True, default=False)
+    name = models.TextField(default=False)
+    surname = models.TextField(default=False)
+
+@make_str('news')
+class News(models.Model):
+    news = models.TextField(default=False)
 
 
 EVENT_TYPES = {

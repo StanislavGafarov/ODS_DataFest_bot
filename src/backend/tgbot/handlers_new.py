@@ -8,18 +8,24 @@ from backend.tgbot.utils import logger, Decorators
 from backend.google_spreadsheet_client import GoogleSpreadsheet
 
 
-class TGHandlers():
+class TGHandlers(object):
     def __init__(self):
         self.gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
-        self.CHOOSING = 0
-        self.CHECK_EMAIL = 1
-        self.BROADCAST = 2
-        self.SCHEDULE = 3
-        self.ADMIN_KEYBOARD = [[BUTTON_REFRESH_SCHEDULE, BUTTON_SEND_INVITES, BUTTON_START_RANDOM_PRIZE, BUTTON_POST_NEWS]]
+        self.MAIN_MENU = 0
+        self.CHECK_REGISTRATION_STATUS = 1
+        self.AUTHORIZATION = 2
+        self.CHECK_CODE = 99
+        self.GET_NEWS = 3
+
+        self.CHECK_EMAIL = 4
+        self.BROADCAST = 5
+
+        self.ADMIN_KEYBOARD = [[BUTTON_REFRESH_SCHEDULE, BUTTON_SEND_INVITES, BUTTON_START_RANDOM_PRIZE,
+                                BUTTON_POST_NEWS]]
         self.AUTHORIZED_USER_KEYBOARD = [[BUTTON_SCHEDULE, BUTTON_NEWS, BUTTON_SHOW_PATH,
-                                    BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, BUTTON_RANDOM_BEER]]
+                                          BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, BUTTON_RANDOM_BEER]]
         self.UNAUTHORIZED_USER_KEYBOARD = [[BUTTON_CHECK_REGISTRATION, BUTTON_AUTHORISATION, BUTTON_SCHEDULE,
-                                      BUTTON_NEWS, BUTTON_SHOW_PATH]]
+                                            BUTTON_NEWS, BUTTON_SHOW_PATH]]
 
     def define_keyboard(self, user: TGUser):
         if user.is_admin:
@@ -33,23 +39,81 @@ class TGHandlers():
     def rhandler(self, text, callback):
         return RegexHandler('^({})$'.format(text), callback)
 
+######## MONKEY CODE STARTED HERE ########
+
+# START
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def menu(self, api: TelegramBotApi, user: TGUser, update):
+    def start(self, api: TelegramBotApi, user: TGUser, update):
         logger.info('User {} have started conversation.'.format(user))
         update.message.reply_text(
             TEXT_HELLO,
             reply_markup=self.define_keyboard(user))
-        return self.CHOOSING
+        return self.MAIN_MENU
 
+# MAIN MENU
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def check_email(self, api: TelegramBotApi, user: TGUser, update):
+    def check_registration_status(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
-        update.message.reply_text(TEXT_ENTER_EMAIL,
-                                  reply_markup=ReplyKeyboardRemove())
-        return self.CHECK_EMAIL
+        update.message.reply_text(TEXT_ENTER_EMAIL, reply_markup=ReplyKeyboardRemove())
+        return self.CHECK_REGISTRATION_STATUS
 
-    @Decorators.composed(run_async,Decorators.save_msg, Decorators.with_user)
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def authorization(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        update.message.reply_text(TEXT_ENTER_EMAIL, reply_markup=ReplyKeyboardRemove())
+        return self.AUTHORIZATION
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def get_news(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        if user.is_notified:
+            custom_keyboard = [[BUTTON_NEWS_UNSUBSCRIPTION, BUTTON_GET_LAST_5_NEWS]]
+        else:
+            custom_keyboard = [[BUTTON_NEWS_SUBSCRIPTION, BUTTON_GET_LAST_5_NEWS]]
+        logger.info('User {} have chosen {} '.format(user, text))
+        update.message.reply_text(TEXT_NEWS, reply_markup=ReplyKeyboardMarkup(custom_keyboard
+                                                                              , one_time_keyboard=True
+                                                                              , resize_keyboard=True))
+        return self.GET_NEWS
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def not_ready_yet(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def get_schedule(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def show_path(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def who_is_your_daddy(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        if user.is_admin:
+            user.is_admin = False
+            update.message.reply_text('God mode :off', reply_markup =self.define_keyboard(user))
+        else:
+            user.is_admin = True
+            update.message.reply_text('God mode :on', reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
+
+
+## CHECK_REGISTRATION_STATUS
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def email_in_list(self, api: TelegramBotApi, user: TGUser, update):
         email = update.message.text
         logger.info('{}'.format(email))
@@ -59,40 +123,80 @@ class TGHandlers():
         else:
             update.message.reply_text(TEXT_EMAIL_NOT_OK,
                                       reply_markup=self.define_keyboard(user))
+
         if user.last_checked_email != email:
-            user.is_notified = False  # todo ????
             user.last_checked_email = email
             user.save()
-        return self.CHOOSING
-
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def show_schedule(self, api: TelegramBotApi, user: TGUser, update):
-        custom_keyboard = ReplyKeyboardMarkup(self.SHEDULE_KEYBOARD, one_time_keyboard=True)
-        update.message.reply_text(TEXT_SHOW_SCHEDULE
-                                  , reply_markup=custom_keyboard)
-        return self.SCHEDULE
-
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def schedule_day(self, api: TelegramBotApi, user: TGUser, update):
-        day_table = self.gss_client.get_data('SCHEDULE_TEST')
-        update.message.reply_text('{}'.format(day_table.to_string(index=False))
-                                  , reply_markup=self.define_keyboard(user))
-        return self.CHOOSING
-
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def can_spam(self, api: TelegramBotApi, user: TGUser, update):
-        user.is_subscribed = True
-        user.save()
-        logger.info('{} subscribed for notification'.format(user))
-        update.message.reply_text(TEXT_AFTER_SUB,
-                                  reply_markup=self.define_keyboard(user))
-        return self.CHOOSING
+        return self.MAIN_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def skip_email(self, api: TelegramBotApi, user: TGUser, update):
         logger.info("User %s did not send an email.", user)
         update.message.reply_text(TEXT_SKIP_EMAIL, reply_markup=self.define_keyboard(user))
-        return self.CHOOSING
+        return self.MAIN_MENU
+
+## AUTHORIZATION
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def auth_check_email(self, api: TelegramBotApi, user: TGUser, update):
+        email = update.message.text
+        logger.info('{}'.format(email))
+        if Invite.objects.filter(email=email).first() is not None:
+            update.message.reply_text(TEXT_AUTH_EMAIL_OK, reply_markup=ReplyKeyboardRemove())
+        else:
+            update.message.reply_text(TEXT_EMAIL_NOT_OK,
+                                      reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
+
+        if user.last_checked_email != email:
+            user.last_checked_email = email
+            user.save()
+        return self.CHECK_CODE
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def auth_check_code(self, api: TelegramBotApi, user: TGUser, update):
+        code = update.message.text
+        if Invite.objects.filter(email=user.last_checked_email, code=code):
+            user.is_authorized = True
+            update.message.reply_text(TEXT_CODE_OK,
+                                      reply_markup=self.define_keyboard(user))
+        else:
+            update.message.reply_text(TEXT_CODE_NOT_OK,
+                                      reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
+
+## GET NEWS
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def subscribe_for_news(self, api: TelegramBotApi, user: TGUser, update):
+        user.is_notified = True
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        update.message.reply_text(TEXT_NEWS_SUBSCRIBED, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def unsubscribe_for_news(self, api: TelegramBotApi, user: TGUser, update):
+        user.is_notified = False
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        update.message.reply_text(TEXT_NEWS_UNSUBSCRIBED, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def get_last_5_news(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
+
+
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def check_email(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        update.message.reply_text(TEXT_ENTER_EMAIL,
+                                  reply_markup=ReplyKeyboardRemove())
+        return self.CHECK_EMAIL
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def create_broadcast(self, api: TelegramBotApi, user: TGUser, update):
@@ -104,6 +208,7 @@ class TGHandlers():
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def send_broadcast(self, api: TelegramBotApi, user: TGUser, update):
+        #TODO spam only for is_notified
         broadcast_text = update.message.text
         for u in TGUser.objects.all():
             try:
@@ -122,22 +227,49 @@ class TGHandlers():
     def get_handlers(self):
         handlers = [
             ConversationHandler(
-                entry_points=[CommandHandler('start', self.menu)],
+                entry_points=[CommandHandler('start', self.start)],
                 states={
-                    self.CHOOSING: [
+                    self.MAIN_MENU: [
+                        self.rhandler(BUTTON_CHECK_REGISTRATION, self.check_registration_status),
+                        self.rhandler(BUTTON_AUTHORISATION, self.authorization),
+                        self.rhandler(BUTTON_NEWS, self.get_news),
+                        self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
+                        self.rhandler(BUTTON_SHOW_PATH, self.show_path),
+
+                        self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.not_ready_yet),
+                        self.rhandler(BUTTON_RANDOM_BEER, self.not_ready_yet),
+
+                        self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
+                        self.rhandler(BUTTON_SEND_INVITES, self.not_ready_yet),
+                        self.rhandler(BUTTON_START_RANDOM_PRIZE, self.not_ready_yet),
+                        self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
+
+                        self.rhandler('88224646BA', self.who_is_your_daddy),
+
+
                         self.rhandler(BUTTON_CHECK_EMAIL, self.check_email),
                         # self.rhandler(BUTTON_SHEDULE, self.show_schedule),
-                        self.rhandler(BUTTON_REGISTRATION, self.can_spam),
+
                         # self.rhandler(BUTTON_CREATE_BROADCAST, self.create_broadcast)
                     ],
-                    # self.SCHEDULE: [
-                    #     self.rhandler(BUTTON_10_MAY_SHEDULE, self.schedule_day),
-                    #     self.rhandler(BUTTON_11_MAY_SHEDULE, self.schedule_day)
-                    # ],
+
+                    self.CHECK_REGISTRATION_STATUS: [
+                        MessageHandler(Filters.text, self.email_in_list),
+                        CommandHandler('skip', self.skip_email)
+                    ],
+
+                    self.AUTHORIZATION: MessageHandler(Filters.text, self.auth_check_email),
+                    self.CHECK_CODE: MessageHandler(Filters.text, self.auth_check_code),
+
+                    self.GET_NEWS: [
+                        self.rhandler(BUTTON_NEWS_UNSUBSCRIPTION, self.unsubscribe_for_news),
+                        self.rhandler(BUTTON_NEWS_SUBSCRIPTION, self.subscribe_for_news),
+                        self.rhandler(BUTTON_GET_LAST_5_NEWS, self.not_ready_yet)
+                    ],
+
                     self.CHECK_EMAIL: [MessageHandler(Filters.text, self.email_in_list),
                                        CommandHandler('skip', self.skip_email)],
-                    self.BROADCAST: [MessageHandler(Filters.text, self.send_broadcast),
-                                     CommandHandler('skip', self.skip_email)]  # fixme
+                    self.BROADCAST: MessageHandler(Filters.text, self.send_broadcast)  # fixme
                 },
                 fallbacks=[CommandHandler('cancel', self.cancel)]
             )

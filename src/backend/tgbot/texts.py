@@ -13,6 +13,15 @@ TEXT_AUTH_EMAIL_OK = 'Хорошо, теперь введите код, кото
 TEXT_CODE_NOT_OK = 'Что-то пошло не так, попробуйте еще раз.'
 TEXT_CODE_OK = 'Вы авторизовались, теперь Вы можете попробовать поучавствовать в розыгрыше лута ну или в "Рэндом Пиве"'
 
+# Get news
+TEXT_NEWS = "Тут ты сможешь подписаться на последние обновления ну или посмотреть последние 5 новостей"
+TEXT_NEWS_SUBSCRIBED = "Ты подписался на новости: \nСПАМУ БЫТЬ!"
+TEXT_NEWS_UNSUBSCRIBED = "Ты отписался от новостей, слабак!"
+
+#ZAGLUSHKA
+TEXT_NOT_READY_YET = "ВЕДУТСЯ СТРОИТЕЛЬНЫЕ РАБОТЫ, ВЕРНИТЕСЬ ПОЗЖЕ."
+
+
 TEXT_BYE = 'Bye! I hope we can talk again some day.'
 
 TEXT_AFTER_SUB = 'Thank for sub, bro'
@@ -39,7 +48,9 @@ BUTTON_SEND_INVITES = 'Разослать инвайты'
 BUTTON_START_RANDOM_PRIZE = 'Запустить розыгрыш'
 BUTTON_POST_NEWS = 'Запостить новость'
 
-
+BUTTON_NEWS_SUBSCRIPTION = 'Подписаться на новости'
+BUTTON_NEWS_UNSUBSCRIPTION = 'Отписаться от новостей'
+BUTTON_GET_LAST_5_NEWS = 'Посмотреть новости'
 
 BUTTON_REGISTRATION = 'Регистрация'
 
