@@ -104,6 +104,7 @@ class TGHandlers(object):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def who_is_your_daddy(self, api: TelegramBotApi, user: TGUser, update):
+        return self.MAIN_MENU # Nope
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
         if user.is_admin:
