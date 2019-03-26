@@ -1,11 +1,14 @@
 import time
+import traceback
+
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import MessageHandler, Filters, run_async, ConversationHandler, CommandHandler, RegexHandler
-from backend.models import Message, Invite, TGUser, Event
+
+from backend.google_spreadsheet_client import GoogleSpreadsheet
+from backend.models import Invite, TGUser
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.utils import logger, Decorators
-from backend.google_spreadsheet_client import GoogleSpreadsheet
 
 
 class TGHandlers(object):
@@ -39,9 +42,9 @@ class TGHandlers(object):
     def rhandler(self, text, callback):
         return RegexHandler('^({})$'.format(text), callback)
 
-######## MONKEY CODE STARTED HERE ########
+    ######## MONKEY CODE STARTED HERE ########
 
-# START
+    # START
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def start(self, api: TelegramBotApi, user: TGUser, update):
         logger.info('User {} have started conversation.'.format(user))
@@ -50,7 +53,7 @@ class TGHandlers(object):
             reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
-# MAIN MENU
+    # MAIN MENU
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def check_registration_status(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
@@ -106,15 +109,14 @@ class TGHandlers(object):
         if user.is_admin:
             user.is_admin = False
             user.save()
-            update.message.reply_text('God mode :off', reply_markup =self.define_keyboard(user))
+            update.message.reply_text('God mode :off', reply_markup=self.define_keyboard(user))
         else:
             user.is_admin = True
             user.save()
             update.message.reply_text('God mode :on', reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
-
-## CHECK_REGISTRATION_STATUS
+    ## CHECK_REGISTRATION_STATUS
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def email_in_list(self, api: TelegramBotApi, user: TGUser, update):
         email = update.message.text
@@ -137,7 +139,7 @@ class TGHandlers(object):
         update.message.reply_text(TEXT_SKIP_EMAIL, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
-## AUTHORIZATION
+    ## AUTHORIZATION
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def auth_check_email(self, api: TelegramBotApi, user: TGUser, update):
         email = update.message.text
@@ -166,7 +168,7 @@ class TGHandlers(object):
                                       reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
-## GET NEWS
+    ## GET NEWS
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def subscribe_for_news(self, api: TelegramBotApi, user: TGUser, update):
         user.is_notified = True
@@ -192,8 +194,6 @@ class TGHandlers(object):
         update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
-
-
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def check_email(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
@@ -212,7 +212,7 @@ class TGHandlers(object):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def send_broadcast(self, api: TelegramBotApi, user: TGUser, update):
-        #TODO spam only for is_notified
+        # TODO spam only for is_notified
         broadcast_text = update.message.text
         for u in TGUser.objects.all():
             try:
@@ -227,6 +227,23 @@ class TGHandlers(object):
         logger.info("User %s canceled the conversation.", user)
         update.message.reply_text(TEXT_BYE,
                                   reply_markup=ReplyKeyboardRemove())
+
+    ### ADMIN
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def refresh_invites_and_notify(self, api: TelegramBotApi, user: TGUser, update):
+        logger.info("User %s initiated invites refresh.", user)
+        if not user.is_admin:
+            update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
+        update.message.reply_text(TEXT_START_INVITE_REFRESH)
+        try:
+            new_invites_count = self.gss_client.update_invites()
+            update.message.reply_text(TEXT_REPORT_INVITE_COUNT.format(new_invites_count))
+            notification_count = send_notifications(api)
+            update.message.reply_text(TEXT_REPORT_NOTIFICATION_COUNT.format(notification_count))
+        except:
+            update.message.reply_text(TEXT_REPORT_INVITE_REFRESH_ERROR + '\n' + traceback.format_exc())
+            raise
+        return self.MAIN_MENU
 
     def get_handlers(self):
         handlers = [
@@ -249,7 +266,6 @@ class TGHandlers(object):
                         self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 
                         self.rhandler('88224646BA', self.who_is_your_daddy),
-
 
                         self.rhandler(BUTTON_CHECK_EMAIL, self.check_email),
                         # self.rhandler(BUTTON_SHEDULE, self.show_schedule),
@@ -279,3 +295,18 @@ class TGHandlers(object):
             )
         ]
         return handlers
+
+
+def send_notifications(api: TelegramBotApi):
+    count = 0
+
+    for user in TGUser.objects.filter(is_notified=False).exclude(last_checked_email='').all():
+        invite = Invite.objects.filter(email=user.last_checked_email).first()
+        if invite is not None:
+            api.bot.send_message(user.tg_id, TEXT_INVITE_NOTIFICATION)
+            user.is_notified = True
+            user.save()
+            count += 1
+    return count
+
+
