@@ -105,9 +105,11 @@ class TGHandlers(object):
         logger.info('User {} have chosen {} '.format(user, text))
         if user.is_admin:
             user.is_admin = False
+            user.save()
             update.message.reply_text('God mode :off', reply_markup =self.define_keyboard(user))
         else:
             user.is_admin = True
+            user.save()
             update.message.reply_text('God mode :on', reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
@@ -168,6 +170,7 @@ class TGHandlers(object):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def subscribe_for_news(self, api: TelegramBotApi, user: TGUser, update):
         user.is_notified = True
+        user.save()
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
         update.message.reply_text(TEXT_NEWS_SUBSCRIBED, reply_markup=self.define_keyboard(user))
@@ -176,6 +179,7 @@ class TGHandlers(object):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def unsubscribe_for_news(self, api: TelegramBotApi, user: TGUser, update):
         user.is_notified = False
+        user.save()
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
         update.message.reply_text(TEXT_NEWS_UNSUBSCRIBED, reply_markup=self.define_keyboard(user))
