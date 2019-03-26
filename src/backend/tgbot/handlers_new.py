@@ -261,7 +261,7 @@ class TGHandlers(object):
                         self.rhandler(BUTTON_RANDOM_BEER, self.not_ready_yet),
 
                         self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
-                        self.rhandler(BUTTON_SEND_INVITES, self.not_ready_yet),
+                        self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
                         self.rhandler(BUTTON_START_RANDOM_PRIZE, self.not_ready_yet),
                         self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 
