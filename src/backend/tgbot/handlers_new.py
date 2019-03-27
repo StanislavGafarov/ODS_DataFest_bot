@@ -120,20 +120,20 @@ class TGHandlers(object):
         update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def who_is_your_daddy(self, api: TelegramBotApi, user: TGUser, update):
-        return self.MAIN_MENU  # Nope
-        text = update.message.text
-        logger.info('User {} have chosen {} '.format(user, text))
-        if user.is_admin:
-            user.is_admin = False
-            user.save()
-            update.message.reply_text('God mode :off', reply_markup=self.define_keyboard(user))
-        else:
-            user.is_admin = True
-            user.save()
-            update.message.reply_text('God mode :on', reply_markup=self.define_keyboard(user))
-        return self.MAIN_MENU
+    # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    # def who_is_your_daddy(self, api: TelegramBotApi, user: TGUser, update):
+    #     return self.MAIN_MENU  # Nope
+    #     text = update.message.text
+    #     logger.info('User {} have chosen {} '.format(user, text))
+    #     if user.is_admin:
+    #         user.is_admin = False
+    #         user.save()
+    #         update.message.reply_text('God mode :off', reply_markup=self.define_keyboard(user))
+    #     else:
+    #         user.is_admin = True
+    #         user.save()
+    #         update.message.reply_text('God mode :on', reply_markup=self.define_keyboard(user))
+    #     return self.MAIN_MENU
 
     ## CHECK_REGISTRATION_STATUS
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
@@ -291,7 +291,7 @@ class TGHandlers(object):
                         self.rhandler(BUTTON_START_RANDOM_PRIZE, self.not_ready_yet),
                         self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 
-                        self.rhandler('88224646BA', self.who_is_your_daddy),
+                        # self.rhandler('88224646BA', self.who_is_your_daddy),
 
                         self.rhandler(BUTTON_CHECK_EMAIL, self.check_email),
                         # self.rhandler(BUTTON_SHEDULE, self.show_schedule),
@@ -304,7 +304,9 @@ class TGHandlers(object):
                         CommandHandler('skip', self.skip_email)
                     ],
 
-                    self.AUTHORIZATION: [MessageHandler(Filters.text, self.auth_check_email)],
+                    self.AUTHORIZATION: [MessageHandler(Filters.text, self.auth_check_email),
+                                         CommandHandler('skip', self.skip_email)
+                    ],
                     self.CHECK_CODE: [MessageHandler(Filters.text, self.auth_check_code)],
 
                     self.GET_NEWS: [
