@@ -29,8 +29,10 @@ TEXT_AFTER_SUB = 'Thank for sub, bro'
 TEXT_SHOW_SCHEDULE = 'Выберите день'
 
 TEXT_NOT_ADMIN = 'Руки убрал, ты не админ'
-TEXT_ENTER_BROADCAST = 'Введите сообщение'
+TEXT_ENTER_BROADCAST = 'Введите сообщение или введите /cancel чтобы вернуться назад'
 TEXT_BROADCAST_DONE = 'готово'
+TEXT_CANCEL_BROADCASTING = 'Ну не надо, так не надо...'
+
 TEXT_START_INVITE_REFRESH = 'Запущено обновление инвайтов'
 TEXT_REPORT_INVITE_COUNT = 'Инвайты обновлены, новых {}'
 TEXT_REPORT_NOTIFICATION_COUNT = 'Нотификации по инвайтам разосланы: аш {} штук'

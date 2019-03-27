@@ -142,7 +142,7 @@ class TGHandlers(object):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def unknown_command(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
-        logger.info('User wrote unknown command: {}'.format(user, text))
+        logger.info('User {} wrote unknown command: {}'.format(user, text))
         update.message.reply_text(TEXT_UNKNOWN_COMMAND, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
@@ -256,12 +256,20 @@ class TGHandlers(object):
             except:
                 logger.exception('Error sending broadcast to user {}'.format(u))
         update.message.reply_text(TEXT_BROADCAST_DONE, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def cancel(self, api: TelegramBotApi, user: TGUser, update):
         logger.info("User %s canceled the conversation.", user)
         update.message.reply_text(TEXT_BYE,
                                   reply_markup=ReplyKeyboardRemove())
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def cancel_broadcast(self, api: TelegramBotApi, user: TGUser, update):
+        logger.info("User {} desided not to send broadcast.", user)
+        update.message.reply_text(TEXT_CANCEL_BROADCASTING,
+                                  reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
 
     ### ADMIN
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
@@ -330,7 +338,8 @@ class TGHandlers(object):
 
                     self.CHECK_EMAIL: [MessageHandler(Filters.text, self.email_in_list),
                                        CommandHandler('skip', self.skip_email)],
-                    self.BROADCAST: [MessageHandler(Filters.text, self.send_broadcast)]  # fixme
+                    self.BROADCAST: [MessageHandler(Filters.text, self.send_broadcast),
+                                     CommandHandler('cancel', self.skip_email)]
                 },
                 fallbacks=[CommandHandler('cancel', self.cancel)]
             )
