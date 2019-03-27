@@ -23,12 +23,30 @@ class TGHandlers(object):
         self.CHECK_EMAIL = 4
         self.BROADCAST = 5
 
-        self.ADMIN_KEYBOARD = [[BUTTON_REFRESH_SCHEDULE, BUTTON_SEND_INVITES, BUTTON_START_RANDOM_PRIZE,
-                                BUTTON_POST_NEWS]]
-        self.AUTHORIZED_USER_KEYBOARD = [[BUTTON_SCHEDULE, BUTTON_NEWS, BUTTON_SHOW_PATH,
-                                          BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, BUTTON_RANDOM_BEER]]
-        self.UNAUTHORIZED_USER_KEYBOARD = [[BUTTON_CHECK_REGISTRATION, BUTTON_AUTHORISATION, BUTTON_SCHEDULE,
-                                            BUTTON_NEWS, BUTTON_SHOW_PATH]]
+        admin_buttons = [
+            BUTTON_REFRESH_SCHEDULE,
+            BUTTON_SEND_INVITES,
+            BUTTON_START_RANDOM_PRIZE,
+            BUTTON_POST_NEWS
+        ]
+        auth_buttons = [
+            BUTTON_SCHEDULE,
+            # BUTTON_NEWS,
+            # BUTTON_SHOW_PATH,
+            # BUTTON_PARTICIPATE_IN_RANDOM_PRIZE,
+            # BUTTON_RANDOM_BEER
+        ]
+        # UNAUTH_ONLY_BUTTONS = []
+        unauth_buttons = [
+            BUTTON_CHECK_REGISTRATION,
+            BUTTON_AUTHORISATION,
+            BUTTON_SCHEDULE,
+            # BUTTON_NEWS,
+            BUTTON_SHOW_PATH
+        ]
+        self.ADMIN_KEYBOARD = [admin_buttons, unauth_buttons]
+        self.AUTHORIZED_USER_KEYBOARD = [auth_buttons]
+        self.UNAUTHORIZED_USER_KEYBOARD = [unauth_buttons]
 
     def define_keyboard(self, user: TGUser):
         if user.is_admin:
