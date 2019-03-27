@@ -339,7 +339,7 @@ class TGHandlers(object):
                     self.CHECK_EMAIL: [MessageHandler(Filters.text, self.email_in_list),
                                        CommandHandler('skip', self.skip_email)],
                     self.BROADCAST: [MessageHandler(Filters.text, self.send_broadcast),
-                                     CommandHandler('cancel', self.skip_email)]
+                                     CommandHandler('cancel', self.cancel_broadcast)]
                 },
                 fallbacks=[CommandHandler('cancel', self.cancel)]
             )
