@@ -122,7 +122,7 @@ class TGHandlers(object):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def who_is_your_daddy(self, api: TelegramBotApi, user: TGUser, update):
-        return self.MAIN_MENU # Nope
+        return self.MAIN_MENU  # Nope
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
         if user.is_admin:
@@ -263,10 +263,12 @@ class TGHandlers(object):
             new_invites_count = self.gss_client.update_invites()
             update.message.reply_text(TEXT_REPORT_INVITE_COUNT.format(new_invites_count))
             notification_count = send_notifications(api)
-            update.message.reply_text(TEXT_REPORT_NOTIFICATION_COUNT.format(notification_count))
+            update.message.reply_text(TEXT_REPORT_NOTIFICATION_COUNT.format(notification_count),
+                                      reply_markup=self.define_keyboard(user))
         except:
-            update.message.reply_text(TEXT_REPORT_INVITE_REFRESH_ERROR + '\n' + traceback.format_exc())
-            raise
+            update.message.reply_text(TEXT_REPORT_INVITE_REFRESH_ERROR + '\n' + traceback.format_exc(),
+                                      reply_markup=self.define_keyboard(user))
+            logger.exception('error updating invites')
         return self.MAIN_MENU
 
     def get_handlers(self):
@@ -332,5 +334,3 @@ def send_notifications(api: TelegramBotApi):
             user.save()
             count += 1
     return count
-
-
