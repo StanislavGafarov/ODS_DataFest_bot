@@ -31,10 +31,10 @@ class TGHandlers(object):
         ]
         auth_buttons = [
             BUTTON_SCHEDULE,
-            # BUTTON_NEWS,
-            # BUTTON_SHOW_PATH,
-            # BUTTON_PARTICIPATE_IN_RANDOM_PRIZE,
-            # BUTTON_RANDOM_BEER
+            BUTTON_NEWS,
+            BUTTON_SHOW_PATH,
+            BUTTON_PARTICIPATE_IN_RANDOM_PRIZE,
+            BUTTON_RANDOM_BEER
         ]
         # UNAUTH_ONLY_BUTTONS = []
         unauth_buttons = [
@@ -90,9 +90,13 @@ class TGHandlers(object):
     def get_news(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         if user.is_notified:
-            custom_keyboard = [[BUTTON_NEWS_UNSUBSCRIPTION, BUTTON_GET_LAST_5_NEWS]]
+            custom_keyboard = [[BUTTON_NEWS_UNSUBSCRIPTION,
+                                # BUTTON_GET_LAST_5_NEWS
+                                ]]
         else:
-            custom_keyboard = [[BUTTON_NEWS_SUBSCRIPTION, BUTTON_GET_LAST_5_NEWS]]
+            custom_keyboard = [[BUTTON_NEWS_SUBSCRIPTION,
+                                # BUTTON_GET_LAST_5_NEWS
+                                ]]
         logger.info('User {} have chosen {} '.format(user, text))
         update.message.reply_text(TEXT_NEWS, reply_markup=ReplyKeyboardMarkup(custom_keyboard
                                                                               , one_time_keyboard=True
@@ -134,6 +138,13 @@ class TGHandlers(object):
     #         user.save()
     #         update.message.reply_text('God mode :on', reply_markup=self.define_keyboard(user))
     #     return self.MAIN_MENU
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def unknown_command(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User wrote unknown command: {}'.format(user, text))
+        update.message.reply_text(TEXT_UNKNOWN_COMMAND, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
 
     ## CHECK_REGISTRATION_STATUS
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
@@ -297,6 +308,7 @@ class TGHandlers(object):
                         # self.rhandler(BUTTON_SHEDULE, self.show_schedule),
 
                         # self.rhandler(BUTTON_CREATE_BROADCAST, self.create_broadcast)
+                        MessageHandler(Filters.text, self.unknown_command)
                     ],
 
                     self.CHECK_REGISTRATION_STATUS: [
@@ -312,7 +324,8 @@ class TGHandlers(object):
                     self.GET_NEWS: [
                         self.rhandler(BUTTON_NEWS_UNSUBSCRIPTION, self.unsubscribe_for_news),
                         self.rhandler(BUTTON_NEWS_SUBSCRIPTION, self.subscribe_for_news),
-                        self.rhandler(BUTTON_GET_LAST_5_NEWS, self.not_ready_yet)
+                        self.rhandler(BUTTON_GET_LAST_5_NEWS, self.not_ready_yet),
+                        MessageHandler(Filters.text, self.unknown_command)
                     ],
 
                     self.CHECK_EMAIL: [MessageHandler(Filters.text, self.email_in_list),
