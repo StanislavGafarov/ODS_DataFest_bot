@@ -178,8 +178,13 @@ class TGHandlers(object):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def auth_check_code(self, api: TelegramBotApi, user: TGUser, update):
         code = update.message.text
-        if Invite.objects.filter(email=user.last_checked_email, code=code):
+        try:
+            code = int(code)
+        except:
+            code = None
+        if code is not None and Invite.objects.filter(email=user.last_checked_email, code=code):
             user.is_authorized = True
+            user.save()
             update.message.reply_text(TEXT_CODE_OK,
                                       reply_markup=self.define_keyboard(user))
         else:
