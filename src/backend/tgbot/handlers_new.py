@@ -26,8 +26,8 @@ class TGHandlers(object):
         admin_buttons = [
             BUTTON_REFRESH_SCHEDULE,
             BUTTON_SEND_INVITES,
-            [BUTTON_START_RANDOM_PRIZE,
-            BUTTON_POST_NEWS]
+            BUTTON_START_RANDOM_PRIZE,
+            BUTTON_POST_NEWS
         ]
         auth_buttons = [
             BUTTON_SCHEDULE,
