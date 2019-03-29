@@ -43,30 +43,30 @@ TEXT_UNKNOWN_COMMAND = "Пожалуйста, воспользуйтесь кн�
 
 ############# BUTTONS #############
 # Main menu
-BUTTON_CHECK_REGISTRATION = 'Проверить статус регистрации.'
-BUTTON_AUTHORISATION = 'Авторизоваться.'
-BUTTON_SCHEDULE = 'Расписание феста.'
-BUTTON_NEWS = 'Новости феста.'
-BUTTON_SHOW_PATH = 'Как добраться / Карта.'
+BUTTON_CHECK_REGISTRATION = 'Проверить статус регистрации'
+BUTTON_AUTHORISATION = 'Авторизоваться'
+BUTTON_SCHEDULE = 'Расписание феста'
+BUTTON_NEWS = 'Новости феста'
+BUTTON_SHOW_PATH = 'Как добраться / Карта'
 
-BUTTON_PARTICIPATE_IN_RANDOM_PRIZE = 'Участвовать в розыгрыше призов.'
-BUTTON_RANDOM_BEER = 'Участвовать в random beer.'
+BUTTON_PARTICIPATE_IN_RANDOM_PRIZE = 'Участвовать в розыгрыше призов'
+BUTTON_RANDOM_BEER = 'Участвовать в random beer'
 
-BUTTON_REFRESH_SCHEDULE = 'Обновить расписание.'
-BUTTON_SEND_INVITES = 'Разослать инвайты.'
-BUTTON_START_RANDOM_PRIZE = 'Запустить розыгрыш.'
-BUTTON_POST_NEWS = 'Запостить новость.'
+BUTTON_REFRESH_SCHEDULE = 'Обновить расписание'
+BUTTON_SEND_INVITES = 'Разослать инвайты'
+BUTTON_START_RANDOM_PRIZE = 'Запустить розыгрыш'
+BUTTON_POST_NEWS = 'Запостить новость'
 
-BUTTON_NEWS_SUBSCRIPTION = 'Подписаться на новости.'
-BUTTON_NEWS_UNSUBSCRIPTION = 'Отписаться от новостей.'
-BUTTON_GET_LAST_5_NEWS = 'Посмотреть новости.'
+BUTTON_NEWS_SUBSCRIPTION = 'Подписаться на новости'
+BUTTON_NEWS_UNSUBSCRIPTION = 'Отписаться от новостей'
+BUTTON_GET_LAST_5_NEWS = 'Посмотреть новости'
 
-BUTTON_REGISTRATION = 'Регистрация.'
+BUTTON_REGISTRATION = 'Регистрация'
 
 
-BUTTON_10_MAY_SCHEDULE = 'Расписание на 10 мая.'
-BUTTON_11_MAY_SCHEDULE = 'Расписание на 11 мая.'
+BUTTON_10_MAY_SCHEDULE = 'Расписание на 10 мая'
+BUTTON_11_MAY_SCHEDULE = 'Расписание на 11 мая'
 
-BUTTON_CHECK_EMAIL = 'Проверить Email.'
+BUTTON_CHECK_EMAIL = 'Проверить Email'
 
 

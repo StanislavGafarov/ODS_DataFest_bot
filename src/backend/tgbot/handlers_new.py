@@ -26,8 +26,8 @@ class TGHandlers(object):
         admin_buttons = [
             BUTTON_REFRESH_SCHEDULE,
             BUTTON_SEND_INVITES,
-            BUTTON_START_RANDOM_PRIZE,
-            BUTTON_POST_NEWS
+            [BUTTON_START_RANDOM_PRIZE,
+            BUTTON_POST_NEWS]
         ]
         auth_buttons = [
             BUTTON_SCHEDULE,
@@ -55,7 +55,7 @@ class TGHandlers(object):
             keyboard = self.AUTHORIZED_USER_KEYBOARD
         else:
             keyboard = self.UNAUTHORIZED_USER_KEYBOARD
-        return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
+        return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
 
     def rhandler(self, text, callback):
         return RegexHandler('^({})$'.format(text), callback)
