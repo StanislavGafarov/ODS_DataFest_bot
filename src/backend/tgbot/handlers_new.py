@@ -2,6 +2,7 @@ import time
 import traceback
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram.error import Unauthorized
 from telegram.ext import MessageHandler, Filters, run_async, ConversationHandler, CommandHandler, RegexHandler
 
 from backend.google_spreadsheet_client import GoogleSpreadsheet
@@ -349,10 +350,12 @@ class TGHandlers(object):
 
 def restore_states(conv_handler: ConversationHandler):
     # hacky way to restore conversations
-    for user in TGUser.objects.all():
+    logger.info('restoring user states')
+    for user in TGUser.objects.exclude(state=None).all():
         if user.state is not None:
             key = (user.tg_id, user.tg_id)
             conv_handler.conversations[key] = user.state
+    logger.info('restoring done')
 
 
 def send_notifications(api: TelegramBotApi):
@@ -361,8 +364,11 @@ def send_notifications(api: TelegramBotApi):
     for user in TGUser.objects.filter(is_notified=False).exclude(last_checked_email='').all():
         invite = Invite.objects.filter(email=user.last_checked_email).first()
         if invite is not None:
-            api.bot.send_message(user.tg_id, TEXT_INVITE_NOTIFICATION)
-            user.is_notified = True
-            user.save()
+            try:
+                api.bot.send_message(user.tg_id, TEXT_INVITE_NOTIFICATION)
+                user.is_notified = True
+                user.save()
+            except Unauthorized:
+                logger.info('{} blocked'.format(user))
             count += 1
     return count
