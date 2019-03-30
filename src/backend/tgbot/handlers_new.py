@@ -291,60 +291,68 @@ class TGHandlers(object):
         return self.MAIN_MENU
 
     def get_handlers(self):
-        handlers = [
-            ConversationHandler(
-                entry_points=[CommandHandler('start', self.start)],
-                states={
-                    self.MAIN_MENU: [
-                        self.rhandler(BUTTON_CHECK_REGISTRATION, self.check_registration_status),
-                        self.rhandler(BUTTON_AUTHORISATION, self.authorization),
-                        self.rhandler(BUTTON_NEWS, self.get_news),
-                        self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
-                        self.rhandler(BUTTON_SHOW_PATH, self.show_path),
+        conv_handler = ConversationHandler(
+            entry_points=[CommandHandler('start', self.start)],
+            states={
+                self.MAIN_MENU: [
+                    self.rhandler(BUTTON_CHECK_REGISTRATION, self.check_registration_status),
+                    self.rhandler(BUTTON_AUTHORISATION, self.authorization),
+                    self.rhandler(BUTTON_NEWS, self.get_news),
+                    self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
+                    self.rhandler(BUTTON_SHOW_PATH, self.show_path),
 
-                        self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.not_ready_yet),
-                        self.rhandler(BUTTON_RANDOM_BEER, self.not_ready_yet),
+                    self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.not_ready_yet),
+                    self.rhandler(BUTTON_RANDOM_BEER, self.not_ready_yet),
 
-                        self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
-                        self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
-                        self.rhandler(BUTTON_START_RANDOM_PRIZE, self.not_ready_yet),
-                        self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
+                    self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
+                    self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
+                    self.rhandler(BUTTON_START_RANDOM_PRIZE, self.not_ready_yet),
+                    self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 
-                        # self.rhandler('88224646BA', self.who_is_your_daddy),
+                    # self.rhandler('88224646BA', self.who_is_your_daddy),
 
-                        self.rhandler(BUTTON_CHECK_EMAIL, self.check_email),
-                        # self.rhandler(BUTTON_SHEDULE, self.show_schedule),
+                    self.rhandler(BUTTON_CHECK_EMAIL, self.check_email),
+                    # self.rhandler(BUTTON_SHEDULE, self.show_schedule),
 
-                        # self.rhandler(BUTTON_CREATE_BROADCAST, self.create_broadcast)
-                        MessageHandler(Filters.text, self.unknown_command)
-                    ],
+                    # self.rhandler(BUTTON_CREATE_BROADCAST, self.create_broadcast)
+                    MessageHandler(Filters.text, self.unknown_command)
+                ],
 
-                    self.CHECK_REGISTRATION_STATUS: [
-                        MessageHandler(Filters.text, self.email_in_list),
-                        CommandHandler('skip', self.skip_email)
-                    ],
+                self.CHECK_REGISTRATION_STATUS: [
+                    MessageHandler(Filters.text, self.email_in_list),
+                    CommandHandler('skip', self.skip_email)
+                ],
 
-                    self.AUTHORIZATION: [MessageHandler(Filters.text, self.auth_check_email),
-                                         CommandHandler('skip', self.skip_email)
-                    ],
-                    self.CHECK_CODE: [MessageHandler(Filters.text, self.auth_check_code)],
+                self.AUTHORIZATION: [MessageHandler(Filters.text, self.auth_check_email),
+                                     CommandHandler('skip', self.skip_email)
+                                     ],
+                self.CHECK_CODE: [MessageHandler(Filters.text, self.auth_check_code)],
 
-                    self.GET_NEWS: [
-                        self.rhandler(BUTTON_NEWS_UNSUBSCRIPTION, self.unsubscribe_for_news),
-                        self.rhandler(BUTTON_NEWS_SUBSCRIPTION, self.subscribe_for_news),
-                        self.rhandler(BUTTON_GET_LAST_5_NEWS, self.not_ready_yet),
-                        MessageHandler(Filters.text, self.unknown_command)
-                    ],
+                self.GET_NEWS: [
+                    self.rhandler(BUTTON_NEWS_UNSUBSCRIPTION, self.unsubscribe_for_news),
+                    self.rhandler(BUTTON_NEWS_SUBSCRIPTION, self.subscribe_for_news),
+                    self.rhandler(BUTTON_GET_LAST_5_NEWS, self.not_ready_yet),
+                    MessageHandler(Filters.text, self.unknown_command)
+                ],
 
-                    self.CHECK_EMAIL: [MessageHandler(Filters.text, self.email_in_list),
-                                       CommandHandler('skip', self.skip_email)],
-                    self.BROADCAST: [MessageHandler(Filters.text, self.send_broadcast),
-                                     CommandHandler('cancel', self.cancel_broadcast)]
-                },
-                fallbacks=[CommandHandler('cancel', self.cancel)]
-            )
-        ]
-        return handlers
+                self.CHECK_EMAIL: [MessageHandler(Filters.text, self.email_in_list),
+                                   CommandHandler('skip', self.skip_email)],
+                self.BROADCAST: [MessageHandler(Filters.text, self.send_broadcast),
+                                 CommandHandler('cancel', self.cancel_broadcast)]
+            },
+            fallbacks=[CommandHandler('cancel', self.cancel)],
+            allow_reentry=True
+        )
+        restore_states(conv_handler)
+        return [conv_handler]
+
+
+def restore_states(conv_handler: ConversationHandler):
+    # hacky way to restore conversations
+    for user in TGUser.objects.all():
+        if user.state is not None:
+            key = (user.tg_id, user.tg_id)
+            conv_handler.conversations[key] = user.state
 
 
 def send_notifications(api: TelegramBotApi):

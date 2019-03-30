@@ -54,7 +54,10 @@ class Decorators(object):
         @wraps(f)
         def get_user(cls, api: TelegramBotApi, update):
             user = api.get_user(update.message.chat_id)
-            return f(cls, api, user, update)
+            new_state = f(cls, api, user, update)
+            user.state = new_state
+            user.save()
+            return new_state
         return get_user
 
     @classmethod

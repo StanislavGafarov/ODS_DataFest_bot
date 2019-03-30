@@ -28,6 +28,7 @@ class TGUser(models.Model):
     is_authorized = models.BooleanField(default=False)
     is_notified = models.BooleanField(default=False)
     last_checked_email = models.TextField(null=True, default=None)
+    state = models.IntegerField(null=True, default=None)
 
 
 @make_str('user', 'text')
