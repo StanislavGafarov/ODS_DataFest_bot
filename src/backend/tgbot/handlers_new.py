@@ -25,25 +25,25 @@ class TGHandlers(object):
         self.BROADCAST = 5
 
         admin_buttons = [
-            BUTTON_REFRESH_SCHEDULE,
-            BUTTON_SEND_INVITES,
-            BUTTON_START_RANDOM_PRIZE,
-            BUTTON_POST_NEWS
+            [KeyboardButton(BUTTON_REFRESH_SCHEDULE)],
+            [KeyboardButton(BUTTON_SEND_INVITES)],
+            [KeyboardButton(BUTTON_START_RANDOM_PRIZE)],
+            [KeyboardButton(BUTTON_POST_NEWS)]
         ]
         auth_buttons = [
-            [BUTTON_SCHEDULE],
-            [BUTTON_NEWS,
-            BUTTON_SHOW_PATH],
-            [BUTTON_PARTICIPATE_IN_RANDOM_PRIZE],
-            [BUTTON_RANDOM_BEER]
+            [KeyboardButton(BUTTON_SCHEDULE)],
+            [KeyboardButton(BUTTON_NEWS),
+             KeyboardButton(BUTTON_SHOW_PATH)],
+            [KeyboardButton(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE)],
+            [KeyboardButton(BUTTON_RANDOM_BEER)]
         ]
         # UNAUTH_ONLY_BUTTONS = []
         unauth_buttons = [
-            [BUTTON_CHECK_REGISTRATION],
-            [BUTTON_AUTHORISATION],
-            [BUTTON_SCHEDULE],
+            [KeyboardButton(BUTTON_CHECK_REGISTRATION)],
+            [KeyboardButton(BUTTON_AUTHORISATION)],
+            [KeyboardButton(BUTTON_SCHEDULE)],
             # BUTTON_NEWS,
-            [BUTTON_SHOW_PATH]
+            [KeyboardButton(BUTTON_SHOW_PATH)]
         ]
         self.ADMIN_KEYBOARD = [admin_buttons, unauth_buttons]
         self.AUTHORIZED_USER_KEYBOARD = [auth_buttons]
