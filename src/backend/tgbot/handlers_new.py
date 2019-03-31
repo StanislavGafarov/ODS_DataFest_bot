@@ -45,7 +45,7 @@ class TGHandlers(object):
             # BUTTON_NEWS,
             [BUTTON_SHOW_PATH]
         ]
-        self.ADMIN_KEYBOARD = admin_buttons.append(unauth_buttons)
+        self.ADMIN_KEYBOARD = admin_buttons + unauth_buttons
         self.AUTHORIZED_USER_KEYBOARD = auth_buttons
         self.UNAUTHORIZED_USER_KEYBOARD = unauth_buttons
 
