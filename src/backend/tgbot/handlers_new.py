@@ -1,7 +1,7 @@
 import time
 import traceback
 
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.error import Unauthorized
 from telegram.ext import MessageHandler, Filters, run_async, ConversationHandler, CommandHandler, RegexHandler
 
@@ -25,29 +25,29 @@ class TGHandlers(object):
         self.BROADCAST = 5
 
         admin_buttons = [
-            [KeyboardButton(BUTTON_REFRESH_SCHEDULE)],
-            [KeyboardButton(BUTTON_SEND_INVITES)],
-            [KeyboardButton(BUTTON_START_RANDOM_PRIZE)],
-            [KeyboardButton(BUTTON_POST_NEWS)]
+            [BUTTON_REFRESH_SCHEDULE],
+            [BUTTON_SEND_INVITES],
+            [BUTTON_START_RANDOM_PRIZE],
+            [BUTTON_POST_NEWS]
         ]
         auth_buttons = [
-            [KeyboardButton(BUTTON_SCHEDULE)],
-            [KeyboardButton(BUTTON_NEWS),
-             KeyboardButton(BUTTON_SHOW_PATH)],
-            [KeyboardButton(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE)],
-            [KeyboardButton(BUTTON_RANDOM_BEER)]
+            [BUTTON_SCHEDULE],
+            [BUTTON_NEWS,
+             BUTTON_SHOW_PATH],
+            [BUTTON_PARTICIPATE_IN_RANDOM_PRIZE],
+            [BUTTON_RANDOM_BEER]
         ]
         # UNAUTH_ONLY_BUTTONS = []
         unauth_buttons = [
-            [KeyboardButton(BUTTON_CHECK_REGISTRATION)],
-            [KeyboardButton(BUTTON_AUTHORISATION)],
-            [KeyboardButton(BUTTON_SCHEDULE)],
+            [BUTTON_CHECK_REGISTRATION],
+            [BUTTON_AUTHORISATION],
+            [BUTTON_SCHEDULE],
             # BUTTON_NEWS,
-            [KeyboardButton(BUTTON_SHOW_PATH)]
+            [BUTTON_SHOW_PATH]
         ]
-        self.ADMIN_KEYBOARD = [admin_buttons, unauth_buttons]
-        self.AUTHORIZED_USER_KEYBOARD = [auth_buttons]
-        self.UNAUTHORIZED_USER_KEYBOARD = [unauth_buttons]
+        self.ADMIN_KEYBOARD = admin_buttons.append(unauth_buttons)
+        self.AUTHORIZED_USER_KEYBOARD = auth_buttons
+        self.UNAUTHORIZED_USER_KEYBOARD = unauth_buttons
 
     def define_keyboard(self, user: TGUser):
         if user.is_admin:
@@ -56,7 +56,7 @@ class TGHandlers(object):
             keyboard = self.AUTHORIZED_USER_KEYBOARD
         else:
             keyboard = self.UNAUTHORIZED_USER_KEYBOARD
-        return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
+        return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
 
     def rhandler(self, text, callback):
         return RegexHandler('^({})$'.format(text), callback)
@@ -92,12 +92,12 @@ class TGHandlers(object):
         text = update.message.text
         if user.is_notified:
             custom_keyboard = [[BUTTON_NEWS_UNSUBSCRIPTION,
-                                BUTTON_FULL_BACK,
+                                BUTTON_FULL_BACK
                                 # BUTTON_GET_LAST_5_NEWS
                                 ]]
         else:
             custom_keyboard = [[BUTTON_NEWS_SUBSCRIPTION,
-                                BUTTON_FULL_BACK,
+                                BUTTON_FULL_BACK
                                 # BUTTON_GET_LAST_5_NEWS
                                 ]]
         logger.info('User {} have chosen {} '.format(user, text))
