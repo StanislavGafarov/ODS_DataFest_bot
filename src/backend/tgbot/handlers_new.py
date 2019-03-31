@@ -1,7 +1,7 @@
 import time
 import traceback
 
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton
 from telegram.error import Unauthorized
 from telegram.ext import MessageHandler, Filters, run_async, ConversationHandler, CommandHandler, RegexHandler
 
@@ -31,19 +31,19 @@ class TGHandlers(object):
             BUTTON_POST_NEWS
         ]
         auth_buttons = [
-            BUTTON_SCHEDULE,
-            BUTTON_NEWS,
-            BUTTON_SHOW_PATH,
-            BUTTON_PARTICIPATE_IN_RANDOM_PRIZE,
-            BUTTON_RANDOM_BEER
+            [BUTTON_SCHEDULE],
+            [BUTTON_NEWS,
+            BUTTON_SHOW_PATH],
+            [BUTTON_PARTICIPATE_IN_RANDOM_PRIZE],
+            [BUTTON_RANDOM_BEER]
         ]
         # UNAUTH_ONLY_BUTTONS = []
         unauth_buttons = [
-            BUTTON_CHECK_REGISTRATION,
-            BUTTON_AUTHORISATION,
-            BUTTON_SCHEDULE,
+            [BUTTON_CHECK_REGISTRATION],
+            [BUTTON_AUTHORISATION],
+            [BUTTON_SCHEDULE],
             # BUTTON_NEWS,
-            BUTTON_SHOW_PATH
+            [BUTTON_SHOW_PATH]
         ]
         self.ADMIN_KEYBOARD = [admin_buttons, unauth_buttons]
         self.AUTHORIZED_USER_KEYBOARD = [auth_buttons]
@@ -92,10 +92,12 @@ class TGHandlers(object):
         text = update.message.text
         if user.is_notified:
             custom_keyboard = [[BUTTON_NEWS_UNSUBSCRIPTION,
+                                BUTTON_FULL_BACK,
                                 # BUTTON_GET_LAST_5_NEWS
                                 ]]
         else:
             custom_keyboard = [[BUTTON_NEWS_SUBSCRIPTION,
+                                BUTTON_FULL_BACK,
                                 # BUTTON_GET_LAST_5_NEWS
                                 ]]
         logger.info('User {} have chosen {} '.format(user, text))
@@ -231,6 +233,13 @@ class TGHandlers(object):
         return self.MAIN_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def full_back(self, api:TelegramBotApi, user:TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        update.message.reply_text(TEXT_FULL_BACK, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def check_email(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
@@ -333,6 +342,7 @@ class TGHandlers(object):
                     self.rhandler(BUTTON_NEWS_UNSUBSCRIPTION, self.unsubscribe_for_news),
                     self.rhandler(BUTTON_NEWS_SUBSCRIPTION, self.subscribe_for_news),
                     self.rhandler(BUTTON_GET_LAST_5_NEWS, self.not_ready_yet),
+                    self.rhandler(BUTTON_FULL_BACK, self.full_back),
                     MessageHandler(Filters.text, self.unknown_command)
                 ],
 
