@@ -37,12 +37,11 @@ class TGHandlers(object):
             [BUTTON_PARTICIPATE_IN_RANDOM_PRIZE],
             [BUTTON_RANDOM_BEER]
         ]
-        # UNAUTH_ONLY_BUTTONS = []
         unauth_buttons = [
             [BUTTON_CHECK_REGISTRATION],
             [BUTTON_AUTHORISATION],
-            [BUTTON_SCHEDULE],
-            # BUTTON_NEWS,
+            [BUTTON_SCHEDULE,
+             BUTTON_NEWS],
             [BUTTON_SHOW_PATH]
         ]
         self.ADMIN_KEYBOARD = admin_buttons + unauth_buttons
@@ -163,6 +162,7 @@ class TGHandlers(object):
 
         if user.last_checked_email != email:
             user.last_checked_email = email
+            user.is_notified = True
             user.save()
         return self.MAIN_MENU
 
@@ -239,14 +239,8 @@ class TGHandlers(object):
         update.message.reply_text(TEXT_FULL_BACK, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def check_email(self, api: TelegramBotApi, user: TGUser, update):
-        text = update.message.text
-        logger.info('User {} have chosen {} '.format(user, text))
-        update.message.reply_text(TEXT_ENTER_EMAIL,
-                                  reply_markup=ReplyKeyboardRemove())
-        return self.CHECK_EMAIL
-
+    ##### ADMIN FUNCTIONS #####
+    # BROADCASTING
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def create_broadcast(self, api: TelegramBotApi, user: TGUser, update):
         logger.info("User %s initiated broadcast.", user)
@@ -274,14 +268,7 @@ class TGHandlers(object):
         update.message.reply_text(TEXT_BYE,
                                   reply_markup=ReplyKeyboardRemove())
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def cancel_broadcast(self, api: TelegramBotApi, user: TGUser, update):
-        logger.info("User {} desided not to send broadcast.", user)
-        update.message.reply_text(TEXT_CANCEL_BROADCASTING,
-                                  reply_markup=self.define_keyboard(user))
-        return self.MAIN_MENU
-
-    ### ADMIN
+    # REFRESH INVITES
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def refresh_invites_and_notify(self, api: TelegramBotApi, user: TGUser, update):
         logger.info("User %s initiated invites refresh.", user)
@@ -298,6 +285,13 @@ class TGHandlers(object):
             update.message.reply_text(TEXT_REPORT_INVITE_REFRESH_ERROR + '\n' + traceback.format_exc(),
                                       reply_markup=self.define_keyboard(user))
             logger.exception('error updating invites')
+        return self.MAIN_MENU
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def cancel_broadcast(self, api: TelegramBotApi, user: TGUser, update):
+        logger.info("User {} desided not to send broadcast.", user)
+        update.message.reply_text(TEXT_CANCEL_BROADCASTING,
+                                  reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
     def get_handlers(self):
@@ -371,7 +365,7 @@ def restore_states(conv_handler: ConversationHandler):
 def send_notifications(api: TelegramBotApi):
     count = 0
 
-    for user in TGUser.objects.filter(is_notified=False).exclude(last_checked_email='').all():
+    for user in TGUser.objects.filter(is_notified=True).exclude(last_checked_email='', is_authorized=True).all():
         invite = Invite.objects.filter(email=user.last_checked_email).first()
         if invite is not None:
             try:
