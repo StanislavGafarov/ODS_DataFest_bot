@@ -315,7 +315,6 @@ class TGHandlers(object):
 
                     # self.rhandler('88224646BA', self.who_is_your_daddy),
 
-                    self.rhandler(BUTTON_CHECK_EMAIL, self.check_email),
                     # self.rhandler(BUTTON_SHEDULE, self.show_schedule),
 
                     # self.rhandler(BUTTON_CREATE_BROADCAST, self.create_broadcast)
