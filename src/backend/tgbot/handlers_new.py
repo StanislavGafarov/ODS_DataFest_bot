@@ -14,7 +14,7 @@ from backend.tgbot.utils import logger, Decorators
 
 class TGHandlers(object):
     def __init__(self):
-        self.gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
+        #self.gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
         self.MAIN_MENU = 0
         self.CHECK_REGISTRATION_STATUS = 1
         self.AUTHORIZATION = 2
@@ -271,12 +271,14 @@ class TGHandlers(object):
     # REFRESH INVITES
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def refresh_invites_and_notify(self, api: TelegramBotApi, user: TGUser, update):
+        gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
         logger.info("User %s initiated invites refresh.", user)
         if not user.is_admin:
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
         update.message.reply_text(TEXT_START_INVITE_REFRESH)
         try:
-            new_invites_count = self.gss_client.update_invites()
+            new_invites_count = gss_client.update_invites()
             update.message.reply_text(TEXT_REPORT_INVITE_COUNT.format(new_invites_count))
             notification_count = send_notifications(api)
             update.message.reply_text(TEXT_REPORT_NOTIFICATION_COUNT.format(notification_count),
@@ -364,7 +366,8 @@ def restore_states(conv_handler: ConversationHandler):
 def send_notifications(api: TelegramBotApi):
     count = 0
 
-    for user in TGUser.objects.filter(is_notified=True).exclude(last_checked_email='', is_authorized=True).all():
+    for user in TGUser.objects.filter(is_notified=True).\
+            exclude(last_checked_email='').exclude(is_authorized=True).all():
         invite = Invite.objects.filter(email=user.last_checked_email).first()
         if invite is not None:
             try:
