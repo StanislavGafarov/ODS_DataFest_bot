@@ -10,9 +10,10 @@ from backend.models import Invite, TGUser
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.utils import logger, Decorators
+from backend.tgbot.main_menu import MainMenu
 
 
-class TGHandlers(object):
+class TGHandler(object):
     def __init__(self):
         #self.gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
         self.MAIN_MENU = 0
@@ -353,6 +354,9 @@ class TGHandlers(object):
         return [conv_handler]
 
 
+
+
+
 def restore_states(conv_handler: ConversationHandler):
     # hacky way to restore conversations
     logger.info('restoring user states')
@@ -378,3 +382,46 @@ def send_notifications(api: TelegramBotApi):
                 logger.info('{} blocked'.format(user))
             count += 1
     return count
+
+
+class ConversationWraper(TGHandler):
+
+    def get_states(self):
+        main_menu = MainMenu.create_states()
+        states = main_menu
+        states = states.update({
+                self.CHECK_REGISTRATION_STATUS: [
+                    MessageHandler(Filters.text, self.email_in_list),
+                    CommandHandler('skip', self.skip_email)
+                ],
+
+                self.AUTHORIZATION: [MessageHandler(Filters.text, self.auth_check_email),
+                                     CommandHandler('skip', self.skip_email)
+                                     ],
+                self.CHECK_CODE: [MessageHandler(Filters.text, self.auth_check_code)],
+
+                self.GET_NEWS: [
+                    self.rhandler(BUTTON_NEWS_UNSUBSCRIPTION, self.unsubscribe_for_news),
+                    self.rhandler(BUTTON_NEWS_SUBSCRIPTION, self.subscribe_for_news),
+                    self.rhandler(BUTTON_GET_LAST_5_NEWS, self.not_ready_yet),
+                    self.rhandler(BUTTON_FULL_BACK, self.full_back),
+                    MessageHandler(Filters.text, self.unknown_command)
+                ],
+
+                self.CHECK_EMAIL: [MessageHandler(Filters.text, self.email_in_list),
+                                   CommandHandler('skip', self.skip_email)],
+                self.BROADCAST: [MessageHandler(Filters.text, self.send_broadcast),
+                                 CommandHandler('cancel', self.cancel_broadcast)]
+            })
+        return states
+
+    def create_handler(self):
+        states = self.get_states()
+        conv_handler = ConversationHandler(
+            entry_points=[CommandHandler('start', self.start)],
+            states=states,
+            fallbacks=[CommandHandler('cancel', self.cancel)],
+            allow_reentry=True
+        )
+        restore_states(conv_handler)
+        return [conv_handler]
