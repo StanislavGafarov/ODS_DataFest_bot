@@ -1,10 +1,14 @@
-from telegram import ReplyKeyboardRemove
+import traceback
+
+from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup
 from telegram.ext import run_async, MessageHandler, Filters
+from telegram.error import Unauthorized
 
 from backend.tgbot.utils import logger, Decorators
-from backend.tgbot.handlers_new import TGHandler
+from backend.google_spreadsheet_client import GoogleSpreadsheet
+from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.base import TelegramBotApi
-from backend.models import Invite, TGUser
+from backend.models import TGUser, Invite
 from backend.tgbot.texts import *
 
 
@@ -63,6 +67,35 @@ class MainMenu(TGHandler):
         update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def create_broadcast(self, api: TelegramBotApi, user: TGUser, update):
+        logger.info("User %s initiated broadcast.", user)
+        if not user.is_admin:
+            update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
+        update.message.reply_text(TEXT_ENTER_BROADCAST)
+        return self.BROADCAST
+
+    # REFRESH INVITES
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def refresh_invites_and_notify(self, api: TelegramBotApi, user: TGUser, update):
+        gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
+        logger.info("User %s initiated invites refresh.", user)
+        if not user.is_admin:
+            update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
+        update.message.reply_text(TEXT_START_INVITE_REFRESH)
+        try:
+            new_invites_count = gss_client.update_invites()
+            update.message.reply_text(TEXT_REPORT_INVITE_COUNT.format(new_invites_count))
+            notification_count = send_notifications(api)
+            update.message.reply_text(TEXT_REPORT_NOTIFICATION_COUNT.format(notification_count),
+                                      reply_markup=self.define_keyboard(user))
+        except:
+            update.message.reply_text(TEXT_REPORT_INVITE_REFRESH_ERROR + '\n' + traceback.format_exc(),
+                                      reply_markup=self.define_keyboard(user))
+            logger.exception('error updating invites')
+        return self.MAIN_MENU
+
     # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     # def who_is_your_daddy(self, api: TelegramBotApi, user: TGUser, update):
     #     return self.MAIN_MENU  # Nope
@@ -78,15 +111,8 @@ class MainMenu(TGHandler):
     #         update.message.reply_text('God mode :on', reply_markup=self.define_keyboard(user))
     #     return self.MAIN_MENU
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def unknown_command(self, api: TelegramBotApi, user: TGUser, update):
-        text = update.message.text
-        logger.info('User {} wrote unknown command: {}'.format(user, text))
-        update.message.reply_text(TEXT_UNKNOWN_COMMAND, reply_markup=self.define_keyboard(user))
-        return self.MAIN_MENU
-
-    def create_states(self):
-        states = {self.MAIN_MENU: [
+    def create_state(self):
+        state = {self.MAIN_MENU: [
             self.rhandler(BUTTON_CHECK_REGISTRATION, self.check_registration_status),
             self.rhandler(BUTTON_AUTHORISATION, self.authorization),
             self.rhandler(BUTTON_NEWS, self.get_news),
@@ -103,9 +129,23 @@ class MainMenu(TGHandler):
 
             # self.rhandler('88224646BA', self.who_is_your_daddy),
 
-            # self.rhandler(BUTTON_SHEDULE, self.show_schedule),
-
             # self.rhandler(BUTTON_CREATE_BROADCAST, self.create_broadcast)
             MessageHandler(Filters.text, self.unknown_command)
         ]}
-        return states
+        return state
+
+def send_notifications(api: TelegramBotApi):
+    count = 0
+
+    for user in TGUser.objects.filter(is_notified=True).\
+            exclude(last_checked_email='').exclude(is_authorized=True).all():
+        invite = Invite.objects.filter(email=user.last_checked_email).first()
+        if invite is not None:
+            try:
+                api.bot.send_message(user.tg_id, TEXT_INVITE_NOTIFICATION)
+                user.is_notified = True
+                user.save()
+            except Unauthorized:
+                logger.info('{} blocked'.format(user))
+            count += 1
+    return count
