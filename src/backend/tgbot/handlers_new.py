@@ -10,7 +10,6 @@ from backend.models import Invite, TGUser
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.utils import logger, Decorators
-from backend.tgbot.main_menu import MainMenu
 
 
 class TGHandler(object):
@@ -384,11 +383,13 @@ def send_notifications(api: TelegramBotApi):
     return count
 
 
+from backend.tgbot.main_menu import MainMenu
+
 class ConversationWraper(TGHandler):
 
     def get_states(self):
-        main_menu = MainMenu.create_states()
-        states = main_menu
+        main_menu = MainMenu()
+        states = main_menu.create_states()
         states = states.update({
                 self.CHECK_REGISTRATION_STATUS: [
                     MessageHandler(Filters.text, self.email_in_list),
