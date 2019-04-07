@@ -6,7 +6,7 @@ from backend.tgbot.states.main_menu import MainMenu
 from backend.tgbot.states.check_registration import CheckRegistrationStatus
 from backend.tgbot.states.authorization import Authorization
 from backend.tgbot.states.get_news import GetNews
-from backend.tgbot.states.broadcasting import Broadcsting
+from backend.tgbot.states.broadcasting import Broadcasting
 
 class CustomConversationHandler(TGHandler):
 
@@ -18,7 +18,7 @@ class CustomConversationHandler(TGHandler):
         return states
 
     def create_handler(self):
-        states = self.get_states(MainMenu, CheckRegistrationStatus, Authorization, GetNews, Broadcsting)
+        states = self.get_states(MainMenu, CheckRegistrationStatus, Authorization, GetNews, Broadcasting)
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start)],
             states=states,

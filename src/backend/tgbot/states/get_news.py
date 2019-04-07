@@ -1,4 +1,3 @@
-from telegram import ReplyKeyboardRemove
 from telegram.ext import run_async, MessageHandler, Filters
 
 from backend.tgbot.tghandler import TGHandler
