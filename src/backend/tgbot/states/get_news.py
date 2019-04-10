@@ -9,7 +9,7 @@ from backend.tgbot.texts import *
 class GetNews(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def subscribe_for_news(self, api: TelegramBotApi, user: TGUser, update):
-        user.is_notified = True
+        user.has_news_subscription = True
         user.save()
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
@@ -18,7 +18,7 @@ class GetNews(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def unsubscribe_for_news(self, api: TelegramBotApi, user: TGUser, update):
-        user.is_notified = False
+        user.has_news_subscription = False
         user.save()
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))

@@ -1,15 +1,15 @@
 import traceback
 
 from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup
-from telegram.ext import run_async, MessageHandler, Filters
 from telegram.error import Unauthorized
+from telegram.ext import run_async, MessageHandler, Filters
 
-from backend.tgbot.utils import logger, Decorators
 from backend.google_spreadsheet_client import GoogleSpreadsheet
-from backend.tgbot.tghandler import TGHandler
-from backend.tgbot.base import TelegramBotApi
 from backend.models import TGUser, Invite
+from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
+from backend.tgbot.tghandler import TGHandler
+from backend.tgbot.utils import logger, Decorators
 
 
 class MainMenu(TGHandler):
@@ -30,7 +30,7 @@ class MainMenu(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def get_news(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
-        if user.is_notified:
+        if user.has_news_subscription:
             custom_keyboard = [[BUTTON_NEWS_UNSUBSCRIPTION,
                                 BUTTON_FULL_BACK
                                 # BUTTON_GET_LAST_5_NEWS
@@ -134,10 +134,11 @@ class MainMenu(TGHandler):
         ]}
         return state
 
+
 def send_notifications(api: TelegramBotApi):
     count = 0
 
-    for user in TGUser.objects.filter(is_notified=True).\
+    for user in TGUser.objects.exclude(is_notified=True). \
             exclude(last_checked_email='').exclude(is_authorized=True).all():
         invite = Invite.objects.filter(email=user.last_checked_email).first()
         if invite is not None:

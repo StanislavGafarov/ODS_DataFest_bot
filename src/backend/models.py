@@ -27,6 +27,7 @@ class TGUser(models.Model):
     is_admin = models.BooleanField(default=False)
     is_authorized = models.BooleanField(default=False)
     is_notified = models.BooleanField(default=False)
+    has_news_subscription = models.BooleanField(default=False)
     last_checked_email = models.TextField(null=True, default=None)
     state = models.IntegerField(null=True, default=None)
 
@@ -56,6 +57,7 @@ class Invite(models.Model):
     code = models.IntegerField(unique=True, default=False)
     name = models.TextField(default=False)
     surname = models.TextField(default=False)
+
 
 @make_str('news')
 class News(models.Model):

@@ -1,10 +1,10 @@
 from telegram.ext import run_async, MessageHandler, Filters, CommandHandler
 
-from backend.tgbot.tghandler import TGHandler
-from backend.tgbot.base import TelegramBotApi
-from backend.tgbot.utils import Decorators, logger
 from backend.models import TGUser, Invite
+from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
+from backend.tgbot.tghandler import TGHandler
+from backend.tgbot.utils import Decorators, logger
 
 
 class CheckRegistrationStatus(TGHandler):
@@ -27,6 +27,6 @@ class CheckRegistrationStatus(TGHandler):
 
     def create_state(self):
         state = {self.CHECK_REGISTRATION_STATUS: [
-                    MessageHandler(Filters.text, self.email_in_list),
-                    CommandHandler('skip', self.skip_email)]}
+            MessageHandler(Filters.text, self.email_in_list),
+            CommandHandler('skip', self.skip_email)]}
         return state
