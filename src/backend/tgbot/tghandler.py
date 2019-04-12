@@ -12,8 +12,12 @@ class TGHandler(object):
         self.MAIN_MENU = 0
         self.CHECK_REGISTRATION_STATUS = 1
         self.AUTHORIZATION = 2
-        self.CHECK_CODE = 99
+        self.CHECK_CODE = 21
         self.GET_NEWS = 3
+
+        # self.FREE_PRIZES = 41
+        self.CHOOSEN_SIZE = 41
+        self.CHANGE_SIZE = 42
 
         self.CHECK_EMAIL = 4
         self.BROADCAST = 5

@@ -28,8 +28,17 @@ class TGUser(models.Model):
     is_authorized = models.BooleanField(default=False)
     is_notified = models.BooleanField(default=False)
     has_news_subscription = models.BooleanField(default=False)
+
+    #RANDOM BEER INFO
+    in_random_beer = models.BooleanField(default=False)
+
     last_checked_email = models.TextField(null=True, default=None)
     state = models.IntegerField(null=True, default=None)
+
+    #Random prize
+    in_random_prize = models.BooleanField(default=False)
+    merch_size = models.TextField(null=True, default=None)
+    win_random_prize = models.BooleanField(default=False)
 
 
 @make_str('user', 'text')
