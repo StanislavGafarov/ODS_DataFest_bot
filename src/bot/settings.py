@@ -160,3 +160,5 @@ TG_WEBHOOK_CERT_KEY = os.environ.get('BOT_CERT_KEY', 'cert/private.key')
 TG_WEBHOOK_CERT_PEM = os.environ.get('BOT_CERT_PEM', 'cert/cert.pem')
 TG_WEBHOOK = os.environ.get('BOT_WEBHOOK') == 'true'
 TG_WEBHOOK_PORT = int(os.environ.get('BOT_WEBHOOK_PORT', 5555))
+
+PUBLIC_PORT = int(os.environ.get('PUBLIC_PORT', 8080))

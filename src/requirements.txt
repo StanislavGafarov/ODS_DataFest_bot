@@ -7,3 +7,5 @@ psycopg2-binary==2.7.5
 oauth2client
 gspread
 pandas
+pypng==0.0.19
+pyqrcode==1.2.1
