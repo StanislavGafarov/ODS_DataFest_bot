@@ -1,11 +1,12 @@
 from telegram import ReplyKeyboardRemove
 from telegram.ext import run_async, MessageHandler, Filters, CommandHandler
 
-from backend.tgbot.tghandler import TGHandler
-from backend.tgbot.base import TelegramBotApi
-from backend.tgbot.utils import Decorators, logger
 from backend.models import TGUser, Invite
+from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
+from backend.tgbot.tghandler import TGHandler
+from backend.tgbot.utils import Decorators, logger
+
 
 class Authorization(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
@@ -31,12 +32,18 @@ class Authorization(TGHandler):
             code = int(code)
         except:
             code = None
-        if code is not None and Invite.objects.filter(email=user.last_checked_email, code=code):
-            user.is_authorized = True
-            logger.info('{} is authorized'.format(user))
-            user.save()
-            update.message.reply_text(TEXT_CODE_OK,
-                                      reply_markup=self.define_keyboard(user))
+        invite = Invite.objects.filter(email=user.last_checked_email, code=code).first()
+        if code is not None and invite is not None:
+            if invite.tguser is not None:
+                logger.info('{} tried to sign as {}'.format(user, invite.tguser))
+                update.message.reply_text(TEXT_EMAIL_USED_BY_OTHER_USER, reply_markup=self.define_keyboard(user))
+            else:
+                user.invite = invite
+                user.is_authorized = True
+                logger.info('{} is authorized'.format(user))
+                user.save()
+                update.message.reply_text(TEXT_CODE_OK,
+                                          reply_markup=self.define_keyboard(user))
         else:
             logger.info('{} is NOT authorized'.format(user))
             update.message.reply_text(TEXT_CODE_NOT_OK,
