@@ -3,6 +3,7 @@ import traceback
 from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup
 from telegram.error import Unauthorized
 from telegram.ext import run_async, MessageHandler, Filters
+from django.db.models import Count
 
 from backend.google_spreadsheet_client import GoogleSpreadsheet
 from backend.models import TGUser, Invite
@@ -120,7 +121,7 @@ class MainMenu(TGHandler):
             return self.MAIN_MENU
         logger.info("User %s choose start random_prize.", user)
         group_by_merch = ''
-        for row in  TGUser.objects.values('merch_size').annotate(dcount='merch_size'):
+        for row in  TGUser.objects.values('merch_size').annotate(dcount=Count('merch_size')):
             group_by_merch += '\n' + row['merch_size'] + " : " + row['dcount']
         update.message.reply_text(TEXT_START_RANDOM_PRIZE.format(group_by_merch)
                                   , reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD, one_time_keyboard=True,
