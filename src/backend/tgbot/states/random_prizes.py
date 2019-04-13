@@ -1,4 +1,3 @@
-#TODO: Вбить размеры,
 from telegram.ext import run_async
 
 from backend.tgbot.tghandler import TGHandler
@@ -39,8 +38,8 @@ class RandomFreePrizes(TGHandler):
             self.rhandler(BUTTON_XXXL_SIZE, self.choosen_size()),
             self.rhandler(BUTTON_FULL_BACK, self.full_back())
         ],
-            self.CHANGE_SIZE:[
-
+            self.CHANGE_SIZE: [
+                self.rhandler(BUTTON_CHANGE_SIZE, self.change_size()),
                 self.rhandler(BUTTON_FULL_BACK, self.full_back())
 
         ]}
