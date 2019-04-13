@@ -1,3 +1,4 @@
+from telegram import ReplyKeyboardMarkup
 from telegram.ext import run_async
 
 from backend.tgbot.tghandler import TGHandler
@@ -22,8 +23,9 @@ class RandomFreePrizes(TGHandler):
     def change_size(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have decided to change his size'.format(user, text))
-        update.message.reply_text(TEXT_СHANGE_SIZE, reply_markup=self.SIZE_KEYBOARD, one_time_keyboard=True,
-                                  resize_keyboard=True)
+        update.message.reply_text(TEXT_СHANGE_SIZE, reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD,
+                                                                                     one_time_keyboard=True,
+                                                                                     resize_keyboard=True))
         return self.CHOOSEN_SIZE
 
 
