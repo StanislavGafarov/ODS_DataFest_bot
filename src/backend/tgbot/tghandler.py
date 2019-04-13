@@ -42,6 +42,9 @@ class TGHandler(object):
              BUTTON_NEWS],
             [BUTTON_SHOW_PATH]
         ]
+        self.SIZE_KEYBOARD = [[BUTTON_XS_SIZE, BUTTON_S_SIZE, BUTTON_M_SIZE, BUTTON_L_SIZE],
+                              [BUTTON_XL_SIZE, BUTTON_XXL_SIZE, BUTTON_XXXL_SIZE, BUTTON_FULL_BACK]]
+
         self.ADMIN_KEYBOARD = admin_buttons + unauth_buttons
         self.AUTHORIZED_USER_KEYBOARD = auth_buttons
         self.UNAUTHORIZED_USER_KEYBOARD = unauth_buttons

@@ -8,7 +8,7 @@ from backend.models import TGUser
 from backend.tgbot.texts import *
 
 
-class FreePrizes(TGHandler):
+class RandomFreePrizes(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def choosen_size(self,api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
@@ -23,7 +23,10 @@ class FreePrizes(TGHandler):
     def change_size(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have decided to change his size'.format(user, text))
-        update.message.reply_text(TEXT_CHOOSEN_SIZE, reply_markup=self.define_keyboard(user))
+        update.message.reply_text(TEXT_СHANGE_SIZE, reply_markup=self.SIZE_KEYBOARD, one_time_keyboard=True,
+                                  resize_keyboard=True)
+        return self.CHOOSEN_SIZE
+
 
     def create_state(self):
         state = {self.CHOOSEN_SIZE: [
@@ -37,6 +40,7 @@ class FreePrizes(TGHandler):
             self.rhandler(BUTTON_FULL_BACK, self.full_back())
         ],
             self.CHANGE_SIZE:[
+
                 self.rhandler(BUTTON_FULL_BACK, self.full_back())
 
         ]}

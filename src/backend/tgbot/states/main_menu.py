@@ -47,19 +47,17 @@ class MainMenu(TGHandler):
         return self.GET_NEWS
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def free_prize(self,api: TelegramBotApi, user: TGUser, update):
+    def random_prize(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
         if user.merch_size is None:
-            custom_keyboard = [[BUTTON_XS_SIZE, BUTTON_S_SIZE, BUTTON_M_SIZE, BUTTON_L_SIZE],
-                               [BUTTON_XL_SIZE, BUTTON_XXL_SIZE, BUTTON_XXXL_SIZE, BUTTON_FULL_BACK]]
-            update.message.reply_text(TEXT_CHOOSE_YOUR_SIZE, reply_markup=ReplyKeyboardMarkup(custom_keyboard,
+            update.message.reply_text(TEXT_CHOOSE_YOUR_SIZE, reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD,
                                                                                               one_time_keyboard=True,
                                                                                               resize_keyboard=True))
             return self.CHOOSEN_SIZE
         else:
             custom_keyboard = [[BUTTON_CHANGE_SIZE, BUTTON_FULL_BACK]]
-            update.message.reply_text(TEXT_CHANGE_SIZE.format(user.merch_size)
+            update.message.reply_text(TEXT_KNOW_SIZE.format(user.merch_size)
                                       , reply_markup=ReplyKeyboardMarkup(custom_keyboard, one_time_keyboard=True,
                                                                          resize_keyboard=True))
             return self.CHANGE_SIZE
@@ -137,7 +135,7 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
             self.rhandler(BUTTON_SHOW_PATH, self.show_path),
 
-            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.free_prize),
+            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.random_prize),
             self.rhandler(BUTTON_RANDOM_BEER, self.not_ready_yet),
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
