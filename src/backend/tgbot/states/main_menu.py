@@ -120,9 +120,7 @@ class MainMenu(TGHandler):
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
         logger.info("User %s choose start random_prize.", user)
-        group_by_merch = ''
-        for row in  TGUser.objects.values('merch_size').annotate(dcount=Count('merch_size')):
-            group_by_merch += '\n' + row['merch_size'] + " : " + row['dcount']
+        group_by_merch = TGUser.objects.values('merch_size').annotate(dcount=Count('merch_size'))
         update.message.reply_text(TEXT_START_RANDOM_PRIZE.format(group_by_merch)
                                   , reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD, one_time_keyboard=True,
                                                                      resize_keyboard=True))
