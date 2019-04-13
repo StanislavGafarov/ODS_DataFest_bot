@@ -83,6 +83,7 @@ class MainMenu(TGHandler):
         update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
+    # ADMIN
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def create_broadcast(self, api: TelegramBotApi, user: TGUser, update):
         logger.info("User %s initiated broadcast.", user)
@@ -112,6 +113,20 @@ class MainMenu(TGHandler):
             logger.exception('error updating invites')
         return self.MAIN_MENU
 
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def start_random_prize(self, api: TelegramBotApi, user: TGUser, update):
+        if not user.is_admin:
+            update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
+        logger.info("User %s choose start random_prize.", user)
+        group_by_merch = ''
+        for row in  TGUser.objects.values('merch_size').annotate(dcount='merch_size'):
+            group_by_merch += '\n' + row['merch_size'] + " : " + row['dcount']
+        update.message.reply_text(TEXT_START_RANDOM_PRIZE.format(group_by_merch)
+                                  , reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD, one_time_keyboard=True,
+                                                                     resize_keyboard=True))
+        return self.START_RANDOM_PRIZE
+
     # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     # def who_is_your_daddy(self, api: TelegramBotApi, user: TGUser, update):
     #     return self.MAIN_MENU  # Nope
@@ -140,7 +155,7 @@ class MainMenu(TGHandler):
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
             self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
-            self.rhandler(BUTTON_START_RANDOM_PRIZE, self.not_ready_yet),
+            self.rhandler(BUTTON_START_RANDOM_PRIZE, self.start_random_prize),
             self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 
             # self.rhandler('88224646BA', self.who_is_your_daddy),

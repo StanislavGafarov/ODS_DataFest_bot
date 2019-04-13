@@ -19,8 +19,9 @@ class TGHandler(object):
         self.CHOOSEN_SIZE = 41
         self.CHANGE_SIZE = 42
 
-        self.CHECK_EMAIL = 4
-        self.BROADCAST = 5
+        # Admin
+        self.BROADCAST = 995
+        self.START_RANDOM_PRIZE = 996
 
         admin_buttons = [
             [BUTTON_REFRESH_SCHEDULE],

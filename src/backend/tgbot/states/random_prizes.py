@@ -10,7 +10,7 @@ from backend.tgbot.texts import *
 
 class RandomFreePrizes(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def choosen_size(self,api: TelegramBotApi, user: TGUser, update):
+    def chosen_size(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have set his size: {} '.format(user, text))
         user.in_random_prize = True
@@ -28,21 +28,28 @@ class RandomFreePrizes(TGHandler):
                                                                                      resize_keyboard=True))
         return self.CHOOSEN_SIZE
 
+    # ADMIN
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def admin_chosen_category(self, api: TelegramBotApi, user: TGUser, update):
+        return self.MAIN_MENU
 
     def create_state(self):
         state = {self.CHOOSEN_SIZE: [
-            self.rhandler(BUTTON_XS_SIZE, self.choosen_size),
-            self.rhandler(BUTTON_S_SIZE, self.choosen_size),
-            self.rhandler(BUTTON_M_SIZE, self.choosen_size),
-            self.rhandler(BUTTON_L_SIZE, self.choosen_size),
-            self.rhandler(BUTTON_XL_SIZE, self.choosen_size),
-            self.rhandler(BUTTON_XXL_SIZE, self.choosen_size),
-            self.rhandler(BUTTON_XXXL_SIZE, self.choosen_size),
+            self.rhandler(BUTTON_XS_SIZE, self.chosen_size),
+            self.rhandler(BUTTON_S_SIZE, self.chosen_size),
+            self.rhandler(BUTTON_M_SIZE, self.chosen_size),
+            self.rhandler(BUTTON_L_SIZE, self.chosen_size),
+            self.rhandler(BUTTON_XL_SIZE, self.chosen_size),
+            self.rhandler(BUTTON_XXL_SIZE, self.chosen_size),
+            self.rhandler(BUTTON_XXXL_SIZE, self.chosen_size),
             self.rhandler(BUTTON_FULL_BACK, self.full_back)
         ],
             self.CHANGE_SIZE: [
                 self.rhandler(BUTTON_CHANGE_SIZE, self.change_size),
                 self.rhandler(BUTTON_FULL_BACK, self.full_back)
-
-        ]}
+        ],
+            self.START_RANDOM_PRIZE:[
+                self.rhandler(BUTTON_FULL_BACK, self.full_back)
+            ]
+        }
         return state
