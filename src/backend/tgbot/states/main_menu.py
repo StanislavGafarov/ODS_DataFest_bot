@@ -123,7 +123,7 @@ class MainMenu(TGHandler):
         group_by_merch = TGUser.objects.values('merch_size').annotate(dcount=Count('merch_size'))
         text = ''
         for row in group_by_merch:
-            text += '\n' + row.get('merch_size') + ' : ' + row.get('dcount')
+            text += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('dcount'))
         update.message.reply_text(TEXT_START_RANDOM_PRIZE.format(text)
                                   , reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD, one_time_keyboard=True,
                                                                      resize_keyboard=True))
