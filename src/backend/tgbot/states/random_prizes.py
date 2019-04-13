@@ -29,18 +29,18 @@ class RandomFreePrizes(TGHandler):
 
     def create_state(self):
         state = {self.CHOOSEN_SIZE: [
-            self.rhandler(BUTTON_XS_SIZE, self.choosen_size()),
-            self.rhandler(BUTTON_S_SIZE, self.choosen_size()),
-            self.rhandler(BUTTON_M_SIZE, self.choosen_size()),
-            self.rhandler(BUTTON_L_SIZE, self.choosen_size()),
-            self.rhandler(BUTTON_XL_SIZE, self.choosen_size()),
-            self.rhandler(BUTTON_XXL_SIZE, self.choosen_size()),
-            self.rhandler(BUTTON_XXXL_SIZE, self.choosen_size()),
-            self.rhandler(BUTTON_FULL_BACK, self.full_back())
+            self.rhandler(BUTTON_XS_SIZE, self.choosen_size),
+            self.rhandler(BUTTON_S_SIZE, self.choosen_size),
+            self.rhandler(BUTTON_M_SIZE, self.choosen_size),
+            self.rhandler(BUTTON_L_SIZE, self.choosen_size),
+            self.rhandler(BUTTON_XL_SIZE, self.choosen_size),
+            self.rhandler(BUTTON_XXL_SIZE, self.choosen_size),
+            self.rhandler(BUTTON_XXXL_SIZE, self.choosen_size),
+            self.rhandler(BUTTON_FULL_BACK, self.full_back)
         ],
             self.CHANGE_SIZE: [
-                self.rhandler(BUTTON_CHANGE_SIZE, self.change_size()),
-                self.rhandler(BUTTON_FULL_BACK, self.full_back())
+                self.rhandler(BUTTON_CHANGE_SIZE, self.change_size),
+                self.rhandler(BUTTON_FULL_BACK, self.full_back)
 
         ]}
         return state
