@@ -28,7 +28,7 @@ class TGUser(models.Model):
     is_authorized = models.BooleanField(default=False)
     is_notified = models.BooleanField(default=False)
     has_news_subscription = models.BooleanField(default=False)
-    invite = models.OneToOneField('Invite', on_delete=models.SET_NULL, null=True, default=None, related_name='email')
+    invite = models.OneToOneField('Invite', on_delete=models.SET_NULL, null=True, default=None, related_name='tguser')
 
     #RANDOM BEER INFO
     in_random_beer = models.BooleanField(default=False)
