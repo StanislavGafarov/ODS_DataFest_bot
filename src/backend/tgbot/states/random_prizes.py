@@ -38,6 +38,7 @@ class RandomFreePrizes(TGHandler):
         prizes = Prizes.objects.values()
         if prizes.count() == 0:
             update.message.reply_text(TEXT_EMPTY_TABLE_PRIZE, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
         else:
             for row in prizes:
                 merch_size = row.get('merch_size')
