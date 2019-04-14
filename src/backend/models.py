@@ -28,7 +28,7 @@ class TGUser(models.Model):
     is_authorized = models.BooleanField(default=False)
     is_notified = models.BooleanField(default=False)
     has_news_subscription = models.BooleanField(default=False)
-    invite = models.OneToOneField('Invite', on_delete=models.SET_NULL, null=True, default=None, related_name='tguser')
+    invite = models.OneToOneField('Invite', on_delete=models.SET_NULL, null=True, default=None, related_name='email')
 
     #RANDOM BEER INFO
     in_random_beer = models.BooleanField(default=False)
@@ -77,7 +77,7 @@ class News(models.Model):
 SIZES = [(i,i) for i in ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']]
 
 
-@make_str('prizes')
+@make_str('merch_size')
 class Prizes(models.Model):
     merch_size = models.TextField(choices=SIZES)
     quantity = models.IntegerField(default=0)

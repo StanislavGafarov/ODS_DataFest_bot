@@ -6,7 +6,7 @@ from telegram.ext import run_async, MessageHandler, Filters
 from django.db.models import Count
 
 from backend.google_spreadsheet_client import GoogleSpreadsheet
-from backend.models import TGUser, Invite
+from backend.models import TGUser, Invite, Prizes
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.tghandler import TGHandler
@@ -119,13 +119,18 @@ class MainMenu(TGHandler):
         if not user.is_admin:
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
-        logger.info("User %s choose start random_prize.", user)
+        logger.info("User %s choose draw prizes.", user)
         group_by_merch = TGUser.objects.values('merch_size').annotate(dcount=Count('merch_size'))
-        text = ''
+        users_merch_table = ''
         for row in group_by_merch:
-            text += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('dcount'))
+            users_merch_table += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('dcount'))
 
-        update.message.reply_text(TEXT_START_RANDOM_PRIZE.format(text)
+        prizes_info = Prizes.object.all()
+        prizes_table = ''
+        for row in prizes_info:
+            prizes_table += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('quantity'))
+
+        update.message.reply_text(TEXT_START_RANDOM_PRIZE.format(users_merch_table, prizes_table)
                                   , reply_markup=ReplyKeyboardMarkup([[BUTTON_START_DRAWING, BUTTON_FULL_BACK]]
                                                                      , one_time_keyboard=True,
                                                                      resize_keyboard=True))
