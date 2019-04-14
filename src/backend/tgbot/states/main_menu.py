@@ -48,7 +48,7 @@ class MainMenu(TGHandler):
         return self.GET_NEWS
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def random_prize(self, api: TelegramBotApi, user: TGUser, update):
+    def participate_random_prize(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
         if user.merch_size is None:
@@ -115,7 +115,7 @@ class MainMenu(TGHandler):
         return self.MAIN_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def start_random_prize(self, api: TelegramBotApi, user: TGUser, update):
+    def draw_prizes(self, api: TelegramBotApi, user: TGUser, update):
         if not user.is_admin:
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
@@ -124,10 +124,12 @@ class MainMenu(TGHandler):
         text = ''
         for row in group_by_merch:
             text += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('dcount'))
+
         update.message.reply_text(TEXT_START_RANDOM_PRIZE.format(text)
-                                  , reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD, one_time_keyboard=True,
+                                  , reply_markup=ReplyKeyboardMarkup([[BUTTON_START_DRAWING, BUTTON_FULL_BACK]]
+                                                                     , one_time_keyboard=True,
                                                                      resize_keyboard=True))
-        return self.START_RANDOM_PRIZE
+        return self.DRAW_PRIZES
 
     # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     # def who_is_your_daddy(self, api: TelegramBotApi, user: TGUser, update):
@@ -152,12 +154,12 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
             self.rhandler(BUTTON_SHOW_PATH, self.show_path),
 
-            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.random_prize),
+            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
             self.rhandler(BUTTON_RANDOM_BEER, self.not_ready_yet),
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
             self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
-            self.rhandler(BUTTON_START_RANDOM_PRIZE, self.start_random_prize),
+            self.rhandler(BUTTON_DRAW_PRIZES, self.draw_prizes),
             self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 
             # self.rhandler('88224646BA', self.who_is_your_daddy),

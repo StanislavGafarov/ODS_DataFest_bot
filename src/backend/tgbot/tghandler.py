@@ -21,12 +21,12 @@ class TGHandler(object):
 
         # Admin
         self.BROADCAST = 995
-        self.START_RANDOM_PRIZE = 996
+        self.DRAW_PRIZES = 996
 
         admin_buttons = [
             [BUTTON_REFRESH_SCHEDULE],
             [BUTTON_SEND_INVITES],
-            [BUTTON_START_RANDOM_PRIZE],
+            [BUTTON_DRAW_PRIZES],
             [BUTTON_POST_NEWS]
         ]
         auth_buttons = [

@@ -73,6 +73,11 @@ class Invite(models.Model):
 class News(models.Model):
     news = models.TextField(default=False)
 
+@make_str('prizes')
+class Prizes(models.Model):
+    merch_size = models.TextField(choices=['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'])
+    quantity = models.IntegerField(default=0)
+
 
 EVENT_TYPES = {
     'talk': 'доклад',
