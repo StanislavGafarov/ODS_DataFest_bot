@@ -125,7 +125,7 @@ class MainMenu(TGHandler):
         for row in group_by_merch:
             users_merch_table += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('dcount'))
 
-        prizes_info = Prizes.object.all()
+        prizes_info = Prizes.objects.values()
         prizes_table = ''
         for row in prizes_info:
             prizes_table += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('quantity'))
