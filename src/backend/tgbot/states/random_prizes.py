@@ -45,7 +45,10 @@ class RandomFreePrizes(TGHandler):
                 sample_size = row.get('quantity')
                 all_users = TGUser.objects.filter(in_random_prize=True, merch_size=merch_size)\
                     .exclude(win_random_prize=True).values_list('tg_id', flat=True)
-                winners = random.sample(list(all_users), sample_size)
+
+                winners = random.sample(list(all_users),
+                                        sample_size if len(list(all_users)) > sample_size else len(list(all_users))
+                                        )
                 for winner in winners:
                     win_user = TGUser.objects.get(tg_id=winner)
                     win_user.win_random_prize = True
@@ -68,7 +71,6 @@ class RandomFreePrizes(TGHandler):
             self.rhandler(BUTTON_L_SIZE, self.chosen_size),
             self.rhandler(BUTTON_XL_SIZE, self.chosen_size),
             self.rhandler(BUTTON_XXL_SIZE, self.chosen_size),
-            self.rhandler(BUTTON_XXXL_SIZE, self.chosen_size),
             self.rhandler(BUTTON_FULL_BACK, self.full_back),
             MessageHandler(Filters.text, self.unknown_command)
         ],
