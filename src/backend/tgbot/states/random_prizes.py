@@ -45,13 +45,15 @@ class RandomFreePrizes(TGHandler):
                 sample_size = row.get('quantity')
                 all_users = TGUser.objects.filter(in_random_prize=True, merch_size=merch_size)\
                     .exclude(win_random_prize=True).values_list('tg_id', flat=True)
-                winners = random.sample(all_users, sample_size)
+                winners = random.sample(list(all_users), sample_size)
                 for winner in winners:
-                    win_user = TGUser.objects.get(tg_id=winner)
+                    win_user = TGUser.objects.get(tg_id=winner).first()
                     win_user.win_random_prize = True
                     win_user.save()
+                    logger.info('User {} email:{} win the prize in category {}'
+                                .format(win_user.name, win_user.last_checked_email, merch_size))
                     try:
-                        api.bot.send_message(win_user.tg_id, TEXT_INVITE_NOTIFICATION)
+                        api.bot.send_message(win_user.tg_id, TEXT_CONGRATULATION)
                     except Unauthorized:
                         logger.info('{} blocked'.format(user))
 
