@@ -13,9 +13,15 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path
 
+import backend.qrgen
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    url(r'^qr/(?P<user_id>[0-9a-zA-Z-]+)$',
+        backend.qrgen.qr_code_view,
+        name='image-info'),
 ]
