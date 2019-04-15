@@ -1,6 +1,5 @@
-import gspread
 import pandas as pd
-from oauth2client.service_account import ServiceAccountCredentials
+import pygsheets
 
 from backend.models import Invite
 from backend.tgbot.utils import logger
@@ -11,16 +10,22 @@ class GoogleSpreadsheet():
              'https://www.googleapis.com/auth/drive']
 
     def __init__(self, client_secret_path):
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(client_secret_path, self.SCOPE)
-        gc = gspread.authorize(credentials)
+        self.client_secret_path = client_secret_path
 
-        self.schedule = gc.open("ODS_Sheet_1").sheet1
-        self.email_codes = gc.open("Data Fest⁶, регистрация (Ответы)").get_worksheet(1)
-
-        self.table_map = {"SCHEDULE_TEST": self.schedule, "EMAIL_CODES": self.email_codes}
+        self.table_map = {"SCHEDULE_TEST": self.schedule_sheet, "EMAIL_CODES": self.email_sheet}
 
     def get_data(self, tab) -> pd.DataFrame:
-        return pd.DataFrame(self.table_map[tab].get_all_records())
+        return pd.DataFrame(self.table_map[tab]().get_all_records())
+
+    @property
+    def _client(self):
+        return pygsheets.authorize(service_account_file=self.client_secret_path)
+
+    def email_sheet(self):
+        return self._client.open('Data Fest⁶, регистрация (Ответы)').worksheet(value=1)
+
+    def schedule_sheet(self):
+        return self._client.open("ODS_Sheet_1").sheet1
 
     def update_invites(self):
         existing_invite_count = len(Invite.objects.all())
