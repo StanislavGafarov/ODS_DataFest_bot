@@ -47,7 +47,7 @@ class RandomFreePrizes(TGHandler):
                     .exclude(win_random_prize=True).values_list('tg_id', flat=True)
                 winners = random.sample(list(all_users), sample_size)
                 for winner in winners:
-                    win_user = TGUser.objects.get(tg_id=winner).first()
+                    win_user = TGUser.objects.get(tg_id=winner)
                     win_user.win_random_prize = True
                     win_user.save()
                     logger.info('User {} email:{} win the prize in category {}'
