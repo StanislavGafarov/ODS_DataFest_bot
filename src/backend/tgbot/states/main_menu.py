@@ -3,9 +3,10 @@ import traceback
 from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup
 from telegram.error import Unauthorized
 from telegram.ext import run_async, MessageHandler, Filters
+from django.db.models import Count
 
 from backend.google_spreadsheet_client import GoogleSpreadsheet
-from backend.models import TGUser, Invite
+from backend.models import TGUser, Invite, Prizes
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.tghandler import TGHandler
@@ -47,6 +48,22 @@ class MainMenu(TGHandler):
         return self.GET_NEWS
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def participate_random_prize(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        if user.merch_size is None:
+            update.message.reply_text(TEXT_CHOOSE_YOUR_SIZE, reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD,
+                                                                                              one_time_keyboard=True,
+                                                                                              resize_keyboard=True))
+            return self.CHOOSEN_SIZE
+        else:
+            custom_keyboard = [[BUTTON_CHANGE_SIZE, BUTTON_FULL_BACK]]
+            update.message.reply_text(TEXT_KNOW_SIZE.format(user.merch_size)
+                                      , reply_markup=ReplyKeyboardMarkup(custom_keyboard, one_time_keyboard=True,
+                                                                         resize_keyboard=True))
+            return self.CHANGE_SIZE
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def not_ready_yet(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
@@ -67,6 +84,7 @@ class MainMenu(TGHandler):
         update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
+    # ADMIN
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def create_broadcast(self, api: TelegramBotApi, user: TGUser, update):
         logger.info("User %s initiated broadcast.", user)
@@ -96,6 +114,28 @@ class MainMenu(TGHandler):
             logger.exception('error updating invites')
         return self.MAIN_MENU
 
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def draw_prizes(self, api: TelegramBotApi, user: TGUser, update):
+        if not user.is_admin:
+            update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
+        logger.info("User %s choose draw prizes.", user)
+        group_by_merch = TGUser.objects.values('merch_size').annotate(dcount=Count('merch_size'))
+        users_merch_table = ''
+        for row in group_by_merch:
+            users_merch_table += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('dcount'))
+
+        prizes_info = Prizes.objects.values()
+        prizes_table = ''
+        for row in prizes_info:
+            prizes_table += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('quantity'))
+
+        update.message.reply_text(TEXT_START_RANDOM_PRIZE.format(users_merch_table, prizes_table)
+                                  , reply_markup=ReplyKeyboardMarkup([[BUTTON_START_DRAWING, BUTTON_FULL_BACK]]
+                                                                     , one_time_keyboard=True,
+                                                                     resize_keyboard=True))
+        return self.DRAW_PRIZES
+
     # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     # def who_is_your_daddy(self, api: TelegramBotApi, user: TGUser, update):
     #     return self.MAIN_MENU  # Nope
@@ -119,12 +159,12 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
             self.rhandler(BUTTON_SHOW_PATH, self.show_path),
 
-            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.not_ready_yet),
+            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
             self.rhandler(BUTTON_RANDOM_BEER, self.not_ready_yet),
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
             self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
-            self.rhandler(BUTTON_START_RANDOM_PRIZE, self.not_ready_yet),
+            self.rhandler(BUTTON_DRAW_PRIZES, self.draw_prizes),
             self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 
             # self.rhandler('88224646BA', self.who_is_your_daddy),
