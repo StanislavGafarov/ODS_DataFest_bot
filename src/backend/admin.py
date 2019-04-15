@@ -16,13 +16,15 @@ class TGUserAdmin(admin.ModelAdmin):
         'is_authorized',
         'is_notified',
         'has_news_subscription',
+        'win_random_prize',
         'last_checked_email',
     ]
 
     list_filter = [
         'is_admin',
         'is_authorized',
-        'is_notified'
+        'is_notified',
+        'win_random_prize'
     ]
 
     search_fields = ['name', 'last_name', 'username', 'last_checked_email']

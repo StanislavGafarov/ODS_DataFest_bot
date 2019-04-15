@@ -74,7 +74,7 @@ class News(models.Model):
     news = models.TextField(default=False)
 
 
-SIZES = [(i,i) for i in ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']]
+SIZES = [(i, i) for i in ['XS', 'S', 'M', 'L', 'XL', 'XXL']]
 
 
 @make_str('merch_size')
