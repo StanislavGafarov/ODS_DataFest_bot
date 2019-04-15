@@ -34,7 +34,7 @@ class Authorization(TGHandler):
             code = None
         invite = Invite.objects.filter(email=user.last_checked_email, code=code).first()
         if code is not None and invite is not None:
-            if invite.tguser is not None:
+            if hasattr(invite, 'tguser'):
                 logger.info('{} tried to sign as {}'.format(user, invite.tguser))
                 update.message.reply_text(TEXT_EMAIL_USED_BY_OTHER_USER, reply_markup=self.define_keyboard(user))
             else:
