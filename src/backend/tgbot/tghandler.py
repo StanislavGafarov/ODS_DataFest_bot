@@ -12,16 +12,21 @@ class TGHandler(object):
         self.MAIN_MENU = 0
         self.CHECK_REGISTRATION_STATUS = 1
         self.AUTHORIZATION = 2
-        self.CHECK_CODE = 99
+        self.CHECK_CODE = 21
         self.GET_NEWS = 3
 
-        self.CHECK_EMAIL = 4
-        self.BROADCAST = 5
+        # self.FREE_PRIZES = 41
+        self.CHOOSEN_SIZE = 41
+        self.CHANGE_SIZE = 42
+
+        # Admin
+        self.BROADCAST = 995
+        self.DRAW_PRIZES = 996
 
         admin_buttons = [
             [BUTTON_REFRESH_SCHEDULE],
             [BUTTON_SEND_INVITES],
-            [BUTTON_START_RANDOM_PRIZE],
+            [BUTTON_DRAW_PRIZES],
             [BUTTON_POST_NEWS]
         ]
         auth_buttons = [
@@ -38,6 +43,9 @@ class TGHandler(object):
              BUTTON_NEWS],
             [BUTTON_SHOW_PATH]
         ]
+        self.SIZE_KEYBOARD = [[BUTTON_XS_SIZE, BUTTON_S_SIZE, BUTTON_M_SIZE, BUTTON_L_SIZE],
+                              [BUTTON_XL_SIZE, BUTTON_XXL_SIZE, BUTTON_FULL_BACK]]
+
         self.ADMIN_KEYBOARD = admin_buttons + unauth_buttons
         self.AUTHORIZED_USER_KEYBOARD = auth_buttons
         self.UNAUTHORIZED_USER_KEYBOARD = unauth_buttons
