@@ -164,7 +164,8 @@ class MainMenu(TGHandler):
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
             self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
-            self.rhandler(BUTTON_DRAW_PRIZES, self.draw_prizes),
+            #self.rhandler(BUTTON_DRAW_PRIZES, self.draw_prizes),
+            self.rhandler(BUTTON_DRAW_PRIZES, self.not_ready_yet),
             self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 
             # self.rhandler('88224646BA', self.who_is_your_daddy),
