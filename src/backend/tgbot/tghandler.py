@@ -50,6 +50,8 @@ class TGHandler(object):
         self.AUTHORIZED_USER_KEYBOARD = auth_buttons
         self.UNAUTHORIZED_USER_KEYBOARD = unauth_buttons
 
+        self.BOT_MESSAGES = [TEXT_BOT_UPDATED, TEXT_BOT_TESTERS_WANTED]
+
     def define_keyboard(self, user: TGUser):
         if user.is_admin:
             keyboard = self.ADMIN_KEYBOARD
