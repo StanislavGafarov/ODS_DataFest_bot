@@ -61,6 +61,15 @@ class Decorators(object):
         return get_user
 
     @classmethod
+    def with_random_beer_user(cls, f):
+        @wraps(f)
+        def get_random_beer_user(cls, api: TelegramBotApi, update, user):
+            random_beer_user = api.get_random_beer_user(update.message.chat_id)
+            return f(cls, api, user, update, random_beer_user)
+        return get_random_beer_user
+
+
+    @classmethod
     def save_user_info(cls, f):
         @wraps(f)
         def get_user(cls, api: TelegramBotApi, update, user):

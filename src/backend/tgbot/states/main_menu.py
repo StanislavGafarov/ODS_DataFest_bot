@@ -48,22 +48,6 @@ class MainMenu(TGHandler):
         return self.GET_NEWS
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def participate_random_prize(self, api: TelegramBotApi, user: TGUser, update):
-        text = update.message.text
-        logger.info('User {} have chosen {} '.format(user, text))
-        if user.merch_size is None:
-            update.message.reply_text(TEXT_CHOOSE_YOUR_SIZE, reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD,
-                                                                                              one_time_keyboard=True,
-                                                                                              resize_keyboard=True))
-            return self.CHOOSEN_SIZE
-        else:
-            custom_keyboard = [[BUTTON_CHANGE_SIZE, BUTTON_FULL_BACK]]
-            update.message.reply_text(TEXT_KNOW_SIZE.format(user.merch_size)
-                                      , reply_markup=ReplyKeyboardMarkup(custom_keyboard, one_time_keyboard=True,
-                                                                         resize_keyboard=True))
-            return self.CHANGE_SIZE
-
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def not_ready_yet(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
@@ -83,6 +67,43 @@ class MainMenu(TGHandler):
         logger.info('User {} have chosen {} '.format(user, text))
         update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
+
+    # AUTHORIZED
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def participate_random_prize(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        if not user.is_authorized:
+            update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
+        if user.merch_size is None:
+            update.message.reply_text(TEXT_CHOOSE_YOUR_SIZE, reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD,
+                                                                                              one_time_keyboard=True,
+                                                                                              resize_keyboard=True))
+            return self.CHOOSEN_SIZE
+        else:
+            custom_keyboard = [[BUTTON_CHANGE_SIZE, BUTTON_FULL_BACK]]
+            update.message.reply_text(TEXT_KNOW_SIZE.format(user.merch_size)
+                                      , reply_markup=ReplyKeyboardMarkup(custom_keyboard, one_time_keyboard=True,
+                                                                         resize_keyboard=True))
+            return self.CHANGE_SIZE
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
+    def participate_random_beer(self, api: TelegramBotApi, user: TGUser, update, random_beer_user):
+        text = update.message.text
+        logger.info('User {} have choosen {}'.format(user, text))
+        if not user.is_authorized:
+            update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
+        if random_beer_user.accept_rules:
+            update.message.reply_text(TEXT_RANDOM_BEER_MENU, reply_markup=self.random_beer_keyboard(random_beer_user))
+            return self.RANDOM_BEER_MENU
+        else:
+            custom_keyboard = [[BUTTON_ACCEPT_RULES, BUTTON_DECLINE_RULES]]
+            update.message.reply_text(TEXT_RULES, reply_markup=ReplyKeyboardMarkup(custom_keyboard
+                                                                                   , one_time_keyboard=True
+                                                                                   , resize_keyboard=True))
+            return self.RANDOM_BEER_RULES
 
     # ADMIN
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
@@ -161,7 +182,7 @@ class MainMenu(TGHandler):
 
             self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.not_ready_yet),
             #self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
-            self.rhandler(BUTTON_RANDOM_BEER, self.not_ready_yet),
+            self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
             self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
