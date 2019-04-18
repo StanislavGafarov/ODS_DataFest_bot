@@ -15,10 +15,15 @@ class TGHandler(object):
         self.CHECK_CODE = 21
         self.GET_NEWS = 3
 
-        self.CHOOSEN_SIZE = 41
-        self.CHANGE_SIZE = 42
-        self.RANDOM_BEER_MENU = 43
-        self.RANDOM_BEER_RULES = 44
+
+        self.CHOOSEN_SIZE = 40
+        self.CHANGE_SIZE = 41
+
+        self.RANDOM_BEER_MENU = 42
+        self.RANDOM_BEER_RULES = 43
+        self.RANDOM_BEER_TG_NICK = 44
+        self.RANDOM_BEER_ODS_NICK = 45
+        self.RANDOM_BEER_SN_LINK = 46
 
         # Admin
         self.BROADCAST = 995
