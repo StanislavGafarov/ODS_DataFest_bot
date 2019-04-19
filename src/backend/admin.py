@@ -52,6 +52,6 @@ class PrizesAdmin(admin.ModelAdmin):
 
 @admin.register(RandomBeerUser)
 class RandomBeerUserAdmin(admin.ModelAdmin):
-    list_display = ['tg_user_id', 'tg_nickname', 'ods_nickname', 'social_network_link', 'random_beer_try', 'prev_pair',
+    list_display = ['tg_user_id', 'email', 'tg_nickname', 'ods_nickname', 'social_network_link', 'random_beer_try', 'prev_pair',
                     'accept_rules', 'is_busy']
-    search_fields = ['accept_rules', 'is_busy']
+    search_fields = ['accept_rules', 'is_busy', 'email']
