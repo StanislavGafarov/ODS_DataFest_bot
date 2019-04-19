@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from backend.models import TGUser, Message, Event, Invite, Prizes
+from backend.models import TGUser, Message, Event, Invite, Prizes, RandomBeerUser
 
 
 @admin.register(TGUser)
@@ -49,3 +49,9 @@ class InviteAdmin(admin.ModelAdmin):
 class PrizesAdmin(admin.ModelAdmin):
     list_display = ['merch_size', 'quantity']
     search_fields = ['merch_size']
+
+@admin.register(RandomBeerUser)
+class RandomBeerUserAdmin(admin.ModelAdmin):
+    list_display = ['tg_user_id', 'tg_nickname', 'ods_nickname', 'social_network_link', 'random_beer_try', 'prev_pair',
+                    'accept_rules', 'is_busy']
+    search_fields = ['accept_rules', 'is_busy']
