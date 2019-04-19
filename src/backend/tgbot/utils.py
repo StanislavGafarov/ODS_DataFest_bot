@@ -61,7 +61,7 @@ class Decorators(object):
     def with_random_beer_user(cls, f):
         @wraps(f)
         def get_random_beer_user(cls, api: TelegramBotApi, user, update):
-            random_beer_user = RandomBeerUser.objects.filter(tg_user_id=user.tg_id)
+            random_beer_user = RandomBeerUser.objects.filter(tg_user_id=user.tg_id).first()
             if random_beer_user is None:
                 logger.info('User {} not in random beer users, creating new one'.format(user))
                 random_beer_user = RandomBeerUser(tg_user_id=user.tg_id)
