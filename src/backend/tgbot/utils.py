@@ -65,6 +65,7 @@ class Decorators(object):
             if random_beer_user is None:
                 logger.info('User {} not in random beer users, creating new one'.format(user))
                 random_beer_user = RandomBeerUser(tg_user_id=user.tg_id)
+                random_beer_user.email = user.last_checked_email
                 random_beer_user.save()
             return f(cls, api, user, update, random_beer_user)
         return get_random_beer_user

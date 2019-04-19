@@ -90,10 +90,11 @@ class RandomBeerUser(models.Model):
     tg_nickname = models.TextField(null=True, default=None)
     ods_nickname = models.TextField(null=True, default=None)
     social_network_link = models.TextField(null=True, default=None)
-    random_beer_try = models.IntegerField(null=True, default=None)
+    random_beer_try = models.IntegerField(default=0)
     prev_pair = models.IntegerField(null=True, default=None)
     accept_rules = models.BooleanField(default=False)
     is_busy = models.BooleanField(default=False)
+    email = models.TextField(null=True, default=None)
 
 
 
