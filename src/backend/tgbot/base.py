@@ -67,9 +67,9 @@ class TelegramBotApi:
             self.update_user_data(user)
         return user
 
-    def get_random_beer_user(self, tg_id):
-        random_beer_user = RandomBeerUser.objects.filter(tg_user_id=tg_id).first()
+    def get_random_beer_user(self, user):
+        random_beer_user = RandomBeerUser.objects.filter(tg_user_id=user.tg_id).first()
         if random_beer_user is None:
-            random_beer_user = RandomBeerUser(tg_user_id=tg_id)
+            random_beer_user = RandomBeerUser(tg_user_id=user.tg_id)
             random_beer_user.save()
         return random_beer_user
