@@ -183,13 +183,13 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
             self.rhandler(BUTTON_SHOW_PATH, self.show_path),
 
-            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.not_ready_yet),
-            #self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
+            # self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.not_ready_yet),
+            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
             self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
-            self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
-            #self.rhandler(BUTTON_DRAW_PRIZES, self.draw_prizes),
+            # self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
+            self.rhandler(BUTTON_DRAW_PRIZES, self.draw_prizes),
             self.rhandler(BUTTON_DRAW_PRIZES, self.not_ready_yet),
             self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 

@@ -188,9 +188,11 @@ class RandomBeer(TGHandler):
                 pair_user.save()
                 random_beer_user.save()
                 self.send_notification(pair_user, random_beer_user, api)
-                self.send_notification(random_beer_user, pair_user, api)
                 logger.info('User {} will meet with user {}'.format(random_beer_user.email, pair_user.email))
-                update.message.reply_text(reply_markup=self.random_beer_keyboard(random_beer_user))
+                update.message.reply_text(TEXT_RANDOM_BEER_MATCH
+                                          .format(pair_user.tg_nickname, pair_user.ods_nickname,
+                                                  pair_user.social_network_link),
+                                          reply_markup=self.random_beer_keyboard(random_beer_user))
                 return self.RANDOM_BEER_MENU
 
     def get_match(self, random_beer_user: RandomBeerUser):
