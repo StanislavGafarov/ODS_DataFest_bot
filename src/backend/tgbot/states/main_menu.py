@@ -6,7 +6,7 @@ from telegram.ext import run_async, MessageHandler, Filters
 from django.db.models import Count
 
 from backend.google_spreadsheet_client import GoogleSpreadsheet
-from backend.models import TGUser, Invite, Prizes
+from backend.models import TGUser, Invite, Prizes, RandomBeerUser
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.tghandler import TGHandler
@@ -89,7 +89,7 @@ class MainMenu(TGHandler):
             return self.CHANGE_SIZE
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
-    def participate_random_beer(self, api: TelegramBotApi, user: TGUser, update, random_beer_user):
+    def participate_random_beer(self, api: TelegramBotApi, random_beer_user: RandomBeerUser,  user: TGUser, update):
         text = update.message.text
         logger.info('User {} have choosen {}'.format(user, text))
         if not user.is_authorized:
