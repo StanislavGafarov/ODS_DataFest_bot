@@ -59,7 +59,7 @@ class RandomBeer(TGHandler):
         prev_field_val = random_beer_user.tg_nickname
         random_beer_user.tg_nickname = ''
         random_beer_user.save()
-        logger.info('User {} decided to skip tg_nickname filling')
+        logger.info('User {} decided to skip tg_nickname filling'.format(user))
         if prev_field_val is not None:
             update.message.reply_text(TEXT_SUCCESSFULLY_CHANGED +'\n'+ TEXT_RANDOM_BEER_MENU
                                       .format(random_beer_user.tg_nickname, random_beer_user.ods_nickname,
@@ -91,7 +91,7 @@ class RandomBeer(TGHandler):
         prev_field_val = random_beer_user.ods_nickname
         random_beer_user.ods_nickname = ''
         random_beer_user.save()
-        logger.info('User {} decided to skip ods_nickname filling')
+        logger.info('User {} decided to skip ods_nickname filling'.format(user))
         if prev_field_val is not None:
             update.message.reply_text(TEXT_SUCCESSFULLY_CHANGED +'\n'+ TEXT_RANDOM_BEER_MENU
                                       .format(random_beer_user.tg_nickname, random_beer_user.ods_nickname,
@@ -248,7 +248,7 @@ class RandomBeer(TGHandler):
                 self.rhandler(BUTTON_CHANGE_ODS_NICK, self.change_field),
                 self.rhandler(BUTTON_CHANGE_TG_NICK, self.change_field),
                 self.rhandler(BUTTON_FIND_MATCH, self.find_match),
-                self.rhandler(BUTTON_END_MEETING, self.not_ready_yet),
+                self.rhandler(BUTTON_END_MEETING, self.end_meeting),
                 self.rhandler(BUTTON_FULL_BACK, self.full_back),
                 MessageHandler(Filters.text, self.rb_unknown_command)
             ]
