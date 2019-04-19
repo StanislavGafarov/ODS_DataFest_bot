@@ -57,9 +57,16 @@ class RandomBeer(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def skip_tg_nick(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
+        prev_field_val = random_beer_user.tg_nickname
         random_beer_user.tg_nickname = ''
         random_beer_user.save()
         logger.info('User {} decided to skip tg_nickname filling')
+        if prev_field_val is not None:
+            update.message.reply_text(TEXT_SUCCESSFULLY_CHANGED +'\n'+ TEXT_RANDOM_BEER_MENU
+                                      .format(random_beer_user.tg_nickname, random_beer_user.ods_nickname,
+                                              random_beer_user.social_network_link)
+                                      , reply_markup=self.random_beer_keyboard(random_beer_user))
+            return self.RANDOM_BEER_MENU
         update.message.reply_text(TEXT_NEED_ODS_NICK, reply_markup=ReplyKeyboardRemove())
         return self.RANDOM_BEER_ODS_NICK
 
@@ -82,9 +89,16 @@ class RandomBeer(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def skip_ods_nick(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
+        prev_field_val = random_beer_user.ods_nickname
         random_beer_user.ods_nickname = ''
         random_beer_user.save()
         logger.info('User {} decided to skip ods_nickname filling')
+        if prev_field_val is not None:
+            update.message.reply_text(TEXT_SUCCESSFULLY_CHANGED +'\n'+ TEXT_RANDOM_BEER_MENU
+                                      .format(random_beer_user.tg_nickname, random_beer_user.ods_nickname,
+                                              random_beer_user.social_network_link)
+                                      , reply_markup=self.random_beer_keyboard(random_beer_user))
+            return self.RANDOM_BEER_MENU
         update.message.reply_text(TEXT_NEED_SN_LINK, reply_markup=ReplyKeyboardRemove())
         return self.RANDOM_BEER_SN_LINK
 
@@ -109,9 +123,16 @@ class RandomBeer(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def skip_sn_link(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
+        prev_field_val = random_beer_user.social_network_link
         random_beer_user.social_network_link = ''
         random_beer_user.save()
         logger.info('User {} decided to skip social_network_link filling'.format(user))
+        if prev_field_val is not None:
+            update.message.reply_text(TEXT_SUCCESSFULLY_CHANGED +'\n'+ TEXT_RANDOM_BEER_MENU
+                                      .format(random_beer_user.tg_nickname, random_beer_user.ods_nickname,
+                                              random_beer_user.social_network_link)
+                                      , reply_markup=self.random_beer_keyboard(random_beer_user))
+            return self.RANDOM_BEER_MENU
         update.message.reply_text(TEXT_RANDOM_BEER_MENU.format(random_beer_user.tg_nickname,
                                                                random_beer_user.ods_nickname,
                                                                random_beer_user.social_network_link)
