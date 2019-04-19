@@ -171,7 +171,7 @@ class RandomBeer(TGHandler):
 
         else:
             if random_beer_user.random_beer_try == 3:
-                update.message.replay_text(TEXT_LIMIT_IS_OVER, reply_markup=self.random_beer_keyboard(random_beer_user))
+                update.message.reply_text(TEXT_LIMIT_IS_OVER, reply_markup=self.random_beer_keyboard(random_beer_user))
                 return self.RANDOM_BEER_MENU
 
             else:
@@ -189,6 +189,7 @@ class RandomBeer(TGHandler):
                 self.send_notification(pair_user, random_beer_user, api)
                 self.send_notification(random_beer_user, pair_user, api)
                 logger.info('User {} will meet with user {}'.format(random_beer_user.email, pair_user.email))
+                update.message.reply_text(reply_markup=self.random_beer_keyboard(random_beer_user))
                 return self.RANDOM_BEER_MENU
 
     def get_match(self, random_beer_user: RandomBeerUser):
@@ -218,12 +219,12 @@ class RandomBeer(TGHandler):
     def end_meeting(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
         logger.info('{} have finished the meeting'.format(random_beer_user.email))
         random_beer_user.is_busy = False
+        pair_user = RandomBeerUser.objects.filter(tg_user_id=random_beer_user.prev_pair).first()
+        pair_user.is_busy = False
         random_beer_user.save()
+        pair_user.save()
         update.message.reply_text(TEXT_END_MEETING, reply_markup=self.random_beer_keyboard(random_beer_user))
         return self.RANDOM_BEER_MENU
-
-
-
 
     def create_state(self):
         state = {
