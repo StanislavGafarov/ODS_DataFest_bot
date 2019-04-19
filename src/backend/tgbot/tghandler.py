@@ -24,6 +24,7 @@ class TGHandler(object):
         self.RANDOM_BEER_TG_NICK = 44
         self.RANDOM_BEER_ODS_NICK = 45
         self.RANDOM_BEER_SN_LINK = 46
+        self.RANDOM_BEER_CHANGE_FIELD = 47
 
         # Admin
         self.BROADCAST = 995
@@ -56,7 +57,7 @@ class TGHandler(object):
                                           [BUTTON_CHANGE_ODS_NICK],
                                           [BUTTON_CHANGE_SN_LINK]]
 
-        self.ADMIN_KEYBOARD = admin_buttons + unauth_buttons
+        self.ADMIN_KEYBOARD = admin_buttons + auth_buttons
         self.AUTHORIZED_USER_KEYBOARD = auth_buttons
         self.UNAUTHORIZED_USER_KEYBOARD = unauth_buttons
 

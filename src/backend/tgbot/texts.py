@@ -43,6 +43,8 @@ TEXT_RANDOM_BEER_MATCH = 'Итак, великий рандом подобрал
                          'Напишите ему/ей и договоритесь о встрече, хорошей встречи'
 TEXT_WRITE_FEEDBACK = "Напишите отзыв о встречи, как это было?"
 TEXT_GOTO_RANDOM_COFFEE = 'Понравился формат встреч? Чего ждешь? Добавляйся в Random coffee! -=link_to_random_coffee=-'
+TEXT_CHANGE_FIELD = 'Вы решили {}. Введите новое значение либо введите /skip, чтобы пропустить данный шаг.'
+TEXT_SUCCESSFULLY_CHANGED = 'Хорошо. Ваши данные изменены.'
 
 # ZAGLUSHKA
 TEXT_NOT_READY_YET = "В разработке. Мы оповестим о запуске!"

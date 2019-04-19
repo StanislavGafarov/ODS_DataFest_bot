@@ -7,7 +7,7 @@ from backend.tgbot.texts import *
 from backend.tgbot.utils import Decorators, logger
 from backend.models import TGUser, RandomBeerUser
 
-#TODO: Change all this fields
+
 class RandomBeer(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def accepted_rules(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
@@ -28,10 +28,15 @@ class RandomBeer(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def get_tg_nick(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
+        prev_field_val = random_beer_user.tg_nickname
         tg_nick = update.message.text
         random_beer_user.tg_nickname = tg_nick
         random_beer_user.save()
         logger.info('User {} fill tg_nickname with {} '.format(user, tg_nick))
+        if prev_field_val is not None:
+            update.message.reply_text(TEXT_SUCCESSFULLY_CHANGED,
+                                      reply_markup=self.random_beer_keyboard(random_beer_user))
+            return self.RANDOM_BEER_MENU
         update.message.reply_text(TEXT_NEED_ODS_NICK, reply_markup=ReplyKeyboardRemove())
         return self.RANDOM_BEER_ODS_NICK
 
@@ -43,10 +48,16 @@ class RandomBeer(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def get_ods_nick(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
+        prev_field_val = random_beer_user.ods_nickname
         ods_nick = update.message.text
         random_beer_user.ods_nickname = ods_nick
         random_beer_user.save()
         logger.info('User {} fill ods_nickname with {} '.format(user, ods_nick))
+        if prev_field_val is not None:
+            update.message.reply_text(TEXT_SUCCESSFULLY_CHANGED,
+                                      reply_markup=self.random_beer_keyboard(random_beer_user))
+            return self.RANDOM_BEER_MENU
+
         update.message.reply_text(TEXT_NEED_SN_LINK, reply_markup=ReplyKeyboardRemove())
         return self.RANDOM_BEER_SN_LINK
 
@@ -58,18 +69,33 @@ class RandomBeer(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def get_sn_link(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
+        prev_field_val = random_beer_user.social_network_link
         sn_link = update.message.text
         random_beer_user.social_network_link = sn_link
         random_beer_user.save()
-        logger.info('User {} fill social_network_link '.format(user, sn_link))
+        logger.info('User {} fill social_network_link '.format(user))
+        if prev_field_val is not None:
+            update.message.reply_text(TEXT_SUCCESSFULLY_CHANGED,
+                                      reply_markup=self.random_beer_keyboard(random_beer_user))
+            return self.RANDOM_BEER_MENU
         update.message.reply_text(TEXT_RANDOM_BEER_MENU, reply_markup=self.random_beer_keyboard(random_beer_user))
         return self.RANDOM_BEER_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def skip_sn_link(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
-        logger.info('User {} decided to skip social_network_link filling')
+        logger.info('User {} decided to skip social_network_link filling'.format(user))
         update.message.reply_text(TEXT_RANDOM_BEER_MENU, reply_markup=self.random_beer_keyboard(random_beer_user))
         return self.RANDOM_BEER_MENU
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
+    def change_field(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
+        text = update.message.text
+        mapper = {BUTTON_CHANGE_TG_NICK: self.RANDOM_BEER_TG_NICK,
+                  BUTTON_CHANGE_ODS_NICK: self.RANDOM_BEER_ODS_NICK,
+                  BUTTON_CHANGE_SN_LINK: self.RANDOM_BEER_SN_LINK}
+        logger.info('User {} have decided to {}'.format(user, text))
+        update.message.reply_text(TEXT_CHANGE_FIELD.format(text.lower()), reply_markup=ReplyKeyboardRemove())
+        return mapper[text]
 
 
     def create_state(self):
@@ -92,6 +118,10 @@ class RandomBeer(TGHandler):
                 CommandHandler('skip', self.skip_sn_link)
             ],
             self.RANDOM_BEER_MENU: [
+                self.rhandler(BUTTON_CHANGE_SN_LINK, self.change_field),
+                self.rhandler(BUTTON_CHANGE_ODS_NICK, self.change_field),
+                self.rhandler(BUTTON_CHANGE_TG_NICK, self.change_field),
+                self.rhandler(BUTTON_FIND_MATCH, self.not_ready_yet),
                 self.rhandler(BUTTON_FULL_BACK, self.full_back),
                 MessageHandler(Filters.text, self.unknown_command)
             ]
