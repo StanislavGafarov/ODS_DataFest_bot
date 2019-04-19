@@ -177,13 +177,15 @@ class RandomBeer(TGHandler):
             else:
 
                 pair_id = self.get_match(random_beer_user)
-                pair_user = RandomBeerUser(tg_user_id=pair_id)
+                pair_user = RandomBeerUser.objects.filter(tg_user_id=pair_id).first()
                 pair_user.is_busy = True
                 random_beer_user.is_busy = True
                 random_beer_user.prev_pair = pair_id
                 pair_user.prev_pair = random_beer_user.tg_user_id
                 random_beer_user.random_beer_try += 1
                 pair_user.random_beer_try += 1
+                pair_user.save()
+                random_beer_user.save()
                 self.send_notification(pair_user, random_beer_user, api)
                 self.send_notification(random_beer_user, pair_user, api)
                 logger.info('User {} will meet with user {}'.format(random_beer_user.email, pair_user.email))
@@ -207,7 +209,7 @@ class RandomBeer(TGHandler):
         random_beer_table = RandomBeerUser.objects.filter(accept_rules=True)\
                 .exclude(is_busy=True).exclude(random_beer_try = 3).exclude(tg_user_id=random_beer_user.tg_user_id)\
                 .exclude(tg_user_id=random_beer_user.prev_pair).values()
-        return random_beer_table.count() <= 5
+        return random_beer_table.count() <= 2
 
     def check_info(self, rb_user):
         return rb_user.tg_nickname == '' and rb_user.ods_nickname == '' and rb_user.social_network_link == ''
