@@ -1,14 +1,12 @@
 import logging
 import os
 from functools import wraps
-
 import requests
-from telegram.ext import RegexHandler
+
+from bot import settings
 
 from backend.models import Message
 from backend.tgbot.base import TelegramBotApi
-
-from bot import settings
 
 
 def get_public_host():
@@ -38,7 +36,6 @@ def check_certs():
 logger = logging.getLogger('bot')
 
 
-
 class Decorators(object):
     @classmethod
     def save_msg(cls, f):
@@ -63,20 +60,10 @@ class Decorators(object):
     @classmethod
     def with_random_beer_user(cls, f):
         @wraps(f)
-        def get_random_beer_user(cls, api: TelegramBotApi, update, user):
+        def get_random_beer_user(cls, api: TelegramBotApi, user, update):
             random_beer_user = api.get_random_beer_user(update.message.chat_id)
             return f(cls, api, user, update, random_beer_user)
         return get_random_beer_user
-
-
-    @classmethod
-    def save_user_info(cls, f):
-        @wraps(f)
-        def get_user(cls, api: TelegramBotApi, update, user):
-            user.save()
-            return f(cls, api, user, update)
-
-        return get_user
 
     def composed(*decs):
         def deco(f):
