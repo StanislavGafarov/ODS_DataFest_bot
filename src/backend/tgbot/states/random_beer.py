@@ -151,23 +151,32 @@ class RandomBeer(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def find_match(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
+        # TODO: Refactor monkey code here
         text = update.message.text
         logger.info('User {} have choosen {}'.format(user, text))
+        if not self.check_info(random_beer_user):
+            logger.info('User {} do not have enought info for participating'.format(user))
+            update.message.reply_text(TEXT_NOT_ENOUGH_INFO, reply_markup=self.random_beer_keyboard(random_beer_user))
+            return self.RANDOM_BEER_MENU
+
         if random_beer_user.is_busy:
             logger.info('User {} is busy'.format(user))
             update.message.reply_text(TEXT_SHOULD_END_MEETING, reply_markup=self.random_beer_keyboard(random_beer_user))
             return self.RANDOM_BEER_MENU
+
         if self.will_have_pair(random_beer_user):
             logger.info('User {} will not have pair and should wait'.format(user))
-            update.message.reply_text(TEXT_RANDOM_BEER_NOT_ENOUGH_PARTICIPANTS,
+            update.message.reply_text(TEXT_NOT_ENOUGH_PARTICIPANTS,
                                       reply_markup=self.random_beer_keyboard(random_beer_user))
             return self.RANDOM_BEER_MENU
+
         else:
             if random_beer_user.random_beer_try == 3:
                 update.message.replay_text(TEXT_LIMIT_IS_OVER, reply_markup=self.random_beer_keyboard(random_beer_user))
                 return self.RANDOM_BEER_MENU
+
             else:
-                # TODO: Refactor monkey code here
+
                 pair_id = self.get_match(random_beer_user)
                 pair_user = RandomBeerUser(tg_user_id=pair_id)
                 pair_user.is_busy = True
@@ -200,6 +209,9 @@ class RandomBeer(TGHandler):
                 .exclude(is_busy=True).exclude(random_beer_try = 3).exclude(tg_user_id=random_beer_user.tg_user_id)\
                 .exclude(tg_user_id=random_beer_user.prev_pair).values()
         return random_beer_table.count() <= 5
+
+    def check_info(self, rb_user):
+        return rb_user.tg_nickname == '' and rb_user.tg_nickname == '' and rb_user.social_network_link == ''
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def end_meeting(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
