@@ -5,7 +5,7 @@ import telegram
 import telegram.utils.request
 from cached_property import cached_property
 
-from backend.models import TGUser, RandomBeerUser
+from backend.models import TGUser
 from bot import settings
 
 
@@ -66,10 +66,3 @@ class TelegramBotApi:
         if user.last_name == '' and user.name == '' and user.username == '':
             self.update_user_data(user)
         return user
-
-    def get_random_beer_user(self, user):
-        random_beer_user = RandomBeerUser.objects.filter(tg_user_id=user.tg_id).first()
-        if random_beer_user is None:
-            random_beer_user = RandomBeerUser(tg_user_id=user.tg_id)
-            random_beer_user.save()
-        return random_beer_user

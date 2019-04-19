@@ -84,7 +84,7 @@ class Prizes(models.Model):
     merch_size = models.TextField(choices=SIZES)
     quantity = models.IntegerField(default=0)
 
-@make_str('tg_user')
+@make_str('tg_user_id')
 class RandomBeerUser(models.Model):
     tg_user_id = models.IntegerField(unique=True)
     tg_nickname = models.TextField(null=True, default=None)

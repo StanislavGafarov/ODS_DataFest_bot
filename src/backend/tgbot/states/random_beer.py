@@ -10,7 +10,7 @@ from backend.models import TGUser, RandomBeerUser
 
 class RandomBeer(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
-    def accepted_rules(self, api: TelegramBotApi, random_beer_user: RandomBeerUser, user: TGUser, update):
+    def accepted_rules(self, api: TelegramBotApi, user: TGUser, update,  random_beer_user: RandomBeerUser):
         text = update.message.text
         logger.info(' {} '.format(text))
         user.in_random_beer = True
@@ -23,10 +23,17 @@ class RandomBeer(TGHandler):
         return self.RANDOM_BEER_TG_NICK
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
-    def decline_rules(self, api: TelegramBotApi, random_beer_user: RandomBeerUser, user: TGUser, update):
+    def decline_rules(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
         text = update.message.text
         logger.info('User {} have declined random beer rules'.format(user))
         update.message.reply_text(TEXT_RULES_NOT_ACCEPTED, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
+    def rb_unknown_command(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
+        text = update.message.text
+        logger.info('User {} wrote unknown command: {}'.format(user, text))
+        update.message.reply_text(TEXT_UNKNOWN_COMMAND, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
@@ -106,7 +113,7 @@ class RandomBeer(TGHandler):
             self.RANDOM_BEER_RULES: [
                 self.rhandler(BUTTON_ACCEPT_RULES, self.accepted_rules),
                 self.rhandler(BUTTON_DECLINE_RULES, self.decline_rules),
-                MessageHandler(Filters.text, self.unknown_command)
+                MessageHandler(Filters.text, self.rb_unknown_command)
             ],
             self.RANDOM_BEER_TG_NICK: [
                 MessageHandler(Filters.text, self.get_tg_nick),
@@ -126,7 +133,7 @@ class RandomBeer(TGHandler):
                 self.rhandler(BUTTON_CHANGE_TG_NICK, self.change_field),
                 self.rhandler(BUTTON_FIND_MATCH, self.not_ready_yet),
                 self.rhandler(BUTTON_FULL_BACK, self.full_back),
-                MessageHandler(Filters.text, self.unknown_command)
+                MessageHandler(Filters.text, self.rb_unknown_command)
             ]
         }
         return state
