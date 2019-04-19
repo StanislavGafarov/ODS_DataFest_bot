@@ -8,6 +8,7 @@ from backend.tgbot.states.authorization import Authorization
 from backend.tgbot.states.get_news import GetNews
 from backend.tgbot.states.broadcasting import Broadcasting
 from backend.tgbot.states.random_prizes import RandomFreePrizes
+from backend.tgbot.states.random_beer import RandomBeer
 
 class CustomConversationHandler(TGHandler):
 
@@ -20,7 +21,7 @@ class CustomConversationHandler(TGHandler):
 
     def create_handler(self):
         states = self.get_states(MainMenu, CheckRegistrationStatus, Authorization, GetNews, Broadcasting
-                                 , RandomFreePrizes)
+                                 , RandomFreePrizes, RandomBeer)
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start)],
             states=states,

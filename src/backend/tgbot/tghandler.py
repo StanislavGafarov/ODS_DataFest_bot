@@ -1,7 +1,7 @@
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import run_async, ConversationHandler, RegexHandler
 
-from backend.models import TGUser
+from backend.models import TGUser, RandomBeerUser
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.utils import logger, Decorators
@@ -15,9 +15,16 @@ class TGHandler(object):
         self.CHECK_CODE = 21
         self.GET_NEWS = 3
 
-        # self.FREE_PRIZES = 41
-        self.CHOOSEN_SIZE = 41
-        self.CHANGE_SIZE = 42
+
+        self.CHOOSEN_SIZE = 40
+        self.CHANGE_SIZE = 41
+
+        self.RANDOM_BEER_MENU = 42
+        self.RANDOM_BEER_RULES = 43
+        self.RANDOM_BEER_TG_NICK = 44
+        self.RANDOM_BEER_ODS_NICK = 45
+        self.RANDOM_BEER_SN_LINK = 46
+        self.RANDOM_BEER_CHANGE_FIELD = 47
 
         # Admin
         self.BROADCAST = 995
@@ -46,7 +53,11 @@ class TGHandler(object):
         self.SIZE_KEYBOARD = [[BUTTON_XS_SIZE, BUTTON_S_SIZE, BUTTON_M_SIZE, BUTTON_L_SIZE],
                               [BUTTON_XL_SIZE, BUTTON_XXL_SIZE, BUTTON_FULL_BACK]]
 
-        self.ADMIN_KEYBOARD = admin_buttons + unauth_buttons
+        self.RANDOM_BEER_MENU_KEYBOARD = [[BUTTON_CHANGE_TG_NICK],
+                                          [BUTTON_CHANGE_ODS_NICK],
+                                          [BUTTON_CHANGE_SN_LINK]]
+
+        self.ADMIN_KEYBOARD = admin_buttons + auth_buttons
         self.AUTHORIZED_USER_KEYBOARD = auth_buttons
         self.UNAUTHORIZED_USER_KEYBOARD = unauth_buttons
 
@@ -57,6 +68,13 @@ class TGHandler(object):
             keyboard = self.AUTHORIZED_USER_KEYBOARD
         else:
             keyboard = self.UNAUTHORIZED_USER_KEYBOARD
+        return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
+
+    def random_beer_keyboard(self, random_beer_user: RandomBeerUser):
+        if random_beer_user.is_busy:
+            keyboard = self.RANDOM_BEER_MENU_KEYBOARD + [[BUTTON_END_MEETING], [BUTTON_FULL_BACK]]
+        else:
+            keyboard = self.RANDOM_BEER_MENU_KEYBOARD + [[BUTTON_FIND_MATCH], [BUTTON_FULL_BACK]]
         return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
 
     def rhandler(self, text, callback):
