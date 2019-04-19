@@ -171,7 +171,8 @@ class RandomBeer(TGHandler):
 
         else:
             if random_beer_user.random_beer_try == 3:
-                update.message.reply_text(TEXT_LIMIT_IS_OVER, reply_markup=self.random_beer_keyboard(random_beer_user))
+                update.message.reply_text(TEXT_LIMIT_IS_OVER+ '\n'+ TEXT_GOTO_RANDOM_COFFEE
+                                          , reply_markup=self.random_beer_keyboard(random_beer_user))
                 return self.RANDOM_BEER_MENU
 
             else:
