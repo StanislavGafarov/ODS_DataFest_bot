@@ -96,7 +96,10 @@ class MainMenu(TGHandler):
             update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
         if random_beer_user.accept_rules:
-            update.message.reply_text(TEXT_RANDOM_BEER_MENU, reply_markup=self.random_beer_keyboard(random_beer_user))
+            update.message.reply_text(TEXT_RANDOM_BEER_MENU
+                                      .format(random_beer_user.tg_nickname, random_beer_user.ods_nickname,
+                                              random_beer_user.social_network_link),
+                                      reply_markup=self.random_beer_keyboard(random_beer_user))
             return self.RANDOM_BEER_MENU
         else:
             custom_keyboard = [[BUTTON_ACCEPT_RULES, BUTTON_DECLINE_RULES]]

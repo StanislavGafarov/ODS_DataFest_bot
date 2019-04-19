@@ -64,8 +64,10 @@ class RandomBeer(TGHandler):
         random_beer_user.save()
         logger.info('User {} fill ods_nickname with {} '.format(user, ods_nick))
         if prev_field_val is not None:
-            update.message.reply_text(TEXT_SUCCESSFULLY_CHANGED,
-                                      reply_markup=self.random_beer_keyboard(random_beer_user))
+            update.message.reply_text(TEXT_SUCCESSFULLY_CHANGED + TEXT_RANDOM_BEER_MENU
+                                      .format(random_beer_user.tg_nickname, random_beer_user.ods_nickname,
+                                              random_beer_user.social_network_link)
+                                      , reply_markup=self.random_beer_keyboard(random_beer_user))
             return self.RANDOM_BEER_MENU
 
         update.message.reply_text(TEXT_NEED_SN_LINK, reply_markup=ReplyKeyboardRemove())
@@ -88,13 +90,19 @@ class RandomBeer(TGHandler):
             update.message.reply_text(TEXT_SUCCESSFULLY_CHANGED,
                                       reply_markup=self.random_beer_keyboard(random_beer_user))
             return self.RANDOM_BEER_MENU
-        update.message.reply_text(TEXT_RANDOM_BEER_MENU, reply_markup=self.random_beer_keyboard(random_beer_user))
+        update.message.reply_text(TEXT_RANDOM_BEER_MENU.format(random_beer_user.tg_nickname,
+                                                               random_beer_user.ods_nickname,
+                                                               random_beer_user.social_network_link)
+                                  , reply_markup=self.random_beer_keyboard(random_beer_user))
         return self.RANDOM_BEER_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def skip_sn_link(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
         logger.info('User {} decided to skip social_network_link filling'.format(user))
-        update.message.reply_text(TEXT_RANDOM_BEER_MENU, reply_markup=self.random_beer_keyboard(random_beer_user))
+        update.message.reply_text(TEXT_RANDOM_BEER_MENU.format(random_beer_user.tg_nickname,
+                                                               random_beer_user.ods_nickname,
+                                                               random_beer_user.social_network_link)
+                                  , reply_markup=self.random_beer_keyboard(random_beer_user))
         return self.RANDOM_BEER_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
