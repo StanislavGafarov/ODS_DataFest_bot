@@ -62,7 +62,7 @@ class Decorators(object):
         @wraps(f)
         def get_random_beer_user(cls, api: TelegramBotApi, user, update):
             random_beer_user = api.get_random_beer_user(update.message.chat_id)
-            return f(cls, api, user, update, random_beer_user)
+            return f(cls, api, random_beer_user, user, update)
         return get_random_beer_user
 
     def composed(*decs):

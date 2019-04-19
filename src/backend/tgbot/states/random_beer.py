@@ -10,7 +10,7 @@ from backend.models import TGUser, RandomBeerUser
 
 class RandomBeer(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
-    def accepted_rules(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
+    def accepted_rules(self, api: TelegramBotApi, random_beer_user: RandomBeerUser, user: TGUser, update):
         text = update.message.text
         logger.info(' {} '.format(text))
         user.in_random_beer = True
@@ -23,7 +23,7 @@ class RandomBeer(TGHandler):
         return self.RANDOM_BEER_TG_NICK
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
-    def decline_rules(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
+    def decline_rules(self, api: TelegramBotApi, random_beer_user: RandomBeerUser, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have declined random beer rules'.format(user))
         update.message.reply_text(TEXT_RULES_NOT_ACCEPTED, reply_markup=self.define_keyboard(user))
