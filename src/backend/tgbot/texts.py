@@ -39,7 +39,7 @@ TEXT_NEED_SN_LINK = 'Почти готово, вы можете оставить
 TEXT_RANDOM_BEER_MENU = 'Ваши данные:\n - Telegram nick: {};\n - ODS nick: {};\n - Social network link: {}'
 TEXT_NOT_ENOUGH_PARTICIPANTS = "К сожалению других участников еще нет, попробуйте найти пару чуть позже."
 TEXT_RANDOM_BEER_MATCH = 'Итак, великий рандом подобрал тебе партнера в random beer!\n' \
-                         'Его контакты: \n - Telegram nick: {};\n - ODS nick: {};\n - Social network link: {}\n' \
+                         'Контакты партнера: \n - Telegram nick: {};\n - ODS nick: {};\n - Social network link: {}\n' \
                          'Напишите ему/ей и договоритесь о встрече, хорошей встречи'
 TEXT_FAILED_SENT = 'Что-то пошло не так! Ваш партнер заблокировал бота и мы не смогли с ним связаться. Обратитесь к разработчику.'
 TEXT_END_MEETING = 'Хорошо, надеюсь встреча Вам понравилась.'
