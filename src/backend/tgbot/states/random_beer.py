@@ -12,10 +12,13 @@ class RandomBeer(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def accepted_rules(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
         text = update.message.text
+        logger.info(' {} '.format(text))
         user.in_random_beer = True
         user.save()
+        logger.info('User {} have accepted random beer rules'.format(user))
         random_beer_user.accept_rules = True
         random_beer_user.save()
+        logger.info('User {} have accepted random beer rules'.format(user))
         update.message.reply_text(TEXT_RULES_ACCEPTED_NEED_TG_NICK, reply_markup=ReplyKeyboardRemove())
         return self.RANDOM_BEER_TG_NICK
 
