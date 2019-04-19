@@ -21,7 +21,6 @@ class RandomBeer(TGHandler):
         logger.info('User {} have accepted random beer rules'.format(user))
         random_beer_user.accept_rules = True
         random_beer_user.save()
-        logger.info('User {} have accepted random beer rules'.format(user))
         update.message.reply_text(TEXT_RULES_ACCEPTED_NEED_TG_NICK, reply_markup=ReplyKeyboardRemove())
         return self.RANDOM_BEER_TG_NICK
 
@@ -154,7 +153,7 @@ class RandomBeer(TGHandler):
         # TODO: Refactor monkey code here
         text = update.message.text
         logger.info('User {} have choosen {}'.format(user, text))
-        if not self.check_info(random_beer_user):
+        if self.check_info(random_beer_user):
             logger.info('User {} do not have enought info for participating'.format(user))
             update.message.reply_text(TEXT_NOT_ENOUGH_INFO, reply_markup=self.random_beer_keyboard(random_beer_user))
             return self.RANDOM_BEER_MENU
@@ -211,7 +210,7 @@ class RandomBeer(TGHandler):
         return random_beer_table.count() <= 5
 
     def check_info(self, rb_user):
-        return rb_user.tg_nickname == '' and rb_user.tg_nickname == '' and rb_user.social_network_link == ''
+        return rb_user.tg_nickname == '' and rb_user.ods_nickname == '' and rb_user.social_network_link == ''
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def end_meeting(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
@@ -234,7 +233,7 @@ class RandomBeer(TGHandler):
                 MessageHandler(Filters.text, self.get_tg_nick),
                 CommandHandler('skip', self.skip_tg_nick)
             ],
-            self.RANDOM_BEER_ODS_NICK:[
+            self.RANDOM_BEER_ODS_NICK: [
                 MessageHandler(Filters.text, self.get_ods_nick),
                 CommandHandler('skip', self.skip_ods_nick)
             ],
