@@ -163,7 +163,7 @@ class RandomBeer(TGHandler):
             update.message.reply_text(TEXT_SHOULD_END_MEETING, reply_markup=self.random_beer_keyboard(random_beer_user))
             return self.RANDOM_BEER_MENU
 
-        if self.will_have_pair(random_beer_user):
+        if not self.will_have_pair(random_beer_user):
             logger.info('User {} will not have pair and should wait'.format(user))
             update.message.reply_text(TEXT_NOT_ENOUGH_PARTICIPANTS,
                                       reply_markup=self.random_beer_keyboard(random_beer_user))
@@ -239,7 +239,7 @@ class RandomBeer(TGHandler):
             .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
             .exclude(tg_nickname=None, ods_nickname=None, social_network_link=None) \
             .exclude(tg_user_id=random_beer_user.prev_pair).values()
-        logger.info('Table_count: 5 exclude {}'.format(random_beer_table.count()))
+        logger.info('Table_count: 6 exclude {}'.format(random_beer_table.count()))
         return random_beer_table.count() > 0
 
     def check_info(self, rb_user):
