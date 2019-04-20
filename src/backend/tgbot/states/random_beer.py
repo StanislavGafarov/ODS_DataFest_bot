@@ -212,12 +212,35 @@ class RandomBeer(TGHandler):
             logger.info('{} blocked bots notifications'.format(user.email))
 
     def will_have_pair(self, random_beer_user):
-        random_beer_table = RandomBeerUser.objects.filter(accept_rules=True)\
-                .exclude(is_busy=True).exclude(random_beer_try = 3).exclude(tg_user_id=random_beer_user.tg_user_id) \
-                .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
-                .exclude(tg_nickname=None, ods_nickname=None, social_network_link=None)\
-                .exclude(tg_user_id=random_beer_user.prev_pair).values()
-        return random_beer_table.count() >= 2
+        random_beer_table = RandomBeerUser.objects.filter(accept_rules=True).values()
+        logger.info('Table_count: filte {}'.format(random_beer_user.count()))
+        random_beer_table = RandomBeerUser.objects.filter(accept_rules=True) \
+            .exclude(is_busy=True).values()
+        logger.info('Table_count: 1 exclude {}'.format(random_beer_user.count()))
+        random_beer_table = RandomBeerUser.objects.filter(accept_rules=True) \
+            .exclude(is_busy=True).exclude(random_beer_try=3).values()
+        logger.info('Table_count: 2 exclude {}'.format(random_beer_user.count()))
+        random_beer_table = RandomBeerUser.objects.filter(accept_rules=True) \
+            .exclude(is_busy=True).exclude(random_beer_try=3).exclude(tg_user_id=random_beer_user.tg_user_id).values()
+        logger.info('Table_count: 3 exclude {}'.format(random_beer_user.count()))
+        random_beer_table = RandomBeerUser.objects.filter(accept_rules=True) \
+            .exclude(is_busy=True).exclude(random_beer_try=3).exclude(tg_user_id=random_beer_user.tg_user_id) \
+            .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
+            .values()
+        logger.info('Table_count: 4 exclude {}'.format(random_beer_user.count()))
+        random_beer_table = RandomBeerUser.objects.filter(accept_rules=True) \
+            .exclude(is_busy=True).exclude(random_beer_try=3).exclude(tg_user_id=random_beer_user.tg_user_id) \
+            .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
+            .exclude(tg_nickname=None, ods_nickname=None, social_network_link=None) \
+           .values()
+        logger.info('Table_count: 5 exclude {}'.format(random_beer_user.count()))
+        random_beer_table = RandomBeerUser.objects.filter(accept_rules=True) \
+            .exclude(is_busy=True).exclude(random_beer_try=3).exclude(tg_user_id=random_beer_user.tg_user_id) \
+            .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
+            .exclude(tg_nickname=None, ods_nickname=None, social_network_link=None) \
+            .exclude(tg_user_id=random_beer_user.prev_pair).values()
+        logger.info('Table_count: 5 exclude {}'.format(random_beer_user.count()))
+        return random_beer_table.count() > 0
 
     def check_info(self, rb_user):
         return rb_user.tg_nickname == '-' and rb_user.ods_nickname == '-' and rb_user.social_network_link == '-'
