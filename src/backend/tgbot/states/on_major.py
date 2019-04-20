@@ -16,13 +16,14 @@ class OnMajor(TGHandler):
             user.save()
             update.message.reply_text(TEXT_MAJOR_CODE_OK,
                                       reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
         else:
             update.message.reply_text(TEXT_MAJOR_CODE_NOT_OK,
                                       reply_markup=self.define_keyboard(user))
-        return self.MAIN_MENU
+            return self.MAIN_MENU
 
     def create_state(self):
-        state = {self.MAJOR_CHECK_CODE: [
+        state = {self.ON_MAJOR: [
             MessageHandler(Filters.text, self.major_check_code)
             ]}
         return state
