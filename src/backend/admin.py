@@ -24,7 +24,7 @@ class TGUserAdmin(admin.ModelAdmin):
         'is_admin',
         'is_authorized',
         'is_notified',
-        'win_random_prize'
+        'win_random_prize',
         'on_major'
     ]
 
