@@ -9,15 +9,15 @@ class TGUserAdmin(admin.ModelAdmin):
     list_display = [
         'tg_id',
         'name',
-        'last_name',
         'username',
+        'last_checked_email',
 
         'is_admin',
         'is_authorized',
         'is_notified',
         'has_news_subscription',
         'win_random_prize',
-        'last_checked_email',
+        'on_major'
     ]
 
     list_filter = [
@@ -25,9 +25,10 @@ class TGUserAdmin(admin.ModelAdmin):
         'is_authorized',
         'is_notified',
         'win_random_prize'
+        'on_major'
     ]
 
-    search_fields = ['name', 'last_name', 'username', 'last_checked_email']
+    search_fields = ['name', 'last_name', 'username', 'last_checked_email', 'on_major', 'win_random_prize']
 
 
 @admin.register(Message)

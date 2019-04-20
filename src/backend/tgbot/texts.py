@@ -118,7 +118,7 @@ BUTTON_NEWS_UNSUBSCRIPTION = 'Отписаться от новостей'
 BUTTON_GET_LAST_5_NEWS = 'Посмотреть новости'
 
 BUTTON_REGISTRATION = 'Регистрация'
-BUTTON_ON_MAJOR = 'Я на Major'
+BUTTON_ON_MAJOR = 'Я на Major 💪'
 
 BUTTON_FULL_BACK = 'Назад'
 BUTTON_10_MAY_SCHEDULE = 'Расписание на 10 мая'
