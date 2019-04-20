@@ -78,8 +78,12 @@ class MainMenu(TGHandler):
             update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
         else:
-            update.message.reply_text(TEXT_MAJOR_CODE, reply_markup=ReplyKeyboardRemove())
-            return self.ON_MAJOR
+            if user.on_major:
+                update.message.reply_text(TEXT_ALREADY_ON_MAJOR, reply_markup=self.define_keyboard(user))
+                return self.MAIN_MENU
+            else:
+                update.message.reply_text(TEXT_MAJOR_CODE, reply_markup=ReplyKeyboardRemove())
+                return self.ON_MAJOR
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def participate_random_prize(self, api: TelegramBotApi, user: TGUser, update):
