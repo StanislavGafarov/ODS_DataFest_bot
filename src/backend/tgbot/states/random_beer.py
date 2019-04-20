@@ -198,7 +198,8 @@ class RandomBeer(TGHandler):
     def get_match(self, random_beer_user: RandomBeerUser):
         posible_pair_list = RandomBeerUser.objects.filter(accept_rules=True)\
                 .exclude(is_busy=True).exclude(random_beer_try=3).exclude(tg_user_id=random_beer_user.tg_user_id)\
-                .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-')\
+                .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
+                .exclude(tg_nickname=None, ods_nickname=None, social_network_link=None) \
                 .exclude(tg_user_id=random_beer_user.prev_pair).values_list('tg_user_id', flat=True)
         return random.choice(posible_pair_list)
 
@@ -214,11 +215,12 @@ class RandomBeer(TGHandler):
         random_beer_table = RandomBeerUser.objects.filter(accept_rules=True)\
                 .exclude(is_busy=True).exclude(random_beer_try = 3).exclude(tg_user_id=random_beer_user.tg_user_id) \
                 .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
+                .exclude(tg_nickname=None, ods_nickname=None, social_network_link=None)\
                 .exclude(tg_user_id=random_beer_user.prev_pair).values()
         return random_beer_table.count() <= 2
 
     def check_info(self, rb_user):
-        return rb_user.tg_nickname == '' and rb_user.ods_nickname == '' and rb_user.social_network_link == ''
+        return rb_user.tg_nickname == '-' and rb_user.ods_nickname == '-' and rb_user.social_network_link == '-'
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def end_meeting(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
