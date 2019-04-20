@@ -66,7 +66,8 @@ TEXT_SHOW_SCHEDULE = 'Выберите день.'
 
 # ADMIN
 TEXT_ENTER_BROADCAST = 'Введите сообщение или введите /cancel, чтобы вернуться назад.'
-TEXT_BROADCAST_DONE = 'Готово.'
+TEXT_BROADCAST_STARTED = 'Броадкаст запущен'
+TEXT_BROADCAST_DONE = 'Броадкаст выполнен. {} отправлено. {} ошибок'
 TEXT_CANCEL_BROADCASTING = 'Ну не надо, так не надо...'
 
 TEXT_START_INVITE_REFRESH = 'Запущено обновление инвайтов.'
