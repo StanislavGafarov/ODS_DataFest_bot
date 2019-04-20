@@ -197,7 +197,8 @@ class RandomBeer(TGHandler):
 
     def get_match(self, random_beer_user: RandomBeerUser):
         posible_pair_list = RandomBeerUser.objects.filter(accept_rules=True)\
-                .exclude(is_busy=True).exclude(random_beer_try = 3).exclude(tg_user_id=random_beer_user.tg_user_id)\
+                .exclude(is_busy=True).exclude(random_beer_try=3).exclude(tg_user_id=random_beer_user.tg_user_id)\
+                .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-')\
                 .exclude(tg_user_id=random_beer_user.prev_pair).values_list('tg_user_id', flat=True)
         return random.choice(posible_pair_list)
 
@@ -211,7 +212,8 @@ class RandomBeer(TGHandler):
 
     def will_have_pair(self, random_beer_user):
         random_beer_table = RandomBeerUser.objects.filter(accept_rules=True)\
-                .exclude(is_busy=True).exclude(random_beer_try = 3).exclude(tg_user_id=random_beer_user.tg_user_id)\
+                .exclude(is_busy=True).exclude(random_beer_try = 3).exclude(tg_user_id=random_beer_user.tg_user_id) \
+                .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
                 .exclude(tg_user_id=random_beer_user.prev_pair).values()
         return random_beer_table.count() <= 2
 

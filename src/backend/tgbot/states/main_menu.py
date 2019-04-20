@@ -13,6 +13,7 @@ from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.utils import logger, Decorators
 
 
+
 class MainMenu(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def check_registration_status(self, api: TelegramBotApi, user: TGUser, update):
@@ -70,11 +71,26 @@ class MainMenu(TGHandler):
 
     # AUTHORIZED
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def on_major(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        if not user.is_authorized:
+            update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
+        else:
+            update.message.reply_text(TEXT_MAJOR_CODE, reply_markup=ReplyKeyboardRemove())
+            return self.ON_MAJOR
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def participate_random_prize(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
         if not user.is_authorized:
             update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
+        # ON Major
+        if not user.on_major:
+            update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
         if user.merch_size is None:
             update.message.reply_text(TEXT_CHOOSE_YOUR_SIZE, reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD,
@@ -94,6 +110,10 @@ class MainMenu(TGHandler):
         logger.info('User {} have choosen {}'.format(user, text))
         if not user.is_authorized:
             update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
+        # ON Major
+        if not user.on_major:
+            update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
         if random_beer_user.accept_rules:
             update.message.reply_text(TEXT_RANDOM_BEER_MENU
@@ -160,21 +180,6 @@ class MainMenu(TGHandler):
                                                                      resize_keyboard=True))
         return self.DRAW_PRIZES
 
-    # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    # def who_is_your_daddy(self, api: TelegramBotApi, user: TGUser, update):
-    #     return self.MAIN_MENU  # Nope
-    #     text = update.message.text
-    #     logger.info('User {} have chosen {} '.format(user, text))
-    #     if user.is_admin:
-    #         user.is_admin = False
-    #         user.save()
-    #         update.message.reply_text('God mode :off', reply_markup=self.define_keyboard(user))
-    #     else:
-    #         user.is_admin = True
-    #         user.save()
-    #         update.message.reply_text('God mode :on', reply_markup=self.define_keyboard(user))
-    #     return self.MAIN_MENU
-
     def create_state(self):
         state = {self.MAIN_MENU: [
             self.rhandler(BUTTON_CHECK_REGISTRATION, self.check_registration_status),
@@ -193,9 +198,8 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_DRAW_PRIZES, self.not_ready_yet),
             self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 
-            # self.rhandler('88224646BA', self.who_is_your_daddy),
+            self.rhandler(BUTTON_ON_MAJOR, self.on_major),
 
-            # self.rhandler(BUTTON_CREATE_BROADCAST, self.create_broadcast)
             MessageHandler(Filters.text, self.unknown_command)
         ]}
         return state

@@ -43,6 +43,9 @@ class TGUser(models.Model):
     merch_size = models.TextField(null=True, default=None)
     win_random_prize = models.BooleanField(default=False)
 
+    # On Major
+    on_major = models.BooleanField(default=False)
+
 
 @make_str('user', 'text')
 class Message(models.Model):
