@@ -217,7 +217,7 @@ class RandomBeer(TGHandler):
                 .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
                 .exclude(tg_nickname=None, ods_nickname=None, social_network_link=None)\
                 .exclude(tg_user_id=random_beer_user.prev_pair).values()
-        return random_beer_table.count() <= 2
+        return random_beer_table.count() >= 2
 
     def check_info(self, rb_user):
         return rb_user.tg_nickname == '-' and rb_user.ods_nickname == '-' and rb_user.social_network_link == '-'
