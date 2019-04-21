@@ -43,7 +43,7 @@ class Broadcasting(TGHandler):
         def sender(u):
             photo = update.message.photo
             if photo:
-                api.bot.send_photo(u, photo[0].file_id)
+                api.bot.send_photo(u, photo[0].file_id, update.message.caption)
 
         return self.send_message_to_users(user, sender, update)
 
