@@ -14,6 +14,7 @@ from backend.models import TGUser, News
 
 class BroadcastThread(Thread):
     def __init__(self, thread_function):
+        super().__init__()
         self.thread_function = thread_function
 
     def run(self):
