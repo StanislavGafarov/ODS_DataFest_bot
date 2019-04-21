@@ -66,7 +66,7 @@ class MainMenu(TGHandler):
     def get_schedule(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
-        update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        update.message.reply_text(TEXT_SHOW_SCHEDULE, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
