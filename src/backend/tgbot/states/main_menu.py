@@ -200,7 +200,7 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_CHECK_REGISTRATION, self.check_registration_status),
             self.rhandler(BUTTON_AUTHORISATION, self.authorization),
             self.rhandler(BUTTON_NEWS, self.get_news),
-            self.rhandler(BUTTON_SCHEDULE, self.not_ready_yet),
+            self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
             self.rhandler(BUTTON_SHOW_PATH, self.show_path),
 
             self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.ready_but_muted),
