@@ -30,6 +30,8 @@ class TGUser(models.Model):
     has_news_subscription = models.BooleanField(default=False)
     invite = models.OneToOneField('Invite', on_delete=models.SET_NULL, null=True, default=None, related_name='tguser')
 
+    is_banned = models.BooleanField(default=False)
+
     #RANDOM BEER INFO
     in_random_beer = models.BooleanField(default=False)
 
@@ -40,6 +42,9 @@ class TGUser(models.Model):
     in_random_prize = models.BooleanField(default=False)
     merch_size = models.TextField(null=True, default=None)
     win_random_prize = models.BooleanField(default=False)
+
+    # On Major
+    on_major = models.BooleanField(default=False)
 
 
 @make_str('user', 'text')
@@ -81,6 +86,20 @@ SIZES = [(i, i) for i in ['XS', 'S', 'M', 'L', 'XL', 'XXL']]
 class Prizes(models.Model):
     merch_size = models.TextField(choices=SIZES)
     quantity = models.IntegerField(default=0)
+
+@make_str('tg_user_id')
+class RandomBeerUser(models.Model):
+    tg_user_id = models.IntegerField(unique=True)
+    tg_nickname = models.TextField(null=True, default=None)
+    ods_nickname = models.TextField(null=True, default=None)
+    social_network_link = models.TextField(null=True, default=None)
+    random_beer_try = models.IntegerField(default=0)
+    prev_pair = models.IntegerField(null=True, default=None)
+    accept_rules = models.BooleanField(default=False)
+    is_busy = models.BooleanField(default=False)
+    email = models.TextField(null=True, default=None)
+
+
 
 
 EVENT_TYPES = {

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from backend.models import TGUser, Message, Event, Invite, Prizes
+from backend.models import TGUser, Message, Event, Invite, Prizes, RandomBeerUser
 
 
 @admin.register(TGUser)
@@ -9,25 +9,26 @@ class TGUserAdmin(admin.ModelAdmin):
     list_display = [
         'tg_id',
         'name',
-        'last_name',
         'username',
+        'last_checked_email',
 
         'is_admin',
         'is_authorized',
         'is_notified',
         'has_news_subscription',
         'win_random_prize',
-        'last_checked_email',
+        'on_major'
     ]
 
     list_filter = [
         'is_admin',
         'is_authorized',
         'is_notified',
-        'win_random_prize'
+        'win_random_prize',
+        'on_major'
     ]
 
-    search_fields = ['name', 'last_name', 'username', 'last_checked_email']
+    search_fields = ['name', 'last_name', 'username', 'last_checked_email', 'on_major', 'win_random_prize']
 
 
 @admin.register(Message)
@@ -49,3 +50,9 @@ class InviteAdmin(admin.ModelAdmin):
 class PrizesAdmin(admin.ModelAdmin):
     list_display = ['merch_size', 'quantity']
     search_fields = ['merch_size']
+
+@admin.register(RandomBeerUser)
+class RandomBeerUserAdmin(admin.ModelAdmin):
+    list_display = ['tg_user_id', 'email', 'tg_nickname', 'ods_nickname', 'social_network_link', 'random_beer_try', 'prev_pair',
+                    'accept_rules', 'is_busy']
+    search_fields = ['accept_rules', 'is_busy', 'email']
