@@ -13,6 +13,7 @@ from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.utils import logger, Decorators
 
 
+
 class MainMenu(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def check_registration_status(self, api: TelegramBotApi, user: TGUser, update):
@@ -55,6 +56,13 @@ class MainMenu(TGHandler):
         return self.MAIN_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def ready_but_muted(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        update.message.reply_text(TEXT_WILL_BE_ON_DATAFEST, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def get_schedule(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
@@ -69,6 +77,21 @@ class MainMenu(TGHandler):
         return self.MAIN_MENU
 
     # AUTHORIZED
+    # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    # def on_major(self, api: TelegramBotApi, user: TGUser, update):
+    #     text = update.message.text
+    #     logger.info('User {} have chosen {} '.format(user, text))
+    #     if not user.is_authorized:
+    #         update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
+    #         return self.MAIN_MENU
+    #     else:
+    #         if user.on_major:
+    #             update.message.reply_text(TEXT_ALREADY_ON_MAJOR, reply_markup=self.define_keyboard(user))
+    #             return self.MAIN_MENU
+    #         else:
+    #             update.message.reply_text(TEXT_MAJOR_CODE, reply_markup=ReplyKeyboardRemove())
+    #             return self.ON_MAJOR
+
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def participate_random_prize(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
@@ -76,6 +99,10 @@ class MainMenu(TGHandler):
         if not user.is_authorized:
             update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
+        # ON Major
+        # if not user.on_major:
+        #     update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        #     return self.MAIN_MENU
         if user.merch_size is None:
             update.message.reply_text(TEXT_CHOOSE_YOUR_SIZE, reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD,
                                                                                               one_time_keyboard=True,
@@ -92,6 +119,10 @@ class MainMenu(TGHandler):
     def participate_random_beer(self, api: TelegramBotApi,  user: TGUser, update, random_beer_user: RandomBeerUser):
         text = update.message.text
         logger.info('User {} have choosen {}'.format(user, text))
+        # ON Major
+        # if not user.on_major:
+        #     update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        #     return self.MAIN_MENU
         if not user.is_authorized:
             update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
@@ -160,32 +191,19 @@ class MainMenu(TGHandler):
                                                                      resize_keyboard=True))
         return self.DRAW_PRIZES
 
-    # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    # def who_is_your_daddy(self, api: TelegramBotApi, user: TGUser, update):
-    #     return self.MAIN_MENU  # Nope
-    #     text = update.message.text
-    #     logger.info('User {} have chosen {} '.format(user, text))
-    #     if user.is_admin:
-    #         user.is_admin = False
-    #         user.save()
-    #         update.message.reply_text('God mode :off', reply_markup=self.define_keyboard(user))
-    #     else:
-    #         user.is_admin = True
-    #         user.save()
-    #         update.message.reply_text('God mode :on', reply_markup=self.define_keyboard(user))
-    #     return self.MAIN_MENU
-
     def create_state(self):
         state = {self.MAIN_MENU: [
             self.rhandler(BUTTON_CHECK_REGISTRATION, self.check_registration_status),
             self.rhandler(BUTTON_AUTHORISATION, self.authorization),
             self.rhandler(BUTTON_NEWS, self.get_news),
-            self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
+            self.rhandler(BUTTON_SCHEDULE, self.not_ready_yet),
             self.rhandler(BUTTON_SHOW_PATH, self.show_path),
 
-            # self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.not_ready_yet),
-            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
-            self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
+            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.ready_but_muted),
+            # self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
+            self.rhandler(BUTTON_RANDOM_BEER, self.ready_but_muted),
+            # self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
+
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
             # self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
@@ -193,9 +211,8 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_DRAW_PRIZES, self.not_ready_yet),
             self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 
-            # self.rhandler('88224646BA', self.who_is_your_daddy),
+            # self.rhandler(BUTTON_ON_MAJOR, self.on_major),
 
-            # self.rhandler(BUTTON_CREATE_BROADCAST, self.create_broadcast)
             MessageHandler(Filters.text, self.unknown_command)
         ]}
         return state
