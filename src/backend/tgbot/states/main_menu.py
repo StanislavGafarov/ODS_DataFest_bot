@@ -66,7 +66,7 @@ class MainMenu(TGHandler):
     def get_schedule(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
-        update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        update.message.reply_text(TEXT_SHOW_SCHEDULE, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
@@ -145,7 +145,11 @@ class MainMenu(TGHandler):
         logger.info("User %s initiated broadcast.", user)
         if not user.is_admin:
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
-        update.message.reply_text(TEXT_ENTER_BROADCAST)
+            return self.MAIN_MENU
+        total_users = TGUser.objects.count()
+        user_with_subscription = TGUser.objects.filter(has_news_subscription=True).count()
+        msg = TEXT_NEWS_STAT.format(total_users, user_with_subscription)+"\n\n"+TEXT_ENTER_BROADCAST
+        update.message.reply_text(msg)
         return self.BROADCAST
 
     # REFRESH INVITES
@@ -196,7 +200,7 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_CHECK_REGISTRATION, self.check_registration_status),
             self.rhandler(BUTTON_AUTHORISATION, self.authorization),
             self.rhandler(BUTTON_NEWS, self.get_news),
-            self.rhandler(BUTTON_SCHEDULE, self.not_ready_yet),
+            self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
             self.rhandler(BUTTON_SHOW_PATH, self.show_path),
 
             self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.ready_but_muted),

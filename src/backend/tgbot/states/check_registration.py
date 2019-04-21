@@ -10,9 +10,9 @@ from backend.tgbot.utils import Decorators, logger
 class CheckRegistrationStatus(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def email_in_list(self, api: TelegramBotApi, user: TGUser, update):
-        email = update.message.text
+        email = update.message.text.strip()
         logger.info('{}'.format(email))
-        if Invite.objects.filter(email=email).first() is not None:
+        if Invite.objects.filter(email__iexact=email).first() is not None:
             update.message.reply_text(TEXT_EMAIL_OK,
                                       reply_markup=self.define_keyboard(user))
         else:
