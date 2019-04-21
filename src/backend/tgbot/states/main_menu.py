@@ -93,9 +93,9 @@ class MainMenu(TGHandler):
             update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
         # ON Major
-        if not user.on_major:
-            update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
-            return self.MAIN_MENU
+        # if not user.on_major:
+        #     update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        #     return self.MAIN_MENU
         if user.merch_size is None:
             update.message.reply_text(TEXT_CHOOSE_YOUR_SIZE, reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD,
                                                                                               one_time_keyboard=True,
@@ -112,12 +112,12 @@ class MainMenu(TGHandler):
     def participate_random_beer(self, api: TelegramBotApi,  user: TGUser, update, random_beer_user: RandomBeerUser):
         text = update.message.text
         logger.info('User {} have choosen {}'.format(user, text))
+        # ON Major
+        # if not user.on_major:
+        #     update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        #     return self.MAIN_MENU
         if not user.is_authorized:
             update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
-            return self.MAIN_MENU
-        # ON Major
-        if not user.on_major:
-            update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
         if random_beer_user.accept_rules:
             update.message.reply_text(TEXT_RANDOM_BEER_MENU
@@ -192,9 +192,10 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
             self.rhandler(BUTTON_SHOW_PATH, self.show_path),
 
-            # self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.not_ready_yet),
-            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
-            self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
+            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.not_ready_yet),
+            # self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
+            # self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
+            self.rhandler(BUTTON_RANDOM_BEER, self.not_ready_yet),
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
             # self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
@@ -202,7 +203,7 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_DRAW_PRIZES, self.not_ready_yet),
             self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 
-            self.rhandler(BUTTON_ON_MAJOR, self.on_major),
+            # self.rhandler(BUTTON_ON_MAJOR, self.on_major),
 
             MessageHandler(Filters.text, self.unknown_command)
         ]}

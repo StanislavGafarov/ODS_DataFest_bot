@@ -25,7 +25,8 @@ class TGHandler(object):
         self.RANDOM_BEER_SN_LINK = 46
         self.RANDOM_BEER_CHANGE_FIELD = 47
 
-        self.ON_MAJOR = 100
+        # self.ON_MAJOR = 100
+
 
         # Admin
         self.BROADCAST = 995
@@ -38,7 +39,7 @@ class TGHandler(object):
             [BUTTON_POST_NEWS]
         ]
         auth_buttons = [
-            [BUTTON_ON_MAJOR],
+            # [BUTTON_ON_MAJOR],
             [BUTTON_SCHEDULE],
             [BUTTON_NEWS,
              BUTTON_SHOW_PATH],
