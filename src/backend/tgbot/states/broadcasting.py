@@ -22,7 +22,7 @@ class BroadcastThread(Thread):
 
 
 class Broadcasting(TGHandler):
-    def send_message_to_users(self, user_from: TGUser, sender, update):
+    def send_message_to_users(self, api: TelegramBotApi, user_from: TGUser, sender, update):
         def send_impl():
             counter = 0
             error_counter = 0
@@ -38,7 +38,7 @@ class Broadcasting(TGHandler):
                     logger.exception('Error sending broadcast to user {}'.format(u))
                     error_counter += 1
 
-            self.api.bot.send_message(self.user.tg_id, TEXT_BROADCAST_DONE.format(counter, error_counter))
+            api.bot.send_message(self.user.tg_id, TEXT_BROADCAST_DONE.format(counter, error_counter))
 
         bt = BroadcastThread(send_impl)
         bt.start()
@@ -49,19 +49,19 @@ class Broadcasting(TGHandler):
     def send_broadcast(self, api: TelegramBotApi, user: TGUser, update):
         def sender(u):
             api.bot.send_message(u, update.message.text)
-        return self.send_message_to_users(user, sender, update)
+        return self.send_message_to_users(api, user, sender, update)
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def send_broadcast_sticker(self, api: TelegramBotApi, user: TGUser, update):
         def sender(u):
             api.bot.send_sticker(u, update.message.sticker.file_id)
-        return self.send_message_to_users(user, sender, update)
+        return self.send_message_to_users(api, user, sender, update)
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def send_broadcast_location(self, api: TelegramBotApi, user: TGUser, update):
         def sender(u):
             api.bot.send_location(u, location=update.message.location)
-        return self.send_message_to_users(user, sender, update)
+        return self.send_message_to_users(api, user, sender, update)
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def send_broadcast_photo(self, api: TelegramBotApi, user: TGUser, update):
@@ -70,7 +70,7 @@ class Broadcasting(TGHandler):
             if photo:
                 api.bot.send_photo(u, photo[0].file_id, update.message.caption)
 
-        return self.send_message_to_users(user, sender, update)
+        return self.send_message_to_users(api, user, sender, update)
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def cancel_broadcast(self, api: TelegramBotApi, user: TGUser, update):
