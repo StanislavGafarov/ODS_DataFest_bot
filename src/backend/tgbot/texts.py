@@ -59,6 +59,7 @@ TEXT_ALREADY_ON_MAJOR = 'Вы уже на Major!'
 
 # ZAGLUSHKA
 TEXT_NOT_READY_YET = "В разработке. Мы оповестим о запуске!"
+TEXT_WILL_BE_ON_DATAFEST = "Данный функционал будет доступен на Data Fest⁶!"
 
 TEXT_BYE = 'До следующей встречи!'
 
