@@ -38,7 +38,7 @@ class Broadcasting(TGHandler):
                     logger.exception('Error sending broadcast to user {}'.format(u))
                     error_counter += 1
 
-            api.bot.send_message(self.user.tg_id, TEXT_BROADCAST_DONE.format(counter, error_counter))
+            api.bot.send_message(user_from.tg_id, TEXT_BROADCAST_DONE.format(counter, error_counter))
 
         bt = BroadcastThread(send_impl)
         bt.start()
