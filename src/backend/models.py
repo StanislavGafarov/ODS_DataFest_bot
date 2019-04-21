@@ -58,7 +58,9 @@ class Message(models.Model):
         tg_id = update.message.message_id
         date: datetime.datetime = update.message.date
         date = date.replace(tzinfo=datetime.timezone.utc)
-        return Message(user=user, tg_id=tg_id, text=update.message.text, date=date).save()
+        text = update.message.text
+        text = text if text else 'not-text'
+        return Message(user=user, tg_id=tg_id, text=text, date=date).save()
 
 
 @make_str('email')
