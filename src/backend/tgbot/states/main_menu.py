@@ -145,7 +145,11 @@ class MainMenu(TGHandler):
         logger.info("User %s initiated broadcast.", user)
         if not user.is_admin:
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
-        update.message.reply_text(TEXT_ENTER_BROADCAST)
+            return self.MAIN_MENU
+        total_users = TGUser.objects.count()
+        user_with_subscription = TGUser.objects.filter(has_news_subscription=True).count()
+        msg = TEXT_NEWS_STAT.format(total_users, user_with_subscription)+"\n\n"+TEXT_ENTER_BROADCAST
+        update.message.reply_text(msg)
         return self.BROADCAST
 
     # REFRESH INVITES
