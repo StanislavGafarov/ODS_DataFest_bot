@@ -1,6 +1,7 @@
 import time
 
 from telegram.ext import run_async, MessageHandler, Filters, CommandHandler
+from telegram.error import Unauthorized
 
 from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.base import TelegramBotApi
@@ -15,6 +16,9 @@ class Broadcasting(TGHandler):
             try:
                 sender(u.tg_id)
                 time.sleep(.1)
+            except Unauthorized as err:
+                logger.exception(f'User is unauthorized {u}')
+                u.delete()
             except:
                 logger.exception('Error sending broadcast to user {}'.format(u))
         update.message.reply_text(TEXT_BROADCAST_DONE, reply_markup=self.define_keyboard(user_from))
