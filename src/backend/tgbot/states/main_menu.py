@@ -70,20 +70,20 @@ class MainMenu(TGHandler):
         return self.MAIN_MENU
 
     # AUTHORIZED
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def on_major(self, api: TelegramBotApi, user: TGUser, update):
-        text = update.message.text
-        logger.info('User {} have chosen {} '.format(user, text))
-        if not user.is_authorized:
-            update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
-            return self.MAIN_MENU
-        else:
-            if user.on_major:
-                update.message.reply_text(TEXT_ALREADY_ON_MAJOR, reply_markup=self.define_keyboard(user))
-                return self.MAIN_MENU
-            else:
-                update.message.reply_text(TEXT_MAJOR_CODE, reply_markup=ReplyKeyboardRemove())
-                return self.ON_MAJOR
+    # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    # def on_major(self, api: TelegramBotApi, user: TGUser, update):
+    #     text = update.message.text
+    #     logger.info('User {} have chosen {} '.format(user, text))
+    #     if not user.is_authorized:
+    #         update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
+    #         return self.MAIN_MENU
+    #     else:
+    #         if user.on_major:
+    #             update.message.reply_text(TEXT_ALREADY_ON_MAJOR, reply_markup=self.define_keyboard(user))
+    #             return self.MAIN_MENU
+    #         else:
+    #             update.message.reply_text(TEXT_MAJOR_CODE, reply_markup=ReplyKeyboardRemove())
+    #             return self.ON_MAJOR
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def participate_random_prize(self, api: TelegramBotApi, user: TGUser, update):
@@ -194,8 +194,9 @@ class MainMenu(TGHandler):
 
             self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.not_ready_yet),
             # self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
-            # self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
             self.rhandler(BUTTON_RANDOM_BEER, self.not_ready_yet),
+            # self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
+
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
             # self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
