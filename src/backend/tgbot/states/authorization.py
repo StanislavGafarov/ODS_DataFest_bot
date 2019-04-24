@@ -32,7 +32,7 @@ class Authorization(TGHandler):
             code = int(code)
         except:
             code = None
-        invite = Invite.objects.filter(email=user.last_checked_email, code=code).first()
+        invite = Invite.objects.filter(email__iexact=user.last_checked_email, code=code).first()
         if code is not None and invite is not None:
             if hasattr(invite, 'tguser'):
                 logger.info('{} tried to sign as {}'.format(user, invite.tguser))
