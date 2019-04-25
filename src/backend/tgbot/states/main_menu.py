@@ -148,9 +148,9 @@ class MainMenu(TGHandler):
             return self.MAIN_MENU
         total_users = TGUser.objects.count()
         user_with_subscription = TGUser.objects.filter(has_news_subscription=True).count()
-        msg = TEXT_NEWS_STAT.format(total_users, user_with_subscription)+"\n\n"+TEXT_ENTER_BROADCAST
+        msg = TEXT_NEWS_STAT.format(total_users, user_with_subscription)+"\n\n"+TEXT_BROADCAST_CHOOSE_GROUP
         update.message.reply_text(msg)
-        return self.BROADCAST
+        return self.BROADCAST_SELECT_GROUP
 
     # REFRESH INVITES
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)

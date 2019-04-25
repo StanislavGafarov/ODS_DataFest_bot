@@ -69,10 +69,12 @@ TEXT_BYE = 'До следующей встречи!'
 TEXT_SHOW_SCHEDULE = "В разработке.\nМероприятие пройдет 10-11 мая во FLACON-е.\nАктуальную информацию по программе мероприятия можно найти тут: https://datafest.ru/schedule/"
 
 # ADMIN
+TEXT_BROADCAST_CHOOSE_GROUP = 'Выберите группу пользователей, кому предназначается сообщение'
 TEXT_ENTER_BROADCAST = 'Введите сообщение или введите /cancel, чтобы вернуться назад.'
 TEXT_BROADCAST_STARTED = 'Броадкаст запущен'
 TEXT_BROADCAST_DONE = 'Броадкаст выполнен. {} отправлено. {} ошибок'
 TEXT_CANCEL_BROADCASTING = 'Ну не надо, так не надо...'
+
 
 TEXT_START_INVITE_REFRESH = 'Запущено обновление инвайтов.'
 TEXT_REPORT_INVITE_COUNT = 'Инвайты обновлены, новых {}.'
@@ -118,6 +120,10 @@ BUTTON_SEND_INVITES = 'Разослать инвайты'
 BUTTON_DRAW_PRIZES = 'Розыгрыш мерча'
 BUTTON_START_DRAWING = 'Начать розыгрыш мерча'
 BUTTON_POST_NEWS = 'Запостить новость'
+BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION = 'С подпиской на новости'
+BUTTON_NEWS_GROUP_ADMIN = 'Админам'
+BUTTON_NEWS_GROUP_WINNERS = 'Победителям'
+BUTTON_NEWS_GROUP_ALL = 'Всем'
 
 BUTTON_NEWS_SUBSCRIPTION = 'Подписаться на новости'
 BUTTON_NEWS_UNSUBSCRIPTION = 'Отписаться от новостей'
