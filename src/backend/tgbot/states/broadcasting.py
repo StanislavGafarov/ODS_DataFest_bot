@@ -37,7 +37,7 @@ class Broadcasting(TGHandler):
         def send_impl():
             counter = 0
             error_counter = 0
-            target_group = Message.filter(user=user_from)[-2]
+            target_group = Message.objects.filter(user=user_from)[-2]
             users_to = get_users(target_group)
             count = users_to.count()
             logger.info(f'Ready to send message to group {target_group}, user count {count}')
