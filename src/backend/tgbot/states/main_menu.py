@@ -144,7 +144,7 @@ class MainMenu(TGHandler):
     def create_broadcast(self, api: TelegramBotApi, user: TGUser, update):
         logger.info("User %s initiated broadcast.", user)
         if not user.is_admin:
-            update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
+            update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.broadcast_group_keyboard(user))
             return self.MAIN_MENU
         total_users = TGUser.objects.count()
         user_with_subscription = TGUser.objects.filter(has_news_subscription=True).count()
