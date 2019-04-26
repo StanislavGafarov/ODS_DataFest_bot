@@ -9,7 +9,7 @@ from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.texts import *
 from backend.tgbot.utils import Decorators, logger
 
-from backend.models import TGUser, Message, News
+from backend.models import TGUser, Message, News, NEWS_GROUPS
 
 
 class BroadcastThread(Thread):
@@ -22,25 +22,27 @@ class BroadcastThread(Thread):
 
 
 class Broadcasting(TGHandler):
-    def send_message_to_users(self, api: TelegramBotApi, user_from: TGUser, sender, update):
-        def get_users(group_name):
-            if group_name in BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION:
+    def send_message_to_users(self, api: TelegramBotApi, user_from: TGUser, sender, update, news: News):
+        def get_users(news):
+            if not news.target_group in NEWS_GROUPS:
+                return list()
+            group_no = NEWS_GROUPS.index(news.target_group)
+            if group_no == 1:
                 return TGUser.filter(has_news_subscription=True)
-            elif group_name in BUTTON_NEWS_GROUP_ADMIN:
+            elif group_no == 2:
                 return TGUser.filter(is_admin=True)
-            elif group_name in BUTTON_NEWS_GROUP_WINNERS:
+            elif group_no == 3:
                 return TGUser.filter(win_random_prize=True)
-            elif group_name in BUTTON_NEWS_GROUP_ALL:
+            elif group_no == 4:
                 return TGUser.objects.all()
             return list()
 
         def send_impl():
             counter = 0
             error_counter = 0
-            target_group = Message.objects.filter(user=user_from)[-2]
-            users_to = get_users(target_group)
+            users_to = get_users(news)
             count = users_to.count()
-            logger.info(f'Ready to send message to group {target_group}, user count {count}')
+            logger.info(f'Ready to send message to group {news.target_group}, user count {count}')
             for u in users_to:
                 try:
                     sender(u.tg_id)
@@ -60,43 +62,65 @@ class Broadcasting(TGHandler):
         update.message.reply_text(TEXT_BROADCAST_STARTED, reply_markup=self.define_keyboard(user_from))
         return self.MAIN_MENU
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def send_broadcast(self, api: TelegramBotApi, user: TGUser, update):
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
+    def send_broadcast(self, api: TelegramBotApi, user: TGUser, update, news: News):
         def sender(u):
             api.bot.send_message(u, update.message.text)
-        return self.send_message_to_users(api, user, sender, update)
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def send_broadcast_sticker(self, api: TelegramBotApi, user: TGUser, update):
+        news.data_type = 'TEXT'
+        news.data = update.message.text
+        news.save()
+        return self.send_message_to_users(api, user, sender, update, news)
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
+    def send_broadcast_sticker(self, api: TelegramBotApi, user: TGUser, update, news: News):
         def sender(u):
             api.bot.send_sticker(u, update.message.sticker.file_id)
+
+        news.data_type = 'STICKER'
+        news.data = update.message.sticker.file_id
+        news.save()
         return self.send_message_to_users(api, user, sender, update)
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def send_broadcast_location(self, api: TelegramBotApi, user: TGUser, update):
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
+    def send_broadcast_location(self, api: TelegramBotApi, user: TGUser, update, news: News):
         def sender(u):
             api.bot.send_location(u, location=update.message.location)
+
+        news.data_type = 'LOCATION'
+        news.data = 'update.message.location'
+        news.save()
         return self.send_message_to_users(api, user, sender, update)
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def send_broadcast_photo(self, api: TelegramBotApi, user: TGUser, update):
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
+    def send_broadcast_photo(self, api: TelegramBotApi, user: TGUser, update, news: News):
         def sender(u):
             photo = update.message.photo
             if photo:
                 api.bot.send_photo(u, photo[0].file_id, update.message.caption)
 
+        news.data_type = 'IMAGE'
+        news.data = update.message.photo[0].file_id
+        news.save()
+
         return self.send_message_to_users(api, user, sender, update)
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def cancel_broadcast(self, api: TelegramBotApi, user: TGUser, update):
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
+    def cancel_broadcast(self, api: TelegramBotApi, user: TGUser, update, news: News):
         logger.info("User {} desided not to send broadcast.", user)
         update.message.reply_text(TEXT_CANCEL_BROADCASTING,
                                   reply_markup=self.define_keyboard(user))
+        news.delete()
         return self.MAIN_MENU
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def broadcast_group(self, api: TelegramBotApi, user: TGUser, update):
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
+    def broadcast_group(self, api: TelegramBotApi, user: TGUser, update, news: News):
         target_group = update.message.text
+        if target_group in NEWS_GROUPS:
+            news.target_group = target_group
+        else:
+            news.target_group = 'NONE'
+        news.save()
         logger.info("User {} choosed group {} send broadcast.", user, target_group)
         update.message.reply_text(TEXT_ENTER_BROADCAST,
                                   reply_markup=self.define_keyboard(user))

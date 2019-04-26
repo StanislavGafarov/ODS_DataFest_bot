@@ -76,9 +76,25 @@ class Invite(models.Model):
     surname = models.TextField(default=False)
 
 
+BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION = 'С подпиской на новости'
+BUTTON_NEWS_GROUP_ADMIN = 'Админам'
+BUTTON_NEWS_GROUP_WINNERS = 'Победителям'
+BUTTON_NEWS_GROUP_ALL = 'Всем'
+
+NEWS_GROUPS = ['NONE', 'NEWS_SUBSCRIPTION', 'ADMINS', 'WINNERS', 'ALL']
+NEWS_TYPE = ['TEXT', 'IMAGE', 'STICKER', 'LOCATION']
+
+
 @make_str('news')
 class News(models.Model):
-    news = models.TextField(default=False)
+    # news creator
+    reporter_user_id = models.ForeignKey(TGUser, on_delete=models.CASCADE, related_name='news')
+    # news target group
+    target_group = models.TextField(choices=NEWS_GROUPS, default='NONE')
+    # message type [text|image|location|sticker]
+    data_type = models.TextField(choices=NEWS_TYPE, default='TEXT')
+    # text value
+    data = models.TextField(default=False, blank=True)
 
 
 SIZES = [(i, i) for i in ['XS', 'S', 'M', 'L', 'XL', 'XXL']]
