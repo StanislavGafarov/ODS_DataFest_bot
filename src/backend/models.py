@@ -81,8 +81,8 @@ BUTTON_NEWS_GROUP_ADMIN = 'Админам'
 BUTTON_NEWS_GROUP_WINNERS = 'Победителям'
 BUTTON_NEWS_GROUP_ALL = 'Всем'
 
-NEWS_GROUPS = ['NONE', 'NEWS_SUBSCRIPTION', 'ADMINS', 'WINNERS', 'ALL']
-NEWS_TYPE = ['TEXT', 'IMAGE', 'STICKER', 'LOCATION']
+NEWS_GROUPS = [(i, i) for i in ['NONE', 'NEWS_SUBSCRIPTION', 'ADMINS', 'WINNERS', 'ALL']]
+NEWS_TYPE = [(i, i) for i in ['TEXT', 'IMAGE', 'STICKER', 'LOCATION']]
 
 
 @make_str('news')
