@@ -107,7 +107,7 @@ class Broadcasting(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
     def cancel_broadcast(self, api: TelegramBotApi, user: TGUser, update, news: News):
-        logger.info("User {} desided not to send broadcast.", user)
+        logger.info(f"User {user} desided not to send broadcast.")
         update.message.reply_text(TEXT_CANCEL_BROADCASTING,
                                   reply_markup=self.define_keyboard(user))
         news.delete()
