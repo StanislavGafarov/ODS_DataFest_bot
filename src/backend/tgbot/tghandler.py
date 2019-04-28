@@ -30,7 +30,7 @@ class TGHandler(object):
 
         # Admin
         self.BROADCAST = 995
-        self.BROADCAST_SELECT_GROUP = 996
+        self.BROADCAST_TYPE_MESSAGE = 996
         self.DRAW_PRIZES = 997
 
         admin_buttons = [

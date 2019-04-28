@@ -88,7 +88,7 @@ NEWS_TYPE = [(i, i) for i in ['TEXT', 'IMAGE', 'STICKER', 'LOCATION']]
 @make_str('news')
 class News(models.Model):
     # news creator
-    reporter_user_id = models.ForeignKey(TGUser, on_delete=models.CASCADE, related_name='news')
+    reporter_user_id = models.IntegerField(unique=True)
     # news target group
     target_group = models.TextField(choices=NEWS_GROUPS, default='NONE')
     # message type [text|image|location|sticker]

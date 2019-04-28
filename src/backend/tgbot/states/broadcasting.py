@@ -24,9 +24,10 @@ class BroadcastThread(Thread):
 class Broadcasting(TGHandler):
     def send_message_to_users(self, api: TelegramBotApi, user_from: TGUser, sender, update, news: News):
         def get_users(news):
-            if not news.target_group in NEWS_GROUPS:
+            if news.target_group not in NEWS_GROUPS:
                 return list()
             group_no = NEWS_GROUPS.index(news.target_group)
+            # group_no == 0 is NONE
             if group_no == 1:
                 return TGUser.filter(has_news_subscription=True)
             elif group_no == 2:
@@ -41,14 +42,14 @@ class Broadcasting(TGHandler):
             counter = 0
             error_counter = 0
             users_to = get_users(news)
-            count = users_to.count()
+            count = users_to.count() if users_to else 0
             logger.info(f'Ready to send message to group {news.target_group}, user count {count}')
             for u in users_to:
                 try:
                     sender(u.tg_id)
                     counter += 1
                     time.sleep(.1)
-                except Unauthorized as err:
+                except Unauthorized:
                     logger.exception(f'User is unauthorized {u}')
                     u.delete()
                 except:
@@ -116,26 +117,32 @@ class Broadcasting(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
     def broadcast_group(self, api: TelegramBotApi, user: TGUser, update, news: News):
         target_group = update.message.text
-        if target_group in NEWS_GROUPS:
-            news.target_group = target_group
+        if target_group == BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION:
+            news.target_group = 'NEWS_SUBSCRIPTION'
+        elif target_group == BUTTON_NEWS_GROUP_ADMIN:
+            news.target_group = 'ADMINS'
+        elif target_group == BUTTON_NEWS_GROUP_WINNERS:
+            news.target_group = 'WINNERS'
+        elif target_group == BUTTON_NEWS_GROUP_ALL:
+            news.target_group = 'ALL'
         else:
             news.target_group = 'NONE'
         news.save()
-        logger.info("User {} choosed group {} send broadcast.", user, target_group)
+        logger.info(f"User {user} choosed group {target_group} for broadcast.")
         update.message.reply_text(TEXT_ENTER_BROADCAST,
                                   reply_markup=self.define_keyboard(user))
-        return self.BROADCAST
+        return self.BROADCAST_TYPE_MESSAGE
 
     def create_state(self):
         state = {
-            self.BROADCAST_SELECT_GROUP: [
+            self.BROADCAST: [
                 self.rhandler(BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION, self.broadcast_group),
                 self.rhandler(BUTTON_NEWS_GROUP_ADMIN, self.broadcast_group),
                 self.rhandler(BUTTON_NEWS_GROUP_WINNERS, self.broadcast_group),
                 self.rhandler(BUTTON_NEWS_GROUP_ALL, self.broadcast_group),
                 MessageHandler(Filters.text, self.unknown_command)
             ],
-            self.BROADCAST: [
+            self.BROADCAST_TYPE_MESSAGE: [
                 MessageHandler(Filters.text, self.send_broadcast),
                 MessageHandler(Filters.sticker, self.send_broadcast_sticker),
                 MessageHandler(Filters.location, self.send_broadcast_location),

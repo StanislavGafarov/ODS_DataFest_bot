@@ -74,7 +74,7 @@ class Decorators(object):
     def with_news(cls, f):
         @wraps(f)
         def get_news(cls, api: TelegramBotApi, user, update):
-            news = News.objects.filter(reporter_user_id=user.tg_id, data='').first()
+            news = News.objects.filter(reporter_user_id=user.tg_id, data='').order_by('-id').first()
             if not news:
                 news = News(reporter_user_id=user.tg_id)
                 news.save()
