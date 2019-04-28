@@ -86,9 +86,16 @@ class TGHandler(object):
             keyboard = self.RANDOM_BEER_MENU_KEYBOARD + [[BUTTON_FIND_MATCH], [BUTTON_FULL_BACK]]
         return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
 
-    def broadcast_group_keyboard(self, user:TGUser):
+    def broadcast_group_keyboard(self, user: TGUser):
         if user.is_admin:
             keyboard = self.BROADCAST_SELECT_GROUP_KEYBOARD
+        else:
+            keyboard = self.UNAUTHORIZED_USER_KEYBOARD
+        return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
+
+    def broadcast_message_keyboard(self, user: TGUser):
+        if user.is_admin:
+            keyboard = self.BUTTON_FULL_BACK
         else:
             keyboard = self.UNAUTHORIZED_USER_KEYBOARD
         return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)

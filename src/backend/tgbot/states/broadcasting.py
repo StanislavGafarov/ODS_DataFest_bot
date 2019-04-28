@@ -115,6 +115,12 @@ class Broadcasting(TGHandler):
         return self.MAIN_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
+    def back_to_group_select(self, api: TelegramBotApi, user: TGUser, update, news: News):
+        update.message.reply_text(TEXT_BROADCAST_CHOOSE_GROUP,
+                                  reply_markup=self.define_keyboard(user))
+        return self.BROADCAST
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
     def broadcast_group(self, api: TelegramBotApi, user: TGUser, update, news: News):
         target_group = update.message.text
         if target_group == BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION:
@@ -130,7 +136,7 @@ class Broadcasting(TGHandler):
         news.save()
         logger.info(f"User {user} choosed group {target_group} for broadcast.")
         update.message.reply_text(TEXT_ENTER_BROADCAST,
-                                  reply_markup=self.define_keyboard(user))
+                                  reply_markup=self.broadcast_group_keyboard(user))
         return self.BROADCAST_TYPE_MESSAGE
 
     def create_state(self):
@@ -140,6 +146,7 @@ class Broadcasting(TGHandler):
                 self.rhandler(BUTTON_NEWS_GROUP_ADMIN, self.broadcast_group),
                 self.rhandler(BUTTON_NEWS_GROUP_WINNERS, self.broadcast_group),
                 self.rhandler(BUTTON_NEWS_GROUP_ALL, self.broadcast_group),
+                self.rhandler(BUTTON_FULL_BACK, self.cancel_broadcast),
                 MessageHandler(Filters.text, self.unknown_command)
             ],
             self.BROADCAST_TYPE_MESSAGE: [
@@ -147,6 +154,7 @@ class Broadcasting(TGHandler):
                 MessageHandler(Filters.sticker, self.send_broadcast_sticker),
                 MessageHandler(Filters.location, self.send_broadcast_location),
                 MessageHandler(Filters.photo, self.send_broadcast_photo),
+                self.rhandler(BUTTON_FULL_BACK, self.back_to_group_select),
                 CommandHandler('cancel', self.cancel_broadcast)
             ]
         }
