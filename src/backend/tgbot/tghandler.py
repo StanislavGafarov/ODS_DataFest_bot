@@ -96,7 +96,7 @@ class TGHandler(object):
 
     def broadcast_message_keyboard(self, user: TGUser):
         if user.is_admin:
-            keyboard = [[self.BUTTON_FULL_BACK]]
+            keyboard = [[BUTTON_FULL_BACK]]
         else:
             keyboard = self.UNAUTHORIZED_USER_KEYBOARD
         return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)

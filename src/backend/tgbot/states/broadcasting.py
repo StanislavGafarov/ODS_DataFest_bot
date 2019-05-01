@@ -117,7 +117,7 @@ class Broadcasting(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
     def back_to_group_select(self, api: TelegramBotApi, user: TGUser, update, news: News):
         update.message.reply_text(TEXT_BROADCAST_CHOOSE_GROUP,
-                                  reply_markup=self.define_keyboard(user))
+                                  reply_markup=self.broadcast_group_keyboard(user))
         return self.BROADCAST
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
@@ -136,7 +136,7 @@ class Broadcasting(TGHandler):
         news.save()
         logger.info(f"User {user} choosed group {target_group} for broadcast.")
         update.message.reply_text(TEXT_ENTER_BROADCAST,
-                                  reply_markup=self.broadcast_group_keyboard(user))
+                                  reply_markup=self.broadcast_message_keyboard(user))
         return self.BROADCAST_TYPE_MESSAGE
 
     def create_state(self):
