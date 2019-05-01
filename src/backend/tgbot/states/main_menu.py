@@ -151,9 +151,8 @@ class MainMenu(TGHandler):
         winner_count = TGUser.objects.filter(win_random_prize=True).count()
         admin_count = TGUser.objects.filter(is_admin=True).count()
 
-        msg = TEXT_NEWS_STAT.format(user_count, subscription_count, winner_count, admin_count)\
-              + "\n\n"\
-              + TEXT_BROADCAST_CHOOSE_GROUP
+        statistics_text = TEXT_NEWS_STAT.format(user_count, subscription_count, winner_count, admin_count)
+        msg = f"{statistics_text}\n{TEXT_BROADCAST_CHOOSE_GROUP}"
         update.message.reply_text(msg,  reply_markup=self.broadcast_group_keyboard(user))
         return self.BROADCAST
 
