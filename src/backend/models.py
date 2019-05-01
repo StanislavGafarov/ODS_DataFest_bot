@@ -76,11 +76,6 @@ class Invite(models.Model):
     surname = models.TextField(default=False)
 
 
-BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION = 'С подпиской на новости'
-BUTTON_NEWS_GROUP_ADMIN = 'Админам'
-BUTTON_NEWS_GROUP_WINNERS = 'Победителям'
-BUTTON_NEWS_GROUP_ALL = 'Всем'
-
 NEWS_GROUPS = [(i, i) for i in ['NONE', 'NEWS_SUBSCRIPTION', 'ADMINS', 'WINNERS', 'ALL']]
 NEWS_TYPE = [(i, i) for i in ['TEXT', 'IMAGE', 'STICKER', 'LOCATION']]
 
@@ -88,13 +83,13 @@ NEWS_TYPE = [(i, i) for i in ['TEXT', 'IMAGE', 'STICKER', 'LOCATION']]
 @make_str('news')
 class News(models.Model):
     # news creator
-    reporter_user_id = models.IntegerField(unique=True)
+    reporter_user_id = models.IntegerField()
     # news target group
-    target_group = models.TextField(choices=NEWS_GROUPS, default='NONE')
+    target_group = models.TextField(choices=NEWS_GROUPS)
     # message type [text|image|location|sticker]
-    data_type = models.TextField(choices=NEWS_TYPE, default='TEXT')
+    news_type = models.TextField(choices=NEWS_TYPE)
     # text value
-    data = models.TextField(default=False, blank=True)
+    news = models.TextField(default='', blank=True)
 
 
 SIZES = [(i, i) for i in ['XS', 'S', 'M', 'L', 'XL', 'XXL']]

@@ -68,8 +68,8 @@ class Broadcasting(TGHandler):
         def sender(u):
             api.bot.send_message(u, update.message.text)
 
-        news.data_type = 'TEXT'
-        news.data = update.message.text
+        news.news_type = 'TEXT'
+        news.news = update.message.text
         news.save()
         return self.send_message_to_users(api, user, sender, update, news)
 
@@ -78,8 +78,8 @@ class Broadcasting(TGHandler):
         def sender(u):
             api.bot.send_sticker(u, update.message.sticker.file_id)
 
-        news.data_type = 'STICKER'
-        news.data = update.message.sticker.file_id
+        news.news_type = 'STICKER'
+        news.news = update.message.sticker.file_id
         news.save()
         return self.send_message_to_users(api, user, sender, update)
 
@@ -88,8 +88,8 @@ class Broadcasting(TGHandler):
         def sender(u):
             api.bot.send_location(u, location=update.message.location)
 
-        news.data_type = 'LOCATION'
-        news.data = 'update.message.location'
+        news.news_type = 'LOCATION'
+        news.news = 'update.message.location'
         news.save()
         return self.send_message_to_users(api, user, sender, update)
 
@@ -100,8 +100,8 @@ class Broadcasting(TGHandler):
             if photo:
                 api.bot.send_photo(u, photo[0].file_id, update.message.caption)
 
-        news.data_type = 'IMAGE'
-        news.data = update.message.photo[0].file_id
+        news.news_type = 'IMAGE'
+        news.news = update.message.photo[0].file_id
         news.save()
 
         return self.send_message_to_users(api, user, sender, update)
@@ -134,7 +134,7 @@ class Broadcasting(TGHandler):
         else:
             news.target_group = 'NONE'
         news.save()
-        logger.info(f"User {user} choosed group {target_group} for broadcast.")
+        logger.info(f"User {user} choosed group {news.target_group} for broadcast.")
         update.message.reply_text(TEXT_ENTER_BROADCAST,
                                   reply_markup=self.broadcast_message_keyboard(user))
         return self.BROADCAST_TYPE_MESSAGE
