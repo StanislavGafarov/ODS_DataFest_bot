@@ -24,16 +24,17 @@ class BroadcastThread(Thread):
 class Broadcasting(TGHandler):
     def send_message_to_users(self, api: TelegramBotApi, user_from: TGUser, sender, update, news: News):
         def get_users(news):
-            if news.target_group not in NEWS_GROUPS:
+            key = (news.target_group, news.target_group)
+            if key not in NEWS_GROUPS:
                 return list()
-            group_no = NEWS_GROUPS.index(news.target_group)
+            group_no = NEWS_GROUPS.index(key)
             # group_no == 0 is NONE
             if group_no == 1:
-                return TGUser.filter(has_news_subscription=True)
+                return TGUser.objects.filter(has_news_subscription=True)
             elif group_no == 2:
-                return TGUser.filter(is_admin=True)
+                return TGUser.objects.filter(is_admin=True)
             elif group_no == 3:
-                return TGUser.filter(win_random_prize=True)
+                return TGUser.objects.filter(win_random_prize=True)
             elif group_no == 4:
                 return TGUser.objects.all()
             return list()
