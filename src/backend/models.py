@@ -85,9 +85,9 @@ class News(models.Model):
     # news creator
     reporter_user_id = models.IntegerField()
     # news target group
-    target_group = models.TextField(choices=NEWS_GROUPS)
+    target_group = models.TextField(choices=NEWS_GROUPS, default='NONE')
     # message type [text|image|location|sticker]
-    news_type = models.TextField(choices=NEWS_TYPE)
+    news_type = models.TextField(choices=NEWS_TYPE, default='TEXT')
     # text value
     news = models.TextField(default='', blank=True)
 
