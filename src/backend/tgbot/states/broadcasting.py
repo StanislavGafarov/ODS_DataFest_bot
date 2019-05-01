@@ -82,7 +82,7 @@ class Broadcasting(TGHandler):
         news.news_type = 'STICKER'
         news.news = update.message.sticker.file_id
         news.save()
-        return self.send_message_to_users(api, user, sender, update)
+        return self.send_message_to_users(api, user, sender, update, news)
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
     def send_broadcast_location(self, api: TelegramBotApi, user: TGUser, update, news: News):
@@ -90,9 +90,9 @@ class Broadcasting(TGHandler):
             api.bot.send_location(u, location=update.message.location)
 
         news.news_type = 'LOCATION'
-        news.news = 'update.message.location'
+        news.news = str(update.message.location)
         news.save()
-        return self.send_message_to_users(api, user, sender, update)
+        return self.send_message_to_users(api, user, sender, update, news)
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
     def send_broadcast_photo(self, api: TelegramBotApi, user: TGUser, update, news: News):
@@ -102,10 +102,10 @@ class Broadcasting(TGHandler):
                 api.bot.send_photo(u, photo[0].file_id, update.message.caption)
 
         news.news_type = 'IMAGE'
-        news.news = update.message.photo[0].file_id
+        news.news = str({'image': update.message.photo[0].file_id, 'caption': update.message.caption})
         news.save()
 
-        return self.send_message_to_users(api, user, sender, update)
+        return self.send_message_to_users(api, user, sender, update, news)
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
     def cancel_broadcast(self, api: TelegramBotApi, user: TGUser, update, news: News):
