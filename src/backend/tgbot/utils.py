@@ -1,11 +1,17 @@
 import logging
 import os
+import time
 from functools import wraps
+from threading import Thread
+
+from telegram.error import Unauthorized
+
 import requests
 
+from backend.tgbot.texts import TEXT_BROADCAST_DONE
 from bot import settings
 
-from backend.models import Message, RandomBeerUser, News
+from backend.models import Message, RandomBeerUser, News, TGUser
 from backend.tgbot.base import TelegramBotApi
 
 
@@ -87,3 +93,38 @@ class Decorators(object):
                 f = dec(f)
             return f
         return deco
+
+
+class BroadcastThread(Thread):
+    def __init__(self, thread_function):
+        super().__init__()
+        self.thread_function = thread_function
+
+    def run(self):
+        self.thread_function()
+
+
+def send_message_to_users(api: TelegramBotApi, user_from: TGUser, target_users, sender, on_started=None, on_done=None):
+    def send_impl():
+        counter = 0
+        error_counter = 0
+        for u in target_users:
+            try:
+                sender(u.tg_id)
+                counter += 1
+                time.sleep(.1)
+            except Unauthorized:
+                logger.exception(f'User is unauthorized {u}')
+                u.delete()
+            except:
+                logger.exception('Error sending broadcast to user {}'.format(u))
+                error_counter += 1
+
+        if on_done:
+            on_done(counter, error_counter)
+        else:
+            api.bot.send_message(user_from.tg_id, TEXT_BROADCAST_DONE.format(counter, error_counter))
+
+    bt = BroadcastThread(send_impl)
+    bt.start()
+    return on_started() if on_started else None
