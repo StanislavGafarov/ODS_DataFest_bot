@@ -91,6 +91,23 @@ class News(models.Model):
     # text value
     news = models.TextField(default='', blank=True)
 
+    def get_users(self):
+        try:
+            key = (str(self.target_group), str(self.target_group))
+            group_no = NEWS_GROUPS.index(key)
+        except ValueError:
+            return TGUser.objects.none()
+
+        if group_no == 1:
+            return TGUser.objects.filter(has_news_subscription=True)
+        elif group_no == 2:
+            return TGUser.objects.filter(is_admin=True)
+        elif group_no == 3:
+            return TGUser.objects.filter(win_random_prize=True)
+        elif group_no == 4:
+            return TGUser.objects.all()
+        return TGUser.objects.none()
+
 
 SIZES = [(i, i) for i in ['XS', 'S', 'M', 'L', 'XL', 'XXL']]
 
