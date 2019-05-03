@@ -17,12 +17,13 @@ class Broadcasting(TGHandler):
             error_counter = 0
             for u in target_users:
                 try:
-                    message_func(u.tg_id)
                     counter += 1
+                    message_func(u.tg_id)
                     time.sleep(.1)
                 except Unauthorized:
                     logger.exception(f'User is unauthorized {u}')
                     u.delete()
+                    error_counter += 1
                 except:
                     logger.exception('Error sending broadcast to user {}'.format(u))
                     error_counter += 1
