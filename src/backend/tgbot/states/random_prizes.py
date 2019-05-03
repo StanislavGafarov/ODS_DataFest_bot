@@ -53,6 +53,7 @@ class RandomFreePrizes(TGHandler):
                     winners = random.sample(list(all_users),
                                             sample_size if len(list(all_users)) > sample_size else len(list(all_users))
                                             )
+                    matched_prize_count = 0
                     for winner in winners:
                         win_user = TGUser.objects.get(tg_id=winner)
                         win_user.win_random_prize = True
@@ -62,6 +63,7 @@ class RandomFreePrizes(TGHandler):
                         try:
                             counter += 1
                             api.bot.send_message(win_user.tg_id, TEXT_CONGRATULATION)
+                            matched_prize_count += 1
                             time.sleep(.1)
                         except Unauthorized:
                             logger.info('{} blocked'.format(user))
@@ -70,8 +72,10 @@ class RandomFreePrizes(TGHandler):
                         except:
                             logger.exception('Error sending broadcast to user {}'.format(winner))
                             error_counter += 1
+                    # prize.quantity -= matched_prize_count
+                    # prizes.save()
 
-                api.bot.send_message(user.tg_id, TEXT_BROADCAST_DONE.format(counter, error_counter))
+                api.bot.send_message(user.tg_id, TEXT_RANDOM_PRIZE_BROADCAST_DONE.format(counter, error_counter))
 
         TGHandler.add_task(send_prizes, api, user, prizes)
         update.message.reply_text(TEXT_RANDOM_PRIZE_BROADCAST_STARTED, reply_markup=self.define_keyboard(user))
