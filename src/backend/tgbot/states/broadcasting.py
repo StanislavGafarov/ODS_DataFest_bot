@@ -1,30 +1,39 @@
+import time
+from telegram.error import Unauthorized
 from telegram.ext import run_async, MessageHandler, Filters, CommandHandler
 
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.texts import *
-from backend.tgbot.utils import Decorators, logger, send_message_to_users
+from backend.tgbot.utils import Decorators, logger
 
 from backend.models import TGUser, News
 
 
 class Broadcasting(TGHandler):
-    def _on_started_broadcast(self, user: TGUser, update):
-        update.message.reply_text(TEXT_BROADCAST_STARTED, reply_markup=self.define_keyboard(user))
-        return self.MAIN_MENU
+    def send_news(self, api: TelegramBotApi, user_from: TGUser, news: News, message_func, update):
+        def send_message_to_users(api: TelegramBotApi, user_from: TGUser, target_users, message_func):
+            counter = 0
+            error_counter = 0
+            for u in target_users:
+                try:
+                    message_func(u.tg_id)
+                    counter += 1
+                    time.sleep(.1)
+                except Unauthorized:
+                    logger.exception(f'User is unauthorized {u}')
+                    u.delete()
+                except:
+                    logger.exception('Error sending broadcast to user {}'.format(u))
+                    error_counter += 1
+            api.bot.send_message(user_from.tg_id, TEXT_BROADCAST_DONE.format(counter, error_counter))
 
-    def _on_done_broadcast(self, api: TelegramBotApi, user: TGUser, ok_count, failure_count):
-        api.bot.send_message(user.tg_id, TEXT_BROADCAST_DONE.format(ok_count, failure_count))
-
-    def send_news(self, api: TelegramBotApi, user_from: TGUser, news: News, sender, update):
         target_users = news.get_users()
         logger.info(f'Ready to send message to group {news.target_group}, user count {target_users.count()}')
-        return send_message_to_users(api
-                                     , user_from
-                                     , target_users
-                                     , sender
-                                     , on_started=lambda: self._on_started_broadcast(user_from, update)
-                                     , on_done=lambda ok, fail: self._on_done_broadcast(api, user_from, ok, fail))
+        TGHandler.add_task(send_message_to_users, api, user_from, target_users, message_func)
+
+        update.message.reply_text(TEXT_BROADCAST_STARTED, reply_markup=self.define_keyboard(user_from))
+        return self.MAIN_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
     def send_broadcast(self, api: TelegramBotApi, user: TGUser, update, news: News):
