@@ -7,7 +7,22 @@ from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.texts import *
 from backend.tgbot.utils import Decorators, logger
 
-from backend.models import TGUser, News
+from backend.models import TGUser, News, NewsGroup
+
+target_group_map = {
+    BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION: NewsGroup.news_subscription(),
+    BUTTON_NEWS_GROUP_ADMIN: NewsGroup.admins(),
+    BUTTON_NEWS_GROUP_WINNERS: NewsGroup.winners(),
+    BUTTON_NEWS_GROUP_ALL: NewsGroup.winners()
+}
+
+
+def get_target_group(text):
+    try:
+        return target_group_map[text]
+    except ValueError:
+        pass
+    return NewsGroup.no_group()
 
 
 class Broadcasting(TGHandler):
@@ -80,35 +95,19 @@ class Broadcasting(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
     def cancel_broadcast(self, api: TelegramBotApi, user: TGUser, update, news: News):
-        logger.info(f"User {user} desided not to send broadcast.")
+        logger.info(f"User {user} decided not to send broadcast.")
         update.message.reply_text(TEXT_CANCEL_BROADCASTING,
                                   reply_markup=self.define_keyboard(user))
         news.delete()
         return self.MAIN_MENU
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
-    def back_to_group_select(self, api: TelegramBotApi, user: TGUser, update, news: News):
-        update.message.reply_text(TEXT_BROADCAST_CHOOSE_GROUP,
-                                  reply_markup=self.broadcast_group_keyboard(user))
-        return self.BROADCAST
-
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
     def broadcast_group(self, api: TelegramBotApi, user: TGUser, update, news: News):
-        target_group = update.message.text
-        if target_group == BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION:
-            news.target_group = 'NEWS_SUBSCRIPTION'
-        elif target_group == BUTTON_NEWS_GROUP_ADMIN:
-            news.target_group = 'ADMINS'
-        elif target_group == BUTTON_NEWS_GROUP_WINNERS:
-            news.target_group = 'WINNERS'
-        elif target_group == BUTTON_NEWS_GROUP_ALL:
-            news.target_group = 'ALL'
-        else:
-            news.target_group = 'NONE'
+        news.target_group = get_target_group(update.message.text)
         news.save()
-        logger.info(f"User {user} choosed group {news.target_group} for broadcast.")
+        logger.info(f"User {user} choose group {news.target_group} for broadcast.")
         update.message.reply_text(TEXT_ENTER_BROADCAST,
-                                  reply_markup=self.broadcast_message_keyboard(user))
+                                  reply_markup=self.define_keyboard(user))
         return self.BROADCAST_TYPE_MESSAGE
 
     def create_state(self):
@@ -126,7 +125,6 @@ class Broadcasting(TGHandler):
                 MessageHandler(Filters.sticker, self.send_broadcast_sticker),
                 MessageHandler(Filters.location, self.send_broadcast_location),
                 MessageHandler(Filters.photo, self.send_broadcast_photo),
-                self.rhandler(BUTTON_FULL_BACK, self.back_to_group_select),
                 CommandHandler('cancel', self.cancel_broadcast)
             ]
         }

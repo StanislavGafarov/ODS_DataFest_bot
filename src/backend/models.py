@@ -76,8 +76,56 @@ class Invite(models.Model):
     surname = models.TextField(default=False)
 
 
-NEWS_GROUPS = [(i, i) for i in ['NONE', 'NEWS_SUBSCRIPTION', 'ADMINS', 'WINNERS', 'ALL']]
-NEWS_TYPE = [(i, i) for i in ['TEXT', 'IMAGE', 'STICKER', 'LOCATION']]
+class NewsGroup:
+    __groups = ['NONE', 'NEWS_SUBSCRIPTION', 'ADMINS', 'WINNERS', 'ALL']
+
+    @staticmethod
+    def no_group():
+        return NewsGroup.__groups[0]
+
+    @staticmethod
+    def news_subscription():
+        return NewsGroup.__groups[1]
+
+    @staticmethod
+    def admins():
+        return NewsGroup.__groups[2]
+
+    @staticmethod
+    def winners():
+        return NewsGroup.__groups[3]
+
+    @staticmethod
+    def all_users():
+        return NewsGroup.__groups[4]
+
+    @staticmethod
+    def choices():
+        return [(i, i) for i in NewsGroup.__groups]
+
+
+class NewsType:
+    __types = ['TEXT', 'IMAGE', 'STICKER', 'LOCATION']
+
+    @staticmethod
+    def text():
+        return NewsType.__types[0]
+
+    @staticmethod
+    def image():
+        return NewsType.__types[1]
+
+    @staticmethod
+    def sticker():
+        return NewsType.__types[2]
+
+    @staticmethod
+    def location():
+        return NewsType.__types[3]
+
+    @staticmethod
+    def choices():
+        return [(i, i) for i in NewsType.__types]
 
 
 @make_str('news')
@@ -85,27 +133,23 @@ class News(models.Model):
     # news creator
     reporter_user_id = models.IntegerField()
     # news target group
-    target_group = models.TextField(choices=NEWS_GROUPS, default='NONE')
+    target_group = models.TextField(choices=NewsGroup.choices(), default=NewsGroup.no_group())
     # message type [text|image|location|sticker]
-    news_type = models.TextField(choices=NEWS_TYPE, default='TEXT')
+    news_type = models.TextField(choices=NewsType.choices(), default=NewsType.text())
     # text value
     news = models.TextField(default='', blank=True)
 
+    __get_users_map = {NewsGroup.no_group(): lambda: TGUser.objects.none(),
+                       NewsGroup.news_subscription(): lambda: TGUser.objects.filter(has_news_subscription=True),
+                       NewsGroup.admins(): lambda: TGUser.objects.filter(is_admin=True),
+                       NewsGroup.winners(): lambda: TGUser.objects.filter(win_random_prize=True),
+                       NewsGroup.all_users(): lambda: TGUser.objects.all()}
+
     def get_users(self):
         try:
-            key = (str(self.target_group), str(self.target_group))
-            group_no = NEWS_GROUPS.index(key)
+            return News.__get_users_map[str(self.target_group)]()
         except ValueError:
-            return TGUser.objects.none()
-
-        if group_no == 1:
-            return TGUser.objects.filter(has_news_subscription=True)
-        elif group_no == 2:
-            return TGUser.objects.filter(is_admin=True)
-        elif group_no == 3:
-            return TGUser.objects.filter(win_random_prize=True)
-        elif group_no == 4:
-            return TGUser.objects.all()
+            pass
         return TGUser.objects.none()
 
 
