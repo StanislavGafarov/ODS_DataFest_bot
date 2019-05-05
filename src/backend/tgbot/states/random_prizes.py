@@ -75,11 +75,13 @@ class RandomFreePrizes(TGHandler):
                             logger.info('{} blocked'.format(win_user))
                             win_user.delete()
                         except:
-                            logger.exception('Error sending broadcast to user {}'.format(winner))
+                            logger.exception('Error sending broadcast to user {}'.format(win_user))
                         error_counter += 1
-                    merch_winners[merch_size] = merch_winners_list
+                    if merch_winners_list:
+                        merch_winners[merch_size] = merch_winners_list
 
-                winner_list_msg = "\n".join(["{}:\n{}".format(size, "\n".winners) for size, winners in merch_winners])
+                winner_list_msg = "\n".join(["{}:\n{}"
+                                            .format(size, "\n".join(winners)) for size, winners in merch_winners.items()])
                 api.bot.send_message(user.tg_id, TEXT_RANDOM_PRIZE_BROADCAST_DONE.format(counter, error_counter))
                 api.bot.send_message(user.tg_id, winner_list_msg)
 
