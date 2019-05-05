@@ -114,7 +114,7 @@ class Broadcasting(TGHandler):
             self.BROADCAST: [
                 self.rhandler(BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION, self.broadcast_group),
                 self.rhandler(BUTTON_NEWS_GROUP_ADMIN, self.broadcast_group),
-                self.rhandler(BUTTON_NEWS_GROUP_WINNERS, self.broadcast_group),
+                # self.rhandler(BUTTON_NEWS_GROUP_WINNERS, self.broadcast_group),
                 self.rhandler(BUTTON_NEWS_GROUP_ALL, self.broadcast_group),
                 self.rhandler(BUTTON_FULL_BACK, self.cancel_broadcast),
                 MessageHandler(Filters.text, self.unknown_command)

@@ -68,7 +68,7 @@ class TGHandler(object):
 
         self.BROADCAST_SELECT_GROUP_KEYBOARD = [[BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION],
                                                 [BUTTON_NEWS_GROUP_ADMIN],
-                                                [BUTTON_NEWS_GROUP_WINNERS],
+                                                # [BUTTON_NEWS_GROUP_WINNERS],
                                                 [BUTTON_NEWS_GROUP_ALL],
                                                 [BUTTON_FULL_BACK]]
 

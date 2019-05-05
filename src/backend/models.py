@@ -76,6 +76,7 @@ class Invite(models.Model):
     surname = models.TextField(default=False)
 
 
+# TODO: Переписать красиво
 class NewsGroup:
     __groups = ['NONE', 'NEWS_SUBSCRIPTION', 'ADMINS', 'WINNERS', 'ALL']
 
@@ -104,6 +105,7 @@ class NewsGroup:
         return [(i, i) for i in NewsGroup.__groups]
 
 
+# TODO: Переписать красиво
 class NewsType:
     __types = ['TEXT', 'IMAGE', 'STICKER', 'LOCATION']
 
@@ -142,7 +144,7 @@ class News(models.Model):
     __get_users_map = {NewsGroup.no_group(): lambda: TGUser.objects.none(),
                        NewsGroup.news_subscription(): lambda: TGUser.objects.filter(has_news_subscription=True),
                        NewsGroup.admins(): lambda: TGUser.objects.filter(is_admin=True),
-                       NewsGroup.winners(): lambda: TGUser.objects.filter(win_random_prize=True),
+                       NewsGroup.winners(): lambda: TGUser.objects.none(),
                        NewsGroup.all_users(): lambda: TGUser.objects.all()}
 
     def get_users(self):
