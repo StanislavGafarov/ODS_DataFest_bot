@@ -9,23 +9,22 @@ from backend.tgbot.utils import Decorators, logger
 
 from backend.models import TGUser, News, NewsGroup
 
-target_group_map = {
-    BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION: NewsGroup.news_subscription(),
-    BUTTON_NEWS_GROUP_ADMIN: NewsGroup.admins(),
-    BUTTON_NEWS_GROUP_WINNERS: NewsGroup.winners(),
-    BUTTON_NEWS_GROUP_ALL: NewsGroup.winners()
-}
-
-
-def get_target_group(text):
-    try:
-        return target_group_map[text]
-    except ValueError:
-        pass
-    return NewsGroup.no_group()
-
 
 class Broadcasting(TGHandler):
+    _target_group_map = {
+        BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION: NewsGroup.news_subscription(),
+        BUTTON_NEWS_GROUP_ADMIN: NewsGroup.admins(),
+        BUTTON_NEWS_GROUP_WINNERS: NewsGroup.winners(),
+        BUTTON_NEWS_GROUP_ALL: NewsGroup.winners()
+    }
+
+    def _get_target_group(self, text):
+        try:
+            return Broadcasting._target_group_map[text]
+        except ValueError:
+            pass
+        return NewsGroup.no_group()
+
     def send_news(self, api: TelegramBotApi, user_from: TGUser, news: News, message_func, update):
         def send_message_to_users(api: TelegramBotApi, user_from: TGUser, target_users, message_func):
             counter = 0
@@ -103,7 +102,7 @@ class Broadcasting(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_news)
     def broadcast_group(self, api: TelegramBotApi, user: TGUser, update, news: News):
-        news.target_group = get_target_group(update.message.text)
+        news.target_group = self._get_target_group(update.message.text)
         news.save()
         logger.info(f"User {user} choose group {news.target_group} for broadcast.")
         update.message.reply_text(TEXT_ENTER_BROADCAST,
