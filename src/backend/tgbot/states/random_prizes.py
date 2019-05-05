@@ -44,38 +44,61 @@ class RandomFreePrizes(TGHandler):
             def send_prizes(api: TelegramBotApi, user, prizes):
                 counter = 0
                 error_counter = 0
+                merch_winners = {}
                 for prize in prizes:
                     merch_size = prize.merch_size
                     sample_size = prize.quantity
-                    all_users = TGUser.objects.filter(in_random_prize=True, merch_size=merch_size)\
+
+                    if not prize.quantity:
+                        continue
+                    merch_winners_list = []
+
+                    all_users = TGUser.objects.filter(in_random_prize=True, merch_size=merch_size) \
                         .exclude(win_random_prize=True).values_list('tg_id', flat=True)
 
                     winners = random.sample(list(all_users),
                                             sample_size if len(list(all_users)) > sample_size else len(list(all_users))
                                             )
-                    matched_prize_count = 0
                     for winner in winners:
                         win_user = TGUser.objects.get(tg_id=winner)
                         win_user.win_random_prize = True
                         win_user.save()
                         logger.info('User {} email:{} win the prize in category {}'
                                     .format(win_user.name, win_user.last_checked_email, merch_size))
+                        counter += 1
                         try:
-                            counter += 1
                             api.bot.send_message(win_user.tg_id, TEXT_CONGRATULATION)
-                            matched_prize_count += 1
+                            merch_winners_list.append(f"{win_user.name}: {win_user.last_checked_email}")
                             time.sleep(.1)
+                            continue
                         except Unauthorized:
                             logger.info('{} blocked'.format(user))
                             user.delete()
-                            error_counter += 1
                         except:
                             logger.exception('Error sending broadcast to user {}'.format(winner))
-                            error_counter += 1
-                    # prize.quantity -= matched_prize_count
-                    # prizes.save()
+                        error_counter += 1
+                    merch_winners[merch_size] = merch_winners_list
 
+                winner_list_msg = "\n".join(["{}:\n{}".format(size, "\n".winners) for size, winners in merch_winners])
                 api.bot.send_message(user.tg_id, TEXT_RANDOM_PRIZE_BROADCAST_DONE.format(counter, error_counter))
+                api.bot.send_message(user.tg_id, winner_list_msg)
+
+                counter = 0
+                error_counter = 0
+                not_succeed_users = TGUser.objects.filter(in_random_prize=True, win_random_prize=False)
+                for user in not_succeed_users:
+                    counter += 1
+                    try:
+                        api.bot.send_message(user.tg_id, TEXT_RANDOM_PRIZE_NOT_SUCCEED)
+                        time.sleep(.1)
+                        continue
+                    except Unauthorized:
+                        logger.info('{} blocked'.format(user))
+                        user.delete()
+                    except:
+                        logger.exception('Error sending broadcast to user {}'.format(winner))
+                    error_counter += 1
+                api.bot.send_message(user.tg_id, TEXT_RANDOM_PRIZE_NOT_SUCCEED_BROADCAST_DONE.format(counter, error_counter))
 
         TGHandler.add_task(send_prizes, api, user, prizes)
         update.message.reply_text(TEXT_RANDOM_PRIZE_BROADCAST_STARTED, reply_markup=self.define_keyboard(user))
