@@ -46,12 +46,8 @@ class RandomFreePrizes(TGHandler):
                 winners = random.sample(list(all_users),
                                         sample_size if len(list(all_users)) > sample_size else len(list(all_users))
                                         )
-                for winner_id in winners:
-                    win_user = TGUser.objects.get(tg_id=winner_id)
-                    win_user.win_random_prize = True
-                    win_user.save()
-                # tg_winners = TGUser.objects.filter(tg_id__in=winners)
-                #tg_winners.update(win_random_prize=True)
+                # обновить только 1 поле.
+                TGUser.objects.filter(tg_id__in=winners).update(win_random_prize=True)
 
         def broadcast_users(users, text):
             counter = 0
@@ -74,8 +70,9 @@ class RandomFreePrizes(TGHandler):
             def get_winner_list(users):
                 for prize in Prizes.objects.all():
                     user_list = "\n".join([f"{win_user.name}, {win_user.last_checked_email}"
-                     for win_user in users.filter(merch_size=prize.merch_size).values()])
-                    yield f"{prize.merch_size}\n{user_list}"
+                     for win_user in users.filter(merch_size=prize.merch_size)])
+                    if user_list:
+                        yield f"{prize.merch_size}:\n{user_list}"
 
             users = TGUser.objects.filter(in_random_prize=True, win_random_prize=True)
             for msg in get_winner_list(users):
@@ -91,7 +88,7 @@ class RandomFreePrizes(TGHandler):
         text = update.message.text
         logger.info('ADMIN {} have chosen {}'.format(user, text))
 
-        if not Prizes.objects.count() == 0:
+        if not Prizes.objects.count():
             update.message.reply_text(TEXT_EMPTY_TABLE_PRIZE, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
 
