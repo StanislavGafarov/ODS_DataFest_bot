@@ -72,8 +72,8 @@ class RandomFreePrizes(TGHandler):
                             time.sleep(.1)
                             continue
                         except Unauthorized:
-                            logger.info('{} blocked'.format(user))
-                            user.delete()
+                            logger.info('{} blocked'.format(win_user))
+                            win_user.delete()
                         except:
                             logger.exception('Error sending broadcast to user {}'.format(winner))
                         error_counter += 1
@@ -86,17 +86,17 @@ class RandomFreePrizes(TGHandler):
                 counter = 0
                 error_counter = 0
                 not_succeed_users = TGUser.objects.filter(in_random_prize=True, win_random_prize=False)
-                for user in not_succeed_users:
+                for ns_user in not_succeed_users:
                     counter += 1
                     try:
-                        api.bot.send_message(user.tg_id, TEXT_RANDOM_PRIZE_NOT_SUCCEED)
+                        api.bot.send_message(ns_user.tg_id, TEXT_RANDOM_PRIZE_NOT_SUCCEED)
                         time.sleep(.1)
                         continue
                     except Unauthorized:
-                        logger.info('{} blocked'.format(user))
-                        user.delete()
+                        logger.info('{} blocked'.format(ns_user))
+                        ns_user.delete()
                     except:
-                        logger.exception('Error sending broadcast to user {}'.format(winner))
+                        logger.exception('Error sending broadcast to user {}'.format(ns_user))
                     error_counter += 1
                 api.bot.send_message(user.tg_id, TEXT_RANDOM_PRIZE_NOT_SUCCEED_BROADCAST_DONE.format(counter, error_counter))
 
