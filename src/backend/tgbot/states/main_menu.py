@@ -1,4 +1,5 @@
 import traceback
+import requests
 
 from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup
 from telegram.error import Unauthorized
@@ -6,12 +7,11 @@ from telegram.ext import run_async, MessageHandler, Filters
 from django.db.models import Count
 
 from backend.google_spreadsheet_client import GoogleSpreadsheet
-from backend.models import TGUser, Invite, Prizes, RandomBeerUser
+from backend.models import TGUser, Invite, Prizes, RandomBeerUser, Event
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.utils import logger, Decorators
-
 
 
 class MainMenu(TGHandler):
@@ -141,6 +141,32 @@ class MainMenu(TGHandler):
 
     # ADMIN
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def refresh_schedule(self, api: TelegramBotApi, user: TGUser, update):
+        def update_schedule():
+            schedule_url = "https://datafest.ru/static/data/speakers.txt"
+            try:
+                response = requests.request('GET', schedule_url, timeout=5)
+                if not response:
+                    class EmptyResponse(Exception):
+                        pass
+                    raise EmptyResponse
+                event_data = response.json()['data']
+            except:
+                logger.exception('Schedule update failed.')
+                update.message.reply_text(TEXT_UPDATE_SCHEDULE_FAIL, reply_markup=self.define_keyboard(user))
+                return
+            Event.objects.all().delete()
+            for data in event_data:
+                event = Event.from_json(data)
+                event.save()
+            update.message.reply_text(TEXT_UPDATE_SCHEDULE_OK, reply_markup=self.define_keyboard(user))
+
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        update_schedule()
+        return self.MAIN_MENU
+
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def create_broadcast(self, api: TelegramBotApi, user: TGUser, update):
         logger.info("User %s initiated broadcast.", user)
         if not user.is_admin:
@@ -209,7 +235,7 @@ class MainMenu(TGHandler):
             # self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
 
 
-            self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
+            self.rhandler(BUTTON_REFRESH_SCHEDULE, self.refresh_schedule),
             self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
             self.rhandler(BUTTON_DRAW_PRIZES, self.draw_prizes),
             self.rhandler(BUTTON_DRAW_PRIZES, self.not_ready_yet),

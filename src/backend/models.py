@@ -102,12 +102,20 @@ class RandomBeerUser(models.Model):
     email = models.TextField(null=True, default=None)
 
 
-
-
 EVENT_TYPES = {
     'talk': 'доклад',
     'section': 'секция',
     'workshop': 'воркшоп'
+}
+
+LOCATION_TYPES = {
+    '1': 'Main stage',
+    '2': 'Pain stage',
+    '3': 'Black stage',
+    '4': 'Space stage',
+    '5': 'Cube stage',
+    '6': 'Community lab',
+    '7': 'Community roof'
 }
 
 df_day = datetime.datetime(2019, 5, 10, 12)
@@ -120,9 +128,33 @@ class Event(models.Model):
     speaker = models.TextField(blank=True, default='')
     description = models.TextField(blank=True, default='')
     location = models.TextField(blank=True)
+    # section ссылается на сам себя? разве он не choice?
     section = models.ForeignKey('Event', on_delete=models.CASCADE, related_name='events', null=True, blank=True)
     start = models.DateTimeField(default=df_day)
     end = models.DateTimeField(null=True, default=None, blank=True)
+
+    @staticmethod
+    def from_json(json_dict) -> 'Event':
+        def parse(node, arg_items):
+            for root, items in arg_items.items():
+                src = node[root]
+                for kk in items:
+                    yield src[kk]
+
+        def make_date_time(day, hour, minutes):
+            return datetime.datetime(2019, month=5, day=int(day), hour=int(hour), minute=int(minutes))
+
+        title, speaker, description \
+            = parse(json_dict, {'content': 'title speaker description'.split()})
+        location, section, date, start, end \
+            = parse(json_dict, {'main': 'place section date time_start time_end'.split()})
+
+        return Event(event_type='talk',
+                     title=title, speaker=speaker, description=description,
+                     location=LOCATION_TYPES[location],
+                     # section=section,
+                     start=make_date_time(date, *start.split(':')),
+                     end=make_date_time(date, *end.split(':')))
 
 
 from backend.tgbot.base import TelegramBotApi
