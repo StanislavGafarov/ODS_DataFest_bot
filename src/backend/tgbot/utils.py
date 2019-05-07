@@ -1,11 +1,12 @@
 import logging
 import os
 from functools import wraps
+
 import requests
 
 from bot import settings
 
-from backend.models import Message, RandomBeerUser
+from backend.models import Message, RandomBeerUser, News, TGUser
 from backend.tgbot.base import TelegramBotApi
 
 
@@ -69,6 +70,17 @@ class Decorators(object):
                 random_beer_user.save()
             return f(cls, api, user, update, random_beer_user)
         return get_random_beer_user
+
+    @classmethod
+    def with_news(cls, f):
+        @wraps(f)
+        def get_news(cls, api: TelegramBotApi, user, update):
+            news = News.objects.filter(reporter_user_id=user.tg_id, news='').order_by('-id').first()
+            if not news:
+                news = News(reporter_user_id=user.tg_id)
+                news.save()
+            return f(cls, api, user, update, news)
+        return get_news
 
     def composed(*decs):
         def deco(f):
