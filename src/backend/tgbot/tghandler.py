@@ -78,10 +78,13 @@ class TGHandler(object):
 
     @staticmethod
     def add_task(task, *args, **kwargs):
-        try:
-            _thread_pool.submit(task, *args, **kwargs)
-        except:
-            logger.exception(f'Error while running task {task}')
+        def wrap(*args, **kwargs):
+            try:
+                task(*args, **kwargs)
+            except:
+                logger.exception(f'Error while running task {task}')
+
+        _thread_pool.submit(wrap, *args, **kwargs)
 
     def define_keyboard(self, user: TGUser):
         if user.is_admin:
