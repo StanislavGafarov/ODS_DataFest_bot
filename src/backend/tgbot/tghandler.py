@@ -68,7 +68,7 @@ class TGHandler(object):
 
         self.BROADCAST_SELECT_GROUP_KEYBOARD = [[BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION],
                                                 [BUTTON_NEWS_GROUP_ADMIN],
-                                                [BUTTON_NEWS_GROUP_WINNERS],
+                                                # [BUTTON_NEWS_GROUP_WINNERS],
                                                 [BUTTON_NEWS_GROUP_ALL],
                                                 [BUTTON_FULL_BACK]]
 
@@ -78,10 +78,13 @@ class TGHandler(object):
 
     @staticmethod
     def add_task(task, *args, **kwargs):
-        try:
-            _thread_pool.submit(task, *args, **kwargs)
-        except:
-            logger.exception(f'Error while running task {task}')
+        def wrap(*args, **kwargs):
+            try:
+                task(*args, **kwargs)
+            except:
+                logger.exception(f'Error while running task {task}')
+
+        _thread_pool.submit(wrap, *args, **kwargs)
 
     def define_keyboard(self, user: TGUser):
         if user.is_admin:
@@ -102,13 +105,6 @@ class TGHandler(object):
     def broadcast_group_keyboard(self, user: TGUser):
         if user.is_admin:
             keyboard = self.BROADCAST_SELECT_GROUP_KEYBOARD
-        else:
-            keyboard = self.UNAUTHORIZED_USER_KEYBOARD
-        return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
-
-    def broadcast_message_keyboard(self, user: TGUser):
-        if user.is_admin:
-            keyboard = [[BUTTON_FULL_BACK]]
         else:
             keyboard = self.UNAUTHORIZED_USER_KEYBOARD
         return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
