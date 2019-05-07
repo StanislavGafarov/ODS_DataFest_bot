@@ -6,6 +6,11 @@ from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.utils import logger, Decorators
 
+from concurrent.futures.thread import ThreadPoolExecutor
+
+
+_thread_pool = ThreadPoolExecutor(max_workers=4)
+
 
 class TGHandler(object):
     def __init__(self):
@@ -63,6 +68,16 @@ class TGHandler(object):
         self.ADMIN_KEYBOARD = admin_buttons + auth_buttons
         self.AUTHORIZED_USER_KEYBOARD = auth_buttons
         self.UNAUTHORIZED_USER_KEYBOARD = unauth_buttons
+
+    @staticmethod
+    def add_task(task, *args, **kwargs):
+        def wrap(*args, **kwargs):
+            try:
+                task(*args, **kwargs)
+            except:
+                logger.exception(f'Error while running task {task}')
+
+        _thread_pool.submit(wrap, *args, **kwargs)
 
     def define_keyboard(self, user: TGUser):
         if user.is_admin:
