@@ -7,3 +7,5 @@ config.py
 venv/
 
 *.idea/
+
+src/db.sqlite3
