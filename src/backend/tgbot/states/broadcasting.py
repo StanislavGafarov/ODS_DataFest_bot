@@ -15,7 +15,7 @@ class Broadcasting(TGHandler):
         BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION: NewsGroup.news_subscription(),
         BUTTON_NEWS_GROUP_ADMIN: NewsGroup.admins(),
         BUTTON_NEWS_GROUP_WINNERS: NewsGroup.winners(),
-        BUTTON_NEWS_GROUP_ALL: NewsGroup.winners()
+        BUTTON_NEWS_GROUP_ALL: NewsGroup.all_users()
     }
 
     def _get_target_group(self, text):
