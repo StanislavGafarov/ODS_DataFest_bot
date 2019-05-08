@@ -54,7 +54,9 @@ class Decorators(object):
             user = api.get_user(update.message.chat_id)
             new_state = f(cls, api, user, update)
             user.state = new_state
-            user.save()
+            # с юзером могли произойти изменения по время выполнения f
+            # так что лучше ограничиться обновлением только одного поля
+            user.save(update_fields=['state'])
             return new_state
         return get_user
 
