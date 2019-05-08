@@ -1,4 +1,5 @@
 import random
+import time
 from telegram import ReplyKeyboardMarkup
 from telegram.ext import run_async, MessageHandler, Filters
 from telegram.error import Unauthorized
@@ -33,34 +34,68 @@ class RandomFreePrizes(TGHandler):
     # ADMIN
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def admin_start_drowing(self, api: TelegramBotApi, user: TGUser, update):
-        text = update.message.text
-        logger.info('ADMIN {} have chosen {}'.format(user, text))
-        prizes = Prizes.objects.values()
-        if prizes.count() == 0:
-            update.message.reply_text(TEXT_EMPTY_TABLE_PRIZE, reply_markup=self.define_keyboard(user))
-            return self.MAIN_MENU
-        else:
-            for row in prizes:
-                merch_size = row.get('merch_size')
-                sample_size = row.get('quantity')
-                all_users = TGUser.objects.filter(in_random_prize=True, merch_size=merch_size)\
+        def calculate_winners(prizes):
+            for prize in prizes:
+                merch_size = prize.merch_size
+                sample_size = prize.quantity
+                if not prize.quantity:
+                    continue
+                all_users = TGUser.objects.filter(in_random_prize=True, merch_size=merch_size) \
                     .exclude(win_random_prize=True).values_list('tg_id', flat=True)
 
                 winners = random.sample(list(all_users),
                                         sample_size if len(list(all_users)) > sample_size else len(list(all_users))
                                         )
-                for winner in winners:
-                    win_user = TGUser.objects.get(tg_id=winner)
-                    win_user.win_random_prize = True
-                    win_user.save()
-                    logger.info('User {} email:{} win the prize in category {}'
-                                .format(win_user.name, win_user.last_checked_email, merch_size))
-                    try:
-                        api.bot.send_message(win_user.tg_id, TEXT_CONGRATULATION)
-                    except Unauthorized:
-                        logger.info('{} blocked'.format(user))
+                # обновить только 1 поле.
+                TGUser.objects.filter(tg_id__in=winners).update(win_random_prize=True)
 
-        update.message.reply_text('Done', reply_markup=self.define_keyboard(user))
+        def broadcast_users(users, text):
+            counter = 0
+            error_counter = 0
+            for user in users:
+                counter += 1
+                try:
+                    api.bot.send_message(user.tg_id, text)
+                    time.sleep(.1)
+                    continue
+                except Unauthorized:
+                    logger.info('{} blocked'.format(user))
+                    user.delete()
+                except:
+                    logger.exception('Error sending broadcast to user {}'.format(user))
+                error_counter += 1
+            return counter, error_counter
+
+        def broadcast_winners(api, admin_user):
+            def get_winner_list(users):
+                for prize in Prizes.objects.all():
+                    user_list = "\n".join([f"{win_user.name}, {win_user.last_checked_email}"
+                     for win_user in users.filter(merch_size=prize.merch_size)])
+                    if user_list:
+                        yield f"{prize.merch_size}:\n{user_list}"
+
+            users = TGUser.objects.filter(in_random_prize=True, win_random_prize=True)
+            for msg in get_winner_list(users):
+                api.bot.send_message(admin_user.tg_id, msg)
+            total, fail = broadcast_users(users, TEXT_CONGRATULATION)
+            api.bot.send_message(admin_user.tg_id, TEXT_RANDOM_PRIZE_BROADCAST_DONE.format(total, fail))
+
+        def broadcast_loosers(api, admin_user):
+            users = TGUser.objects.filter(in_random_prize=True, win_random_prize=False)
+            total, fail = broadcast_users(users, TEXT_RANDOM_PRIZE_NOT_SUCCEED)
+            api.bot.send_message(admin_user.tg_id, TEXT_RANDOM_PRIZE_NOT_SUCCEED_BROADCAST_DONE.format(total, fail))
+
+        text = update.message.text
+        logger.info('ADMIN {} have chosen {}'.format(user, text))
+
+        if not Prizes.objects.count():
+            update.message.reply_text(TEXT_EMPTY_TABLE_PRIZE, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
+
+        calculate_winners(Prizes.objects.all())
+        update.message.reply_text(TEXT_RANDOM_PRIZE_BROADCAST_STARTED, reply_markup=self.define_keyboard(user))
+        TGHandler.add_task(broadcast_winners, api, user)
+        TGHandler.add_task(broadcast_loosers, api, user)
         return self.MAIN_MENU
 
     def create_state(self):

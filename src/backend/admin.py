@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from backend.models import TGUser, Message, Event, Invite, Prizes, RandomBeerUser
+from backend.models import TGUser, Message, Event, Invite, Prizes, RandomBeerUser, News
 
 
 @admin.register(TGUser)
@@ -39,6 +39,12 @@ class MessageAdmin(admin.ModelAdmin):
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(News)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ['reporter_user_id', 'target_group', 'news_type', 'news']
+    list_filter = ['reporter_user_id', 'target_group']
 
 
 @admin.register(Invite)
