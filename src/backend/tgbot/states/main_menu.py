@@ -1,17 +1,21 @@
 import traceback
 
-from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup
+from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup, Location
 from telegram.error import Unauthorized
 from telegram.ext import run_async, MessageHandler, Filters
 from django.db.models import Count
 
 from backend.google_spreadsheet_client import GoogleSpreadsheet
-from backend.models import TGUser, Invite, Prizes, RandomBeerUser
+from backend.models import TGUser, Invite, Prizes, RandomBeerUser, News
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.utils import logger, Decorators
 
+
+class FLACON:
+    location = Location(latitude=55.805120, longitude=37.584590)
+    map = 'https://datafest.ru/static/img/design/nav-c.jpg'
 
 
 class MainMenu(TGHandler):
@@ -73,7 +77,10 @@ class MainMenu(TGHandler):
     def show_path(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
-        update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        api.bot.send_location(user.tg_id, location=FLACON.location)
+        api.bot.send_photo(user.tg_id, photo=FLACON.map,
+                           caption=f"{TEXT_SHOW_PATH_MAP_CAPTION}. {TEXT_SHOW_PATH_MORE_INFO}",
+                           reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
     # AUTHORIZED
@@ -146,10 +153,14 @@ class MainMenu(TGHandler):
         if not user.is_admin:
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
-        total_users = TGUser.objects.count()
-        user_with_subscription = TGUser.objects.filter(has_news_subscription=True).count()
-        msg = TEXT_NEWS_STAT.format(total_users, user_with_subscription)+"\n\n"+TEXT_ENTER_BROADCAST
-        update.message.reply_text(msg)
+        user_count = TGUser.objects.count()
+        subscription_count = TGUser.objects.filter(has_news_subscription=True).count()
+        winner_count = TGUser.objects.filter(win_random_prize=True).count()
+        admin_count = TGUser.objects.filter(is_admin=True).count()
+
+        statistics_text = TEXT_NEWS_STAT.format(user_count, subscription_count, winner_count, admin_count)
+        msg = f"{statistics_text}\n{TEXT_BROADCAST_CHOOSE_GROUP}"
+        update.message.reply_text(msg,  reply_markup=self.broadcast_group_keyboard(user))
         return self.BROADCAST
 
     # REFRESH INVITES
@@ -203,8 +214,8 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
             self.rhandler(BUTTON_SHOW_PATH, self.show_path),
 
-            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.ready_but_muted),
-            # self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
+            # self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.ready_but_muted),
+            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
             self.rhandler(BUTTON_RANDOM_BEER, self.ready_but_muted),
             # self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
 

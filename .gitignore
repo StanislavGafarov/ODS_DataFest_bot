@@ -5,3 +5,7 @@ config.py
 *.ipynb
 
 venv/
+
+*.idea/
+
+src/db.sqlite3
