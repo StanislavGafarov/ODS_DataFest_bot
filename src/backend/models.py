@@ -224,7 +224,7 @@ class Event(models.Model):
         location, section, event_type, date, start, end \
             = parse(json_dict, {'main': 'place section type date time_start time_end'.split()})
 
-        return Event(event_type=EVENT_TYPES[event_type.capitatize()],
+        return Event(event_type=event_type.capitalize(),
                      title=title, speaker=speaker, description=description,
                      location=LOCATION_TYPES[location],
                      section=section,
