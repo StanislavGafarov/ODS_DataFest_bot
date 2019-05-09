@@ -1,9 +1,11 @@
-from telegram.ext import run_async, MessageHandler, Filters
+from telegram.ext import run_async, MessageHandler, Filters, CallbackQueryHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup,ReplyKeyboardRemove
+from django.core.paginator import Paginator
 
 from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.utils import Decorators, logger
-from backend.models import TGUser
+from backend.models import TGUser, News, NewsGroup
 from backend.tgbot.texts import *
 
 class GetNews(TGHandler):
@@ -29,8 +31,32 @@ class GetNews(TGHandler):
     def show_news(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
-        update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        self.render_news(api, update)
         return self.MAIN_MENU
+
+    def render_news(self, api, update):
+        news_list = News.object.filter(target_group=NewsGroup.news_subscription())
+        news_pages = Paginator(news_list, 1)
+
+        query = update.callback_query
+        page = int(query.data) if query.data else 0
+
+        news = news_pages.get_page(page)
+        n = news[0]
+        api.send_message(chat_id=update.callback_query.from_user.id,
+                         text=n.news,
+                         reply_markup=self.create_buttons(news))
+
+    def create_buttons(self, news):
+        buttons = []
+        if news.has_previous():
+            left = InlineKeyboardButton("<-", callback_data="news_page?" + str(news.previous_page_number()))
+            buttons.append(left)
+        buttons.append(str(news.number))
+        if news.has_next():
+            right = InlineKeyboardButton("->", callback_data="news_page?" + str(news.next_page_number()))
+            buttons.append(right)
+        return InlineKeyboardMarkup(buttons)
 
     def create_state(self):
         state = {self.GET_NEWS: [
@@ -38,6 +64,7 @@ class GetNews(TGHandler):
             self.rhandler(BUTTON_NEWS_SUBSCRIPTION, self.subscribe_for_news),
             self.rhandler(BUTTON_GET_LAST_5_NEWS, self.not_ready_yet),
             self.rhandler(BUTTON_FULL_BACK, self.full_back),
+            CallbackQueryHandler(callback=self.render_news, pattern="news_page\?\d*"),
             MessageHandler(Filters.text, self.unknown_command)
         ]}
         return state
