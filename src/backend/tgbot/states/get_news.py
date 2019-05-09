@@ -32,7 +32,7 @@ class GetNews(TGHandler):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
         # сначала последние
-        news_list = News.objects.filter(target_group=NewsGroup.news_subscription()).order_by('-id')
+        news_list = News.objects.filter(target_group__in=[NewsGroup.all_users(), NewsGroup.news_subscription()]).order_by('-id')
         news_pages = Paginator(news_list, 5)
         page = news_pages.get_page(1)
 
