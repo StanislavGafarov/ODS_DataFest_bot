@@ -38,7 +38,7 @@ class GetNews(TGHandler):
 
         for news in page:
             send = news.get_sender()
-            send(api, user)
+            send(api, user.tg_id, self.define_keyboard(user))
         return self.MAIN_MENU
 
     def create_state(self):

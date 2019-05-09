@@ -149,23 +149,27 @@ class News(models.Model):
                        NewsGroup.all_users(): lambda: TGUser.objects.all()}
 
     def get_sender(self):
-        def send_text(api, user, *args, **kwargs):
-            api.bot.send_message(user, self.news, *args, **kwargs)
+        def send_text(api, user, reply_markup=None):
+            api.bot.send_message(user, self.news, reply_markup=reply_markup)
 
-        def send_sticker(api, user, *args, **kwargs):
-            api.bot.send_sticker(user, self.news, *args, **kwargs)
+        def send_sticker(api, user, reply_markup=None):
+            api.bot.send_sticker(user, self.news, reply_markup=reply_markup)
 
-        def send_location(api, user, *args, **kwargs):
-            api.bot.send_location(user, *args, location=Location.de_json(self.news, api), **kwargs)
+        def send_location(api, user, reply_markup=None):
+            def get_location():
+                json_acceptable_string = self.news.replace("'", "\"")
+                data = json.loads(json_acceptable_string)
+                return data['longitude'], data['latitude']
+            longitude, latitude = get_location()
+            api.bot.send_location(user, longitude=longitude, latitude=latitude, reply_markup=reply_markup)
 
-        def send_image(api, user, *args, **kwargs):
+        def send_image(api, user, reply_markup=None):
             def get_image():
                 json_acceptable_string = self.news.replace("'", "\"")
                 data = json.loads(json_acceptable_string)
                 return data['image'], data['caption']
-
             photo, caption = get_image()
-            api.bot.send_photo(user, photo, caption, *args, **kwargs)
+            api.bot.send_photo(user, photo, caption, reply_markup=reply_markup)
 
         __get_sender_map = {NewsType.text(): send_text,
                             NewsType.sticker(): send_sticker,
@@ -173,8 +177,6 @@ class News(models.Model):
                             NewsType.image(): send_image
                             }
         return __get_sender_map[str(self.news_type)]
-
-
 
     def get_users(self):
         try:
