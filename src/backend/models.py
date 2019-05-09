@@ -177,9 +177,11 @@ class RandomBeerUser(models.Model):
 
 
 EVENT_TYPES = {
-    'talk': 'доклад',
-    'section': 'секция',
-    'workshop': 'воркшоп'
+    'Business': 'Бизнес',
+    'Community': 'Сообщество',
+    'Engineering': 'Инжененрия',
+    'Industry': 'Индустрия',
+    'Science': 'Наука'
 }
 
 LOCATION_TYPES = {
@@ -197,13 +199,12 @@ df_day = datetime.datetime(2019, 5, 10, 12)
 
 @make_str('event_type', 'title')
 class Event(models.Model):
-    event_type = models.TextField(choices=EVENT_TYPES.items())
-    title = models.TextField()
+    title = models.TextField(blank=True, default='')
     speaker = models.TextField(blank=True, default='')
     description = models.TextField(blank=True, default='')
     location = models.TextField(blank=True)
-    # section ссылается на сам себя? разве он не choice?
-    section = models.ForeignKey('Event', on_delete=models.CASCADE, related_name='events', null=True, blank=True)
+    event_type = models.TextField(choices=EVENT_TYPES.items())
+    section = models.TextField(blank=True, default='')
     start = models.DateTimeField(default=df_day)
     end = models.DateTimeField(null=True, default=None, blank=True)
 
@@ -220,13 +221,13 @@ class Event(models.Model):
 
         title, speaker, description \
             = parse(json_dict, {'content': 'title speaker description'.split()})
-        location, section, date, start, end \
-            = parse(json_dict, {'main': 'place section date time_start time_end'.split()})
+        location, section, event_type, date, start, end \
+            = parse(json_dict, {'main': 'place section type date time_start time_end'.split()})
 
-        return Event(event_type='talk',
+        return Event(event_type=EVENT_TYPES[event_type.capitatize()],
                      title=title, speaker=speaker, description=description,
                      location=LOCATION_TYPES[location],
-                     # section=section,
+                     section=section,
                      start=make_date_time(date, *start.split(':')),
                      end=make_date_time(date, *end.split(':')))
 
