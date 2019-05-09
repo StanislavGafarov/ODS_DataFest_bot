@@ -227,7 +227,7 @@ class MainMenu(TGHandler):
         df = df.rename(columns=NVIDIA_MAPPER)
         winners = df[(df.rnn_question == RNN_ANSWER)&(df.low_level_library_question == LOW_LEVEL_LIBRARY_ANSWER)&
                      (df.decrease_dimension_question == DECREASE_DIMENSION_ANSWER) & (df.name != 'Тест')]
-        update.meassage.reply_text(winners.shape[0])
+        update.message.reply_text(winners.shape[0])
         if winners.shape[0] > 3:
             winners = winners.sample(3)
         update.message.reply_text(winners[['name', 'surname', 'email', 'tel']] + '\nПобедили в розыгрыше.')
