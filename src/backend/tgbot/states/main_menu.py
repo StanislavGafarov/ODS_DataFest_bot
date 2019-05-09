@@ -88,6 +88,8 @@ class MainMenu(TGHandler):
     def want_jetson(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
+        user.in_nvidia_jetsone = True
+        user.save()
         update.message.reply_text(TEXT_JETSON, reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
     # AUTHORIZED
@@ -227,10 +229,15 @@ class MainMenu(TGHandler):
         df = df.rename(columns=NVIDIA_MAPPER)
         winners = df[(df.rnn_question == RNN_ANSWER)&(df.low_level_library_question == LOW_LEVEL_LIBRARY_ANSWER)&
                      (df.decrease_dimension_question == DECREASE_DIMENSION_ANSWER) & (df.name != 'Тест')]
-        update.message.reply_text('Количество победителей: {}'.format(winners.shape[0]))
+        update.message.reply_text('Количество пользователей давших правильный ответ: {}'.format(winners.shape[0]))
         if winners.shape[0] > 3:
             winners = winners.sample(3)
-        update.message.reply_text(winners[['name', 'surname', 'email', 'tel']])
+
+        who_win = 'Победители: '
+        for row in winners[['name', 'surname', 'email', 'tel']].iterrows():
+            who_win = who_win + '\n Имя: {}, Фамилия: {}, email: {}, tel: {}'.format(row.name, row.surname, row.email,
+                                                                                     row.tel)
+        update.message.reply_text(who_win)
 
         fail_count = 0
         fail_list = []
