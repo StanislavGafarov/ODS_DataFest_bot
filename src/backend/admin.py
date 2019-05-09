@@ -49,8 +49,8 @@ class NewsAdmin(admin.ModelAdmin):
 
 @admin.register(Invite)
 class InviteAdmin(admin.ModelAdmin):
-    list_display = ['email', 'name', 'surname']
-    search_fields = ['email', 'name', 'surname']
+    list_display = ['code', 'email', 'name', 'surname']
+    search_fields = ['code', 'email', 'name', 'surname']
 
 @admin.register(Prizes)
 class PrizesAdmin(admin.ModelAdmin):
