@@ -78,6 +78,8 @@ TEXT_BYE = 'До следующей встречи!'
 TEXT_SHOW_SCHEDULE = "В разработке.\nМероприятие пройдет 10-11 мая во FLACON-е.\nАктуальную информацию по программе мероприятия можно найти тут: https://datafest.ru/schedule/"
 TEXT_UPDATE_SCHEDULE_OK = 'Обновление расписанеия прошло успешно'
 TEXT_UPDATE_SCHEDULE_FAIL = 'Обновление расписанеия закончено с ошибками'
+TEXT_SHOW_PATH_MORE_INFO = 'Больше информации на сайте конференции: https://datafest.ru/map/'
+TEXT_SHOW_PATH_MAP_CAPTION = 'Выбирайте интересующие вас секции в программе и проходите к нужному залу'
 
 # ADMIN
 TEXT_BROADCAST_CHOOSE_GROUP = 'Выберите группу пользователей, кому предназначается сообщение'
