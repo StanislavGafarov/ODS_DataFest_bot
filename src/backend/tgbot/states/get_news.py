@@ -31,38 +31,23 @@ class GetNews(TGHandler):
     def show_news(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
-        self.render_news(api, update)
-        return self.MAIN_MENU
-
-    def render_news(self, api, update):
         news_list = News.object.filter(target_group=NewsGroup.news_subscription())
         news_pages = Paginator(news_list, 1)
+        page = news_pages.get_page(1)
 
-        query = update.callback_query
-        page = int(query.data) if query.data else 0
+        keyboard = [[BUTTON_NEWS_UNSUBSCRIPTION,BUTTON_FULL_BACK, BUTTON_NEWS_MORE]]
+        for news in page:
+            send = news.get_sender()
+            send(api, user, reply_markup=keyboard)
 
-        news = news_pages.get_page(page)
-        n = news[0]
-        api.send_message(chat_id=update.callback_query.from_user.id,
-                         text=n.news,
-                         reply_markup=self.create_buttons(news))
-
-    def create_buttons(self, news):
-        buttons = []
-        if news.has_previous():
-            left = InlineKeyboardButton("<-", callback_data="news_page?" + str(news.previous_page_number()))
-            buttons.append(left)
-        buttons.append(str(news.number))
-        if news.has_next():
-            right = InlineKeyboardButton("->", callback_data="news_page?" + str(news.next_page_number()))
-            buttons.append(right)
-        return InlineKeyboardMarkup(buttons)
+        return self.GET_NEWS
 
     def create_state(self):
         state = {self.GET_NEWS: [
             self.rhandler(BUTTON_NEWS_UNSUBSCRIPTION, self.unsubscribe_for_news),
             self.rhandler(BUTTON_NEWS_SUBSCRIPTION, self.subscribe_for_news),
-            self.rhandler(BUTTON_GET_LAST_5_NEWS, self.not_ready_yet),
+            self.rhandler(BUTTON_GET_LAST_5_NEWS, self.show_news),
+            self.rhandler(BUTTON_NEWS_MORE, self.show_news),
             self.rhandler(BUTTON_FULL_BACK, self.full_back),
             CallbackQueryHandler(callback=self.render_news, pattern="news_page\?\d*"),
             MessageHandler(Filters.text, self.unknown_command)

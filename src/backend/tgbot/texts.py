@@ -139,6 +139,7 @@ BUTTON_NEWS_GROUP_ALL = 'Всем'
 BUTTON_NEWS_SUBSCRIPTION = 'Подписаться на новости'
 BUTTON_NEWS_UNSUBSCRIPTION = 'Отписаться от новостей'
 BUTTON_GET_LAST_5_NEWS = 'Посмотреть новости'
+BUTTON_NEWS_MORE = 'Ещё'
 
 BUTTON_REGISTRATION = 'Регистрация'
 BUTTON_ON_MAJOR = 'Я на Major 💪'

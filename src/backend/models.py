@@ -1,7 +1,8 @@
 import datetime
+import json
 
 from django.db import models
-
+from telegram import Location
 
 # Create your models here.
 
@@ -146,6 +147,33 @@ class News(models.Model):
                        NewsGroup.admins(): lambda: TGUser.objects.filter(is_admin=True),
                        NewsGroup.winners(): lambda: TGUser.objects.none(),
                        NewsGroup.all_users(): lambda: TGUser.objects.all()}
+
+    def get_sender(self):
+        def send_text(api, user, *args, **kwargs):
+            api.bot.send_message(user, self.news, *args, **kwargs)
+
+        def send_sticker(api, user, *args, **kwargs):
+            api.bot.send_sticker(user, self.news, *args, **kwargs)
+
+        def send_location(api, user, *args, **kwargs):
+            api.bot.send_location(user, *args, location=Location.de_json(self.news, api), **kwargs)
+
+        def send_image(api, user, *args, **kwargs):
+            def get_image():
+                data = json.loads(self.news)
+                return data['image'], data['caption']
+
+            photo, caption = get_image()
+            api.bot.send_photo(user, photo, caption, *args, **kwargs)
+
+        __get_sender_map = {NewsType.text(): send_text,
+                            NewsType.sticker(): send_sticker,
+                            NewsType.location(): send_location,
+                            NewsType.image(): send_image
+                            }
+        return __get_sender_map[str(self.news_type)]
+
+
 
     def get_users(self):
         try:
