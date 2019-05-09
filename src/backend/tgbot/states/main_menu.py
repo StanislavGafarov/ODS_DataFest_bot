@@ -235,17 +235,19 @@ class MainMenu(TGHandler):
 
         who_win = 'Победители: '
         for row in winners[['name', 'surname', 'email', 'tel']].itertuples():
-            who_win = who_win + '\n Имя: {}, Фамилия: {}, email: {}, tel: {}'.format(row[0], row[1], row[2],
-                                                                                     row[3])
+            who_win = who_win + '\n Имя: {}, Фамилия: {}, email: {}, tel: {}'.format(row[1], row[2], row[3],
+                                                                                     row[4])
         update.message.reply_text(who_win)
 
         fail_count = 0
         fail_list = []
         for winner in winners.email.tolist():
             try:
-                nvidia_winner = TGUser.objects.filter(last_checked_email__iexact=winner)
+                nvidia_winner = TGUser.objects.filter(last_checked_email__iexact=winner).first()
                 api.bot.send_message(nvidia_winner.tg_id, TEXT_JETSON_WIN)
+                logger.info('email {} has received notification'.format(winner))
             except:
+                logger.info('email {} has NOT received notification'.format(winner))
                 fail_count += 1
                 fail_list.append(winner)
         if fail_count != 0:
