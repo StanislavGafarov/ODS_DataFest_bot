@@ -1,6 +1,7 @@
 import time
 from telegram.error import Unauthorized
 from telegram.ext import run_async, MessageHandler, Filters, CommandHandler
+from telegram import ReplyKeyboardRemove
 
 from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.tghandler import TGHandler
@@ -15,7 +16,7 @@ class Broadcasting(TGHandler):
         BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION: NewsGroup.news_subscription(),
         BUTTON_NEWS_GROUP_ADMIN: NewsGroup.admins(),
         BUTTON_NEWS_GROUP_WINNERS: NewsGroup.winners(),
-        BUTTON_NEWS_GROUP_ALL: NewsGroup.winners()
+        BUTTON_NEWS_GROUP_ALL: NewsGroup.all_users()
     }
 
     def _get_target_group(self, text):
@@ -105,8 +106,7 @@ class Broadcasting(TGHandler):
         news.target_group = self._get_target_group(update.message.text)
         news.save()
         logger.info(f"User {user} choose group {news.target_group} for broadcast.")
-        update.message.reply_text(TEXT_ENTER_BROADCAST,
-                                  reply_markup=self.define_keyboard(user))
+        update.message.reply_text(TEXT_ENTER_BROADCAST, reply_markup=ReplyKeyboardRemove())
         return self.BROADCAST_TYPE_MESSAGE
 
     def create_state(self):
