@@ -38,7 +38,7 @@ class MessageAdmin(admin.ModelAdmin):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['title', 'speaker', 'description', 'location', 'event_type', 'section', 'start', 'end']
 
 
 @admin.register(News)
