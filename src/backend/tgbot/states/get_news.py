@@ -49,7 +49,6 @@ class GetNews(TGHandler):
             self.rhandler(BUTTON_GET_LAST_5_NEWS, self.show_news),
             self.rhandler(BUTTON_NEWS_MORE, self.show_news),
             self.rhandler(BUTTON_FULL_BACK, self.full_back),
-            CallbackQueryHandler(callback=self.render_news, pattern="news_page\?\d*"),
             MessageHandler(Filters.text, self.unknown_command)
         ]}
         return state
