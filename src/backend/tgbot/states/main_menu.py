@@ -83,6 +83,12 @@ class MainMenu(TGHandler):
                            reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def want_jetson(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        update.message.reply_text(TEXT_JETSON, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
     # AUTHORIZED
     # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     # def on_major(self, api: TelegramBotApi, user: TGUser, update):
@@ -149,10 +155,11 @@ class MainMenu(TGHandler):
     # ADMIN
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def create_broadcast(self, api: TelegramBotApi, user: TGUser, update):
-        logger.info("User %s initiated broadcast.", user)
         if not user.is_admin:
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
+        text = update.message.text
+        logger.info('ADMIN {} have choosen {}'.format(user, text))
         user_count = TGUser.objects.count()
         subscription_count = TGUser.objects.filter(has_news_subscription=True).count()
         winner_count = TGUser.objects.filter(win_random_prize=True).count()
@@ -166,11 +173,11 @@ class MainMenu(TGHandler):
     # REFRESH INVITES
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def refresh_invites_and_notify(self, api: TelegramBotApi, user: TGUser, update):
-        gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
-        logger.info("User %s initiated invites refresh.", user)
         if not user.is_admin:
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
+        gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
+        logger.info("ADMIN %s initiated invites refresh.", user)
         update.message.reply_text(TEXT_START_INVITE_REFRESH)
         try:
             new_invites_count = gss_client.update_invites()
@@ -189,7 +196,8 @@ class MainMenu(TGHandler):
         if not user.is_admin:
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
-        logger.info("User %s choose draw prizes.", user)
+        text = update.message.text
+        logger.info('ADMIN {} have choosen {}'.format(user, text))
         group_by_merch = TGUser.objects.values('merch_size').annotate(dcount=Count('merch_size'))
         users_merch_table = ''
         for row in group_by_merch:
@@ -206,6 +214,31 @@ class MainMenu(TGHandler):
                                                                      resize_keyboard=True))
         return self.DRAW_PRIZES
 
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def draw_jetson(self, api: TelegramBotApi, user: TGUser, update):
+        if not user.is_admin:
+            update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
+        text = update.message.text
+        logger.info('ADMIN {} have choosen {}'.format(user, text))
+        update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
+        # group_by_merch = TGUser.objects.values('merch_size').annotate(dcount=Count('merch_size'))
+        # users_merch_table = ''
+        # for row in group_by_merch:
+        #     users_merch_table += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('dcount'))
+        #
+        # prizes_info = Prizes.objects.values()
+        # prizes_table = ''
+        # for row in prizes_info:
+        #     prizes_table += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('quantity'))
+        #
+        # update.message.reply_text(TEXT_START_RANDOM_PRIZE.format(users_merch_table, prizes_table)
+        #                           , reply_markup=ReplyKeyboardMarkup([[BUTTON_START_DRAWING, BUTTON_FULL_BACK]]
+        #                                                              , one_time_keyboard=True,
+        #                                                              resize_keyboard=True))
+        # return self.DRAW_PRIZES
+
     def create_state(self):
         state = {self.MAIN_MENU: [
             self.rhandler(BUTTON_CHECK_REGISTRATION, self.check_registration_status),
@@ -218,6 +251,9 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
             self.rhandler(BUTTON_RANDOM_BEER, self.ready_but_muted),
             # self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
+
+            self.rhandler(BUTTON_JETSON, self.want_jetson),
+            self.rhandler(BUTTON_DRAW_JETSON, self.draw_jetson),
 
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
