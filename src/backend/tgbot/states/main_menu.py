@@ -268,8 +268,8 @@ class MainMenu(TGHandler):
 
             # self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.ready_but_muted),
             self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
-            self.rhandler(BUTTON_RANDOM_BEER, self.ready_but_muted),
-            # self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
+            # self.rhandler(BUTTON_RANDOM_BEER, self.ready_but_muted),
+            self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
 
             self.rhandler(BUTTON_JETSON, self.want_jetson),
             self.rhandler(BUTTON_DRAW_JETSON, self.draw_jetson),

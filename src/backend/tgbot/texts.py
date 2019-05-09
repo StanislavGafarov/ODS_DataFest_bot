@@ -141,7 +141,7 @@ BUTTON_NEWS_GROUP_WITH_SUBSCRIPTION = 'С подпиской на новости
 BUTTON_NEWS_GROUP_ADMIN = 'Админам'
 BUTTON_NEWS_GROUP_WINNERS = 'Победителям'
 BUTTON_NEWS_GROUP_ALL = 'Всем'
-BUTTON_DRAW_JETSON = 'Розыграть Nvidia Jetson'
+BUTTON_DRAW_JETSON = 'Разыграть Nvidia Jetson'
 
 BUTTON_NEWS_SUBSCRIPTION = 'Подписаться на новости'
 BUTTON_NEWS_UNSUBSCRIPTION = 'Отписаться от новостей'
