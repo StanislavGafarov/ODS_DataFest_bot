@@ -222,7 +222,7 @@ class MainMenu(TGHandler):
             return self.MAIN_MENU
         text = update.message.text
         logger.info('ADMIN {} have choosen {}'.format(user, text))
-        gss_client = GoogleSpreadsheet(client_secret_path='./tgbot/client_secret.json')
+        gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
         df = gss_client.get_data('NVIDIA_JETSONE')
         df = df.rename(columns=NVIDIA_MAPPER)
         winners = df[(df.rnn_question == RNN_ANSWER)&(df.low_level_library_question == LOW_LEVEL_LIBRARY_ANSWER)&
