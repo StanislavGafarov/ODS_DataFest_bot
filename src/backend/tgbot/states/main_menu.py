@@ -234,9 +234,9 @@ class MainMenu(TGHandler):
             winners = winners.sample(3)
 
         who_win = 'Победители: '
-        for row in winners[['name', 'surname', 'email', 'tel']].iterrows():
-            who_win = who_win + '\n Имя: {}, Фамилия: {}, email: {}, tel: {}'.format(row.name, row.surname, row.email,
-                                                                                     row.tel)
+        for row in winners[['name', 'surname', 'email', 'tel']].itertuples():
+            who_win = who_win + '\n Имя: {}, Фамилия: {}, email: {}, tel: {}'.format(row[0], row[1], row.email[2],
+                                                                                     row.tel[3])
         update.message.reply_text(who_win)
 
         fail_count = 0
