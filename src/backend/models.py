@@ -160,7 +160,8 @@ class News(models.Model):
 
         def send_image(api, user, *args, **kwargs):
             def get_image():
-                data = json.loads(self.news)
+                json_acceptable_string = self.news.replace("'", "\"")
+                data = json.loads(json_acceptable_string)
                 return data['image'], data['caption']
 
             photo, caption = get_image()
