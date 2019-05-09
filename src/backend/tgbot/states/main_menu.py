@@ -11,6 +11,7 @@ from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.utils import logger, Decorators
+from backend.tgbot.states.nvidia_answers import *
 
 
 class FLACON:
@@ -221,23 +222,27 @@ class MainMenu(TGHandler):
             return self.MAIN_MENU
         text = update.message.text
         logger.info('ADMIN {} have choosen {}'.format(user, text))
-        update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+        gss_client = GoogleSpreadsheet(client_secret_path='./tgbot/client_secret.json')
+        df = gss_client.get_data('NVIDIA_JETSONE')
+        df = df.rename(columns=NVIDIA_MAPPER)
+        winners = df[(df.rnn_question == RNN_ANSWER)&(df.low_level_library_question == LOW_LEVEL_LIBRARY_ANSWER)&
+                     (df.decrease_dimension_question == DECREASE_DIMENSION_ANSWER) & (df.name != 'Тест')].sample(3)
+        update.message.reply_text(winners[['name', 'surname', 'email', 'tel']] + '\nПобедили в розыгрыше.')
+
+        fail_count = 0
+        fail_list = []
+        for winner in winners.email.tolist():
+            try:
+                nvidia_winner = TGUser.objects.filter(last_checked_email__iexact=winner)
+                api.bot.send_message(nvidia_winner.tg_id, TEXT_JETSON_WIN)
+            except:
+                fail_count += 1
+                fail_list.append(winner)
+        if fail_count != 0:
+            update.message.reply_text('C ' + ' '.join(fail_list) + 'мы не смогли связаться',
+                                      reply_markup=self.define_keyboard(user))
+        #TODO sent notification for loosers
         return self.MAIN_MENU
-        # group_by_merch = TGUser.objects.values('merch_size').annotate(dcount=Count('merch_size'))
-        # users_merch_table = ''
-        # for row in group_by_merch:
-        #     users_merch_table += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('dcount'))
-        #
-        # prizes_info = Prizes.objects.values()
-        # prizes_table = ''
-        # for row in prizes_info:
-        #     prizes_table += '\n' + str(row.get('merch_size')) + ' : ' + str(row.get('quantity'))
-        #
-        # update.message.reply_text(TEXT_START_RANDOM_PRIZE.format(users_merch_table, prizes_table)
-        #                           , reply_markup=ReplyKeyboardMarkup([[BUTTON_START_DRAWING, BUTTON_FULL_BACK]]
-        #                                                              , one_time_keyboard=True,
-        #                                                              resize_keyboard=True))
-        # return self.DRAW_PRIZES
 
     def create_state(self):
         state = {self.MAIN_MENU: [

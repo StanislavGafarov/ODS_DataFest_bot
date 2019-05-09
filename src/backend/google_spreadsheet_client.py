@@ -12,7 +12,8 @@ class GoogleSpreadsheet():
     def __init__(self, client_secret_path):
         self.client_secret_path = client_secret_path
 
-        self.table_map = {"SCHEDULE_TEST": self.schedule_sheet, "EMAIL_CODES": self.email_sheet}
+        self.table_map = {"SCHEDULE_TEST": self.schedule_sheet, "EMAIL_CODES": self.email_sheet,
+                          "NVIDIA_JETSONE": self.nvidia_sheet}
 
     def get_data(self, tab) -> pd.DataFrame:
         return pd.DataFrame(self.table_map[tab]().get_all_records())
@@ -26,6 +27,9 @@ class GoogleSpreadsheet():
 
     def schedule_sheet(self):
         return self._client.open("ODS_Sheet_1").sheet1
+
+    def nvidia_sheet(self):
+        return self._client.open('NVIDIA на Data Fest (Responses)').sheet1
 
     def update_invites(self):
         existing_invite_count = len(Invite.objects.all())
