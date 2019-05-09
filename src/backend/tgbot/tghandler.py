@@ -54,7 +54,7 @@ class TGHandler(object):
             [BUTTON_NEWS,
              BUTTON_SHOW_PATH],
             [BUTTON_PARTICIPATE_IN_RANDOM_PRIZE],
-            [BUTTON_JETSON]
+            [BUTTON_JETSON],
             [BUTTON_RANDOM_BEER]
         ]
         unauth_buttons = [
