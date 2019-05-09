@@ -38,13 +38,13 @@ class MainMenu(TGHandler):
         text = update.message.text
         if user.has_news_subscription:
             custom_keyboard = [[BUTTON_NEWS_UNSUBSCRIPTION,
-                                BUTTON_FULL_BACK
-                                # BUTTON_GET_LAST_5_NEWS
+                                BUTTON_FULL_BACK,
+                                BUTTON_GET_LAST_5_NEWS
                                 ]]
         else:
             custom_keyboard = [[BUTTON_NEWS_SUBSCRIPTION,
-                                BUTTON_FULL_BACK
-                                # BUTTON_GET_LAST_5_NEWS
+                                BUTTON_FULL_BACK,
+                                BUTTON_GET_LAST_5_NEWS
                                 ]]
         logger.info('User {} have chosen {} '.format(user, text))
         update.message.reply_text(TEXT_NEWS, reply_markup=ReplyKeyboardMarkup(custom_keyboard
