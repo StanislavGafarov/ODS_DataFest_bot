@@ -253,6 +253,8 @@ class MainMenu(TGHandler):
         if fail_count != 0:
             update.message.reply_text('C ' + ' '.join(fail_list) + 'мы не смогли связаться',
                                       reply_markup=self.define_keyboard(user))
+        update.message.reply_text('Выполнено.',
+                                  reply_markup=self.define_keyboard(user))
         #TODO sent notification for loosers
         return self.MAIN_MENU
 
