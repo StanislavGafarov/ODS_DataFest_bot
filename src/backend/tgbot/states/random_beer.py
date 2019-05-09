@@ -170,7 +170,7 @@ class RandomBeer(TGHandler):
             return self.RANDOM_BEER_MENU
 
         else:
-            if random_beer_user.random_beer_try == 3:
+            if random_beer_user.random_beer_try == 10:
                 update.message.reply_text(TEXT_LIMIT_IS_OVER+ '\n'+ TEXT_GOTO_RANDOM_COFFEE
                                           , reply_markup=self.random_beer_keyboard(random_beer_user))
                 return self.RANDOM_BEER_MENU
@@ -197,7 +197,7 @@ class RandomBeer(TGHandler):
 
     def get_match(self, random_beer_user: RandomBeerUser):
         posible_pair_list = RandomBeerUser.objects.filter(accept_rules=True)\
-                .exclude(is_busy=True).exclude(random_beer_try=3).exclude(tg_user_id=random_beer_user.tg_user_id)\
+                .exclude(is_busy=True).exclude(random_beer_try=10).exclude(tg_user_id=random_beer_user.tg_user_id)\
                 .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
                 .exclude(tg_nickname=None, ods_nickname=None, social_network_link=None) \
                 .exclude(tg_user_id=random_beer_user.prev_pair).values_list('tg_user_id', flat=True)
@@ -213,7 +213,7 @@ class RandomBeer(TGHandler):
 
     def will_have_pair(self, random_beer_user):
         random_beer_table = RandomBeerUser.objects.filter(accept_rules=True) \
-            .exclude(is_busy=True).exclude(random_beer_try=3).exclude(tg_user_id=random_beer_user.tg_user_id) \
+            .exclude(is_busy=True).exclude(random_beer_try=10).exclude(tg_user_id=random_beer_user.tg_user_id) \
             .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
             .exclude(tg_nickname=None, ods_nickname=None, social_network_link=None) \
             .exclude(tg_user_id=random_beer_user.prev_pair).values()
