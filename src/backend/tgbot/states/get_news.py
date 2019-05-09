@@ -1,5 +1,5 @@
 from telegram.ext import run_async, MessageHandler, Filters, CallbackQueryHandler
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup,ReplyKeyboardRemove
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, ReplyKeyboardMarkup
 from django.core.paginator import Paginator
 
 from backend.tgbot.tghandler import TGHandler
@@ -31,23 +31,22 @@ class GetNews(TGHandler):
     def show_news(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
-        news_list = News.object.filter(target_group=NewsGroup.news_subscription())
-        news_pages = Paginator(news_list, 1)
+        # сначала последние
+        news_list = News.objects.filter(target_group=NewsGroup.news_subscription()).order_by('-id')
+        news_pages = Paginator(news_list, 5)
         page = news_pages.get_page(1)
 
-        keyboard = [[BUTTON_NEWS_UNSUBSCRIPTION,BUTTON_FULL_BACK, BUTTON_NEWS_MORE]]
         for news in page:
             send = news.get_sender()
-            send(api, user, reply_markup=keyboard)
-
-        return self.GET_NEWS
+            send(api, user)
+        return self.MAIN_MENU
 
     def create_state(self):
         state = {self.GET_NEWS: [
             self.rhandler(BUTTON_NEWS_UNSUBSCRIPTION, self.unsubscribe_for_news),
             self.rhandler(BUTTON_NEWS_SUBSCRIPTION, self.subscribe_for_news),
             self.rhandler(BUTTON_GET_LAST_5_NEWS, self.show_news),
-            self.rhandler(BUTTON_NEWS_MORE, self.show_news),
+            # self.rhandler(BUTTON_NEWS_MORE, self.show_news),
             self.rhandler(BUTTON_FULL_BACK, self.full_back),
             MessageHandler(Filters.text, self.unknown_command)
         ]}
