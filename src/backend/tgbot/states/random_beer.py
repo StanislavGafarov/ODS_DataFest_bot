@@ -226,10 +226,10 @@ class RandomBeer(TGHandler):
     def end_meeting(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
         logger.info('{} have finished the meeting'.format(random_beer_user.email))
         random_beer_user.is_busy = False
-        pair_user = RandomBeerUser.objects.filter(tg_user_id=random_beer_user.prev_pair).first()
-        pair_user.is_busy = False
+        # pair_user = RandomBeerUser.objects.filter(tg_user_id=random_beer_user.prev_pair).first()
+        # pair_user.is_busy = False
         random_beer_user.save()
-        pair_user.save()
+        # pair_user.save()
         update.message.reply_text(TEXT_END_MEETING, reply_markup=self.random_beer_keyboard(random_beer_user))
         return self.RANDOM_BEER_MENU
 

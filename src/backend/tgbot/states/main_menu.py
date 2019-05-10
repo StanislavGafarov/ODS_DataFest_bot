@@ -11,6 +11,7 @@ from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.utils import logger, Decorators
+from backend.tgbot.states.nvidia_answers import *
 
 
 class FLACON:
@@ -83,6 +84,14 @@ class MainMenu(TGHandler):
                            reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def want_jetson(self, api: TelegramBotApi, user: TGUser, update):
+        text = update.message.text
+        logger.info('User {} have chosen {} '.format(user, text))
+        user.in_nvidia_jetsone = True
+        user.save()
+        update.message.reply_text(TEXT_JETSON, reply_markup=self.define_keyboard(user))
+        return self.MAIN_MENU
     # AUTHORIZED
     # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     # def on_major(self, api: TelegramBotApi, user: TGUser, update):
@@ -149,10 +158,11 @@ class MainMenu(TGHandler):
     # ADMIN
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def create_broadcast(self, api: TelegramBotApi, user: TGUser, update):
-        logger.info("User %s initiated broadcast.", user)
         if not user.is_admin:
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
+        text = update.message.text
+        logger.info('ADMIN {} have choosen {}'.format(user, text))
         user_count = TGUser.objects.count()
         subscription_count = TGUser.objects.filter(has_news_subscription=True).count()
         winner_count = TGUser.objects.filter(win_random_prize=True).count()
@@ -166,11 +176,11 @@ class MainMenu(TGHandler):
     # REFRESH INVITES
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def refresh_invites_and_notify(self, api: TelegramBotApi, user: TGUser, update):
-        gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
-        logger.info("User %s initiated invites refresh.", user)
         if not user.is_admin:
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
+        gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
+        logger.info("ADMIN %s initiated invites refresh.", user)
         update.message.reply_text(TEXT_START_INVITE_REFRESH)
         try:
             new_invites_count = gss_client.update_invites()
@@ -189,7 +199,8 @@ class MainMenu(TGHandler):
         if not user.is_admin:
             update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
-        logger.info("User %s choose draw prizes.", user)
+        text = update.message.text
+        logger.info('ADMIN {} have choosen {}'.format(user, text))
         group_by_merch = TGUser.objects.values('merch_size').annotate(dcount=Count('merch_size'))
         users_merch_table = ''
         for row in group_by_merch:
@@ -206,6 +217,47 @@ class MainMenu(TGHandler):
                                                                      resize_keyboard=True))
         return self.DRAW_PRIZES
 
+    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    def draw_jetson(self, api: TelegramBotApi, user: TGUser, update):
+        if not user.is_admin:
+            update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
+        text = update.message.text
+        logger.info('ADMIN {} have choosen {}'.format(user, text))
+        gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
+        df = gss_client.get_data('NVIDIA_JETSONE')
+        df = df.rename(columns=NVIDIA_MAPPER)
+        winners = df[(df.rnn_question == RNN_ANSWER)&(df.low_level_library_question == LOW_LEVEL_LIBRARY_ANSWER)&
+                     (df.decrease_dimension_question == DECREASE_DIMENSION_ANSWER) & (df.name != 'Тест')]
+        update.message.reply_text('Количество пользователей давших правильный ответ: {}'.format(winners.shape[0]))
+        if winners.shape[0] > 3:
+            winners = winners.sample(3)
+
+        who_win = 'Победители: '
+        for row in winners[['name', 'surname', 'email', 'tel']].itertuples():
+            who_win = who_win + '\n Имя: {}, Фамилия: {}, email: {}, tel: {}'.format(row[1], row[2], row[3],
+                                                                                     row[4])
+        update.message.reply_text(who_win)
+
+        fail_count = 0
+        fail_list = []
+        for winner in winners.email.tolist():
+            try:
+                nvidia_winner = TGUser.objects.filter(last_checked_email__iexact=winner).first()
+                api.bot.send_message(nvidia_winner.tg_id, TEXT_JETSON_WIN)
+                logger.info('email {} has received notification'.format(winner))
+            except:
+                logger.info('email {} has NOT received notification'.format(winner))
+                fail_count += 1
+                fail_list.append(winner)
+        if fail_count != 0:
+            update.message.reply_text('C ' + ' '.join(fail_list) + 'мы не смогли связаться',
+                                      reply_markup=self.define_keyboard(user))
+        update.message.reply_text('Выполнено.',
+                                  reply_markup=self.define_keyboard(user))
+        #TODO sent notification for loosers
+        return self.MAIN_MENU
+
     def create_state(self):
         state = {self.MAIN_MENU: [
             self.rhandler(BUTTON_CHECK_REGISTRATION, self.check_registration_status),
@@ -216,8 +268,11 @@ class MainMenu(TGHandler):
 
             # self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.ready_but_muted),
             self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
-            self.rhandler(BUTTON_RANDOM_BEER, self.ready_but_muted),
-            # self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
+            # self.rhandler(BUTTON_RANDOM_BEER, self.ready_but_muted),
+            self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
+
+            self.rhandler(BUTTON_JETSON, self.want_jetson),
+            self.rhandler(BUTTON_DRAW_JETSON, self.ready_but_muted),
 
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
