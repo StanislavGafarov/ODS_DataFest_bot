@@ -4,6 +4,8 @@ import json
 from django.db import models
 from telegram import Location
 
+from backend.tgbot.texts import TEXT_NEWS_FAIL_LOAD
+
 # Create your models here.
 
 
@@ -161,18 +163,31 @@ class News(models.Model):
         def send_location(api, user, reply_markup=None):
             def get_location():
                 json_acceptable_string = self.news.replace("'", "\"")
-                data = json.loads(json_acceptable_string)
-                return data['longitude'], data['latitude']
+                try:
+                    data = json.loads(json_acceptable_string)
+                    return data['longitude'], data['latitude']
+                except:
+                    return None, None
             longitude, latitude = get_location()
-            api.bot.send_location(user, longitude=longitude, latitude=latitude, reply_markup=reply_markup)
+            if longitude:
+                api.bot.send_location(user, longitude=longitude, latitude=latitude, reply_markup=reply_markup)
+            else:
+                api.bot.send_message(user, TEXT_NEWS_FAIL_LOAD, reply_markup=reply_markup)
 
         def send_image(api, user, reply_markup=None):
             def get_image():
-                json_acceptable_string = self.news.replace("'", "\"")
-                data = json.loads(json_acceptable_string)
-                return data['image'], data['caption']
+                json_acceptable_string = self.news.replace('None', "'None'").replace("'", "\"")
+                try:
+                    data = json.loads(json_acceptable_string)
+                    return data['image'], data['caption']
+                except:
+                    return None, None
             photo, caption = get_image()
-            api.bot.send_photo(user, photo, caption, reply_markup=reply_markup)
+            if photo:
+                caption = None if caption == 'None' else caption
+                api.bot.send_photo(user, photo, caption, reply_markup=reply_markup)
+            else:
+                api.bot.send_message(user, TEXT_NEWS_FAIL_LOAD, reply_markup=reply_markup)
 
         __get_sender_map = {NewsType.text(): send_text,
                             NewsType.sticker(): send_sticker,
