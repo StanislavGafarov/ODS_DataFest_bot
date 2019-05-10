@@ -23,7 +23,7 @@ TEXT_NEWS_STAT = '''Статистика по пользователям:
 Победителей: {}
 Админов: {}
 '''
-
+TEXT_NEWS_FAIL_LOAD = "Ошибка при получении новостей"
 
 
 # Random prize
@@ -146,6 +146,7 @@ BUTTON_DRAW_JETSON = 'Разыграть Nvidia Jetson'
 BUTTON_NEWS_SUBSCRIPTION = 'Подписаться на новости'
 BUTTON_NEWS_UNSUBSCRIPTION = 'Отписаться от новостей'
 BUTTON_GET_LAST_5_NEWS = 'Посмотреть новости'
+BUTTON_NEWS_MORE = 'Ещё'
 
 BUTTON_REGISTRATION = 'Регистрация'
 BUTTON_ON_MAJOR = 'Я на Major 💪'
