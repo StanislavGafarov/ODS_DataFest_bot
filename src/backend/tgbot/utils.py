@@ -34,7 +34,7 @@ def check_certs():
                     'Not valid certificates: issued to "{}", but host ip is "{}"'.format(issued_to, settings.HOST_IP))
 
 
-logger = logging.getLogger('bot').setLevel(logging.INFO)
+logger = logging.getLogger('bot').setLevel(logging.ERROR)
 
 
 class Decorators(object):
