@@ -184,6 +184,7 @@ class News(models.Model):
                     return None, None
             photo, caption = get_image()
             if photo:
+                caption = None if caption == 'None' else caption
                 api.bot.send_photo(user, photo, caption, reply_markup=reply_markup)
             else:
                 api.bot.send_message(user, TEXT_NEWS_FAIL_LOAD, reply_markup=reply_markup)
