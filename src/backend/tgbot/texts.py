@@ -76,7 +76,7 @@ TEXT_JETSON_NOT_SUCCEED ='Розыгрыш NVIDIA Jetson Nano Developer Kit уж
 
 # ZAGLUSHKA
 TEXT_NOT_READY_YET = "В разработке. Мы оповестим о запуске!"
-TEXT_WILL_BE_ON_DATAFEST = "Данный функционал будет доступен на Data Fest⁶"
+TEXT_WILL_BE_ON_DATAFEST = "Данный функционал будет включен 11 числа"
 
 TEXT_BYE = 'До следующей встречи!'
 
