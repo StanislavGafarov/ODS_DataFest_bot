@@ -33,20 +33,39 @@ class GetNews(TGHandler):
         logger.info('User {} have chosen {} '.format(user, text))
         # сначала последние
         news_list = News.objects.filter(target_group__in=[NewsGroup.all_users(), NewsGroup.news_subscription()]).order_by('-id')
-        news_pages = Paginator(news_list, 5)
+        news_pages = Paginator(news_list, 1)
         page = news_pages.get_page(1)
 
         for news in page:
             send = news.get_sender()
-            send(api, user.tg_id, self.define_keyboard(user))
-        return self.MAIN_MENU
+            send(api, user.tg_id, self.get_kb(page))
+        return self.GET_NEWS
+
+    def get_kb(self, page):
+        row = [InlineKeyboardButton("More", callback_data=f"page?{page.next_page_number()}")]
+        keyboard = [row]
+        return InlineKeyboardMarkup(keyboard)
+
+    def show_news_inline(self, api: TelegramBotApi, update):
+        query = update.callback_query
+        page_no = int(query.data.split("?")[1])
+
+        news_list = News.objects.filter(
+            target_group__in=[NewsGroup.all_users(), NewsGroup.news_subscription()]).order_by('-id')
+        news_pages = Paginator(news_list, 1)
+        page = news_pages.get_page(page_no)
+
+        for news in page:
+            send = news.get_sender()
+            send(api, query.message.chat_id, self.get_kb(page))
 
     def create_state(self):
         state = {self.GET_NEWS: [
             self.rhandler(BUTTON_NEWS_UNSUBSCRIPTION, self.unsubscribe_for_news),
             self.rhandler(BUTTON_NEWS_SUBSCRIPTION, self.subscribe_for_news),
             self.rhandler(BUTTON_GET_LAST_5_NEWS, self.show_news),
-            # self.rhandler(BUTTON_NEWS_MORE, self.show_news),
+            CallbackQueryHandler(self.show_news_inline),
+            #self.rhandler(BUTTON_NEWS_MORE, self.show_news),
             self.rhandler(BUTTON_FULL_BACK, self.full_back),
             MessageHandler(Filters.text, self.unknown_command)
         ]}
