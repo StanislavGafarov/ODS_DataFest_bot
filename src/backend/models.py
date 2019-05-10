@@ -5,7 +5,6 @@ from django.db import models
 from telegram import Location
 
 from backend.tgbot.texts import TEXT_NEWS_FAIL_LOAD
-from backend.tgbot.utils import logger
 
 # Create your models here.
 
@@ -168,7 +167,6 @@ class News(models.Model):
                     data = json.loads(json_acceptable_string)
                     return data['longitude'], data['latitude']
                 except:
-                    logger.exception(f"Cant parse location {self.news}")
                     return None, None
             longitude, latitude = get_location()
             if longitude:
@@ -183,7 +181,6 @@ class News(models.Model):
                     data = json.loads(json_acceptable_string)
                     return data['image'], data['caption']
                 except:
-                    logger.exception(f"Cant parse image {self.news}")
                     return None, None
             photo, caption = get_image()
             if photo:
