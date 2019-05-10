@@ -1,4 +1,4 @@
-import logging
+
 from telegram.ext import run_async, MessageHandler, Filters, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, ReplyKeyboardMarkup
 from django.core.paginator import Paginator
@@ -11,7 +11,6 @@ from backend.tgbot.texts import *
 
 
 class GetNews(TGHandler):
-    logging.disable(logging.WARNING)
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def subscribe_for_news(self, api: TelegramBotApi, user: TGUser, update):
         user.has_news_subscription = True
