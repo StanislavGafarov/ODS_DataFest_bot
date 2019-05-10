@@ -176,7 +176,7 @@ class News(models.Model):
 
         def send_image(api, user, reply_markup=None):
             def get_image():
-                json_acceptable_string = self.news.replace("'", "\"")
+                json_acceptable_string = self.news.replace('None', "'None'").replace("'", "\"")
                 try:
                     data = json.loads(json_acceptable_string)
                     return data['image'], data['caption']
