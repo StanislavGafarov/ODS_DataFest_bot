@@ -75,8 +75,8 @@ class GetNews(TGHandler):
         state = {self.GET_NEWS: [
             self.rhandler(BUTTON_NEWS_UNSUBSCRIPTION, self.unsubscribe_for_news),
             self.rhandler(BUTTON_NEWS_SUBSCRIPTION, self.subscribe_for_news),
-            # self.rhandler(BUTTON_GET_LAST_5_NEWS, self.show_news),
-            # CallbackQueryHandler(self.show_news_inline, pattern="page.*"),
+            self.rhandler(BUTTON_GET_LAST_5_NEWS, self.show_news),
+            CallbackQueryHandler(self.show_news_inline, pattern="page.*"),
             self.rhandler(BUTTON_FULL_BACK, self.full_back),
             MessageHandler(Filters.text, self.unknown_command)
         ]}
