@@ -288,9 +288,6 @@ class MainMenu(TGHandler):
             # self.rhandler(BUTTON_RANDOM_BEER, self.ready_but_muted),
             self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
 
-            self.rhandler(BUTTON_JETSON, self.want_jetson),
-            self.rhandler(BUTTON_DRAW_JETSON, self.draw_jetson),
-
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
             self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
