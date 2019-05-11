@@ -150,7 +150,7 @@ class News(models.Model):
     __get_users_map = {NewsGroup.no_group(): lambda: TGUser.objects.none(),
                        NewsGroup.news_subscription(): lambda: TGUser.objects.filter(has_news_subscription=True),
                        NewsGroup.admins(): lambda: TGUser.objects.filter(is_admin=True),
-                       NewsGroup.winners(): lambda: TGUser.objects.none(),
+                       NewsGroup.winners(): lambda: TGUser.objects.filter(win_random_prize=True),
                        NewsGroup.all_users(): lambda: TGUser.objects.all()}
 
     def get_sender(self):
