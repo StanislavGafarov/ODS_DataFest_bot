@@ -85,6 +85,11 @@ class RandomFreePrizes(TGHandler):
             total, fail = broadcast_users(users, TEXT_RANDOM_PRIZE_NOT_SUCCEED)
             api.bot.send_message(admin_user.tg_id, TEXT_RANDOM_PRIZE_NOT_SUCCEED_BROADCAST_DONE.format(total, fail))
 
+        def broadcast_participants(api, admin_user):
+            broadcast_winners(api, admin_user)
+            time.sleep(0.5)
+            broadcast_loosers(api, admin_user)
+
         text = update.message.text
         logger.info('ADMIN {} have chosen {}'.format(user, text))
 
@@ -94,8 +99,7 @@ class RandomFreePrizes(TGHandler):
 
         calculate_winners(Prizes.objects.all())
         update.message.reply_text(TEXT_RANDOM_PRIZE_BROADCAST_STARTED, reply_markup=self.define_keyboard(user))
-        TGHandler.add_task(broadcast_winners, api, user)
-        TGHandler.add_task(broadcast_loosers, api, user)
+        TGHandler.add_task(broadcast_participants, api, user)
         return self.MAIN_MENU
 
     def create_state(self):
