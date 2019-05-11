@@ -62,3 +62,9 @@ class RandomBeerUserAdmin(admin.ModelAdmin):
     list_display = ['tg_user_id', 'email', 'tg_nickname', 'ods_nickname', 'social_network_link', 'random_beer_try', 'prev_pair',
                     'accept_rules', 'is_busy']
     search_fields = ['accept_rules', 'is_busy', 'email']
+
+    actions = ['zero_beer']
+
+    def zero_beer(self, request, queryset):
+        queryset.update(random_beer_try=0, is_busy=False)
+    zero_beer.short_description = "Zero random beer meeting count"
