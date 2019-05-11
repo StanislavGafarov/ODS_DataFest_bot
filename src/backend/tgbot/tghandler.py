@@ -30,8 +30,6 @@ class TGHandler(object):
         self.RANDOM_BEER_SN_LINK = 46
         self.RANDOM_BEER_CHANGE_FIELD = 47
 
-        self.NVIDIA_JETSON = 101
-        self.DRAW_JETSON = 102
 
         # self.ON_MAJOR = 100
 
@@ -46,7 +44,6 @@ class TGHandler(object):
             [BUTTON_SEND_INVITES],
             [BUTTON_DRAW_PRIZES],
             [BUTTON_POST_NEWS],
-            [BUTTON_DRAW_JETSON]
         ]
         auth_buttons = [
             # [BUTTON_ON_MAJOR],
@@ -54,7 +51,6 @@ class TGHandler(object):
             [BUTTON_NEWS,
              BUTTON_SHOW_PATH],
             [BUTTON_PARTICIPATE_IN_RANDOM_PRIZE],
-            [BUTTON_JETSON],
             [BUTTON_RANDOM_BEER]
         ]
         unauth_buttons = [
