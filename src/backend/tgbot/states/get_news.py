@@ -31,11 +31,10 @@ class GetNews(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def show_news(self, api: TelegramBotApi, user: TGUser, update):
-        logger.disable(logger.WARNING)
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
         # сначала последние
-        news_list = News.objects.filter(target_group__in=[NewsGroup.all_users(), NewsGroup.news_subscription()]).order_by('-id')
+        news_list = News.objects.filter(target_group__in=[NewsGroup.allgti_users(), NewsGroup.news_subscription()]).order_by('-id')
         news_pages = Paginator(news_list, 1)
         page = news_pages.get_page(1)
 
