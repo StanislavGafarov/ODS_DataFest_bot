@@ -1,4 +1,5 @@
 import traceback
+import time
 
 from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup, Location
 from telegram.error import Unauthorized
@@ -263,6 +264,7 @@ class MainMenu(TGHandler):
                 total += 1
                 try:
                     api.bot.send_message(loser.tg_id, TEXT_JETSON_NOT_SUCCEED)
+                    time.sleep(0.1)
                 except:
                     errors += 1
             api.bot.send_message(admin.tg_id, "NVIDIA Jetsor\n" + TEXT_BROADCAST_DONE.format(total, errors))
