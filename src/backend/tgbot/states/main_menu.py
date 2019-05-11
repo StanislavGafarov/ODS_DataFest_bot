@@ -288,13 +288,13 @@ class MainMenu(TGHandler):
             self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
 
             self.rhandler(BUTTON_JETSON, self.want_jetson),
-            self.rhandler(BUTTON_DRAW_JETSON, self.ready_but_muted),
+            self.rhandler(BUTTON_DRAW_JETSON, self.draw_jetson),
 
 
             self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
             self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
             self.rhandler(BUTTON_DRAW_PRIZES, self.draw_prizes),
-            self.rhandler(BUTTON_DRAW_PRIZES, self.not_ready_yet),
+            # self.rhandler(BUTTON_DRAW_PRIZES, self.not_ready_yet),
             self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 
             # self.rhandler(BUTTON_ON_MAJOR, self.on_major),
