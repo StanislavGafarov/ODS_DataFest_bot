@@ -228,7 +228,8 @@ class MainMenu(TGHandler):
         df = df.rename(columns=NVIDIA_MAPPER)
         winners = df[(df.rnn_question == RNN_ANSWER)&(df.low_level_library_question == LOW_LEVEL_LIBRARY_ANSWER)&
                      (df.decrease_dimension_question == DECREASE_DIMENSION_ANSWER) & (df.name != 'Тест')]
-        update.message.reply_text('Количество пользователей давших правильный ответ: {}'.format(winners.shape[0]))
+        update.message.reply_text('Количество пользователей давших правильный ответ: {}'
+                                  .format(winners.email.nunique()))
         if winners.shape[0] > 3:
             winners = winners.sample(3)
 
@@ -241,7 +242,7 @@ class MainMenu(TGHandler):
         fail_count = 0
         fail_list = []
         winner_tg_ids = []
-        for winner in winners.email.tolist():
+        for winner in winners.email.unique():
             try:
                 nvidia_winner = TGUser.objects.filter(last_checked_email__iexact=winner).first()
                 winner_tg_ids.append(nvidia_winner.tg_id)
