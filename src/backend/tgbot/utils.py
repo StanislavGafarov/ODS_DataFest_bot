@@ -33,9 +33,13 @@ def check_certs():
                 raise Exception(
                     'Not valid certificates: issued to "{}", but host ip is "{}"'.format(issued_to, settings.HOST_IP))
 
-# root_logger = logging.getLogger('root').setLevel(logging.ERROR)
-# updater_logger = logging.getLogger('telegram.ext.updater').setLevel(logging.ERROR)
-# urllib3_logger = logging.getLogger('telegram.vendor.ptb_urllib3.urllib3.connectionpool').setLevel(logging.ERROR)
+root_logger = logging.getLogger('root')
+root_logger.disabled = True
+updater_logger = logging.getLogger('telegram.ext.updater')
+updater_logger.disabled = True
+urllib3_logger = logging.getLogger('telegram.vendor.ptb_urllib3.urllib3.connectionpool')
+urllib3_logger.disabled = True
+
 logger = logging.getLogger('bot')
 
 
