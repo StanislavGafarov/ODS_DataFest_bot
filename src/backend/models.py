@@ -154,11 +154,18 @@ class News(models.Model):
                        NewsGroup.all_users(): lambda: TGUser.objects.all()}
 
     def get_sender(self):
+
         def send_text(api, user, reply_markup=None):
-            api.bot.send_message(user, self.news, reply_markup=reply_markup)
+            try:
+                api.bot.send_message(user, self.news, reply_markup=reply_markup)
+            except:
+                api.bot.send_message(user, TEXT_NEWS_FAIL_LOAD, reply_markup=reply_markup)
 
         def send_sticker(api, user, reply_markup=None):
-            api.bot.send_sticker(user, self.news, reply_markup=reply_markup)
+            try:
+                api.bot.send_sticker(user, self.news, reply_markup=reply_markup)
+            except:
+                api.bot.send_message(user, TEXT_NEWS_FAIL_LOAD, reply_markup=reply_markup)
 
         def send_location(api, user, reply_markup=None):
             def get_location():
