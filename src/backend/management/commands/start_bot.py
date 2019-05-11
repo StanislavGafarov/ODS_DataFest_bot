@@ -1,5 +1,7 @@
 import logging
 import sys
+import warnings
+warnings.filterwarnings("ignore")
 
 from django.core.management.base import BaseCommand
 

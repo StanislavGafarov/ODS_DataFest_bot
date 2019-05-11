@@ -30,7 +30,6 @@ class CustomConversationHandler(TGHandler):
             states=states,
             fallbacks=[CommandHandler('cancel', self.cancel)],
             allow_reentry=True,
-            per_message=True
         )
         restore_states(conv_handler)
         return [conv_handler]
