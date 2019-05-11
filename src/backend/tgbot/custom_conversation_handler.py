@@ -1,5 +1,3 @@
-import warnings
-
 from telegram.ext import ConversationHandler, CommandHandler
 
 from backend.tgbot.tghandler import TGHandler, restore_states
@@ -14,9 +12,8 @@ from backend.tgbot.states.random_beer import RandomBeer
 
 # from backend.tgbot.states.on_major import OnMajor
 
-class CustomConversationHandler(TGHandler):
-    warnings.filterwarnings("ignore")
 
+class CustomConversationHandler(TGHandler):
     def get_states(self, *args):
         states = {}
         for obj in args:

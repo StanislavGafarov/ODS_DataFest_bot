@@ -31,7 +31,7 @@ class SyncBotApi(TelegramBotApi):
 
     def start_bot(self, handlers):
         logger.info(pformat(self.bot.getMe()))
-        updater = Updater(bot=self.bot)
+        updater = Updater(bot=self.bot, request_kwargs={'con_pool_size': 8})
 
         for handler in handlers:
             updater.dispatcher.add_handler(self._patch_handler(handler))
