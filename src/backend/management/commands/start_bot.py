@@ -1,6 +1,7 @@
 import logging
 import sys
 
+
 from django.core.management.base import BaseCommand
 
 from backend.tgbot.custom_conversation_handler import CustomConversationHandler

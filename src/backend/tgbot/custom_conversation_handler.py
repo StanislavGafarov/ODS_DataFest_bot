@@ -9,10 +9,11 @@ from backend.tgbot.states.get_news import GetNews
 from backend.tgbot.states.broadcasting import Broadcasting
 from backend.tgbot.states.random_prizes import RandomFreePrizes
 from backend.tgbot.states.random_beer import RandomBeer
+
 # from backend.tgbot.states.on_major import OnMajor
 
-class CustomConversationHandler(TGHandler):
 
+class CustomConversationHandler(TGHandler):
     def get_states(self, *args):
         states = {}
         for obj in args:
@@ -29,7 +30,7 @@ class CustomConversationHandler(TGHandler):
             entry_points=[CommandHandler('start', self.start)],
             states=states,
             fallbacks=[CommandHandler('cancel', self.cancel)],
-            allow_reentry=True
+            allow_reentry=True,
         )
         restore_states(conv_handler)
         return [conv_handler]

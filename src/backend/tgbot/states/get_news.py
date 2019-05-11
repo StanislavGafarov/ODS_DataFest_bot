@@ -1,3 +1,4 @@
+
 from telegram.ext import run_async, MessageHandler, Filters, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, ReplyKeyboardMarkup
 from django.core.paginator import Paginator
@@ -7,6 +8,7 @@ from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.utils import Decorators, logger
 from backend.models import TGUser, News, NewsGroup
 from backend.tgbot.texts import *
+
 
 class GetNews(TGHandler):
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
@@ -29,6 +31,7 @@ class GetNews(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     def show_news(self, api: TelegramBotApi, user: TGUser, update):
+        logger.disable(logger.WARNING)
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
         # сначала последние
@@ -55,6 +58,7 @@ class GetNews(TGHandler):
         return None
 
     def show_news_inline(self, api: TelegramBotApi, update):
+
         query = update.callback_query
         page_no = int(query.data.split("?")[1])
 

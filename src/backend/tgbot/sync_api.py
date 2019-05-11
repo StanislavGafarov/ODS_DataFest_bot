@@ -1,4 +1,3 @@
-import logging
 from pprint import pformat
 
 from telegram.ext import Updater, Handler, ConversationHandler
