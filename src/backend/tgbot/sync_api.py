@@ -1,4 +1,3 @@
-import logging
 from pprint import pformat
 
 from telegram.ext import Updater, Handler, ConversationHandler
@@ -30,8 +29,8 @@ class SyncBotApi(TelegramBotApi):
         return handler
 
     def start_bot(self, handlers):
-        # logger.info(pformat(self.bot.getMe()))
-        updater = Updater(bot=self.bot, request_kwargs={'con_pool_size': 8})
+        logger.info(pformat(self.bot.getMe()))
+        updater = Updater(bot=self.bot)
 
         for handler in handlers:
             updater.dispatcher.add_handler(self._patch_handler(handler))
