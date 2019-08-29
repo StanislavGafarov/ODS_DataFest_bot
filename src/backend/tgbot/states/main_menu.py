@@ -12,7 +12,7 @@ from backend.tgbot.base import TelegramBotApi
 from backend.tgbot.texts import *
 from backend.tgbot.tghandler import TGHandler
 from backend.tgbot.utils import logger, Decorators
-from backend.tgbot.states.nvidia_answers import *
+# from backend.tgbot.states.nvidia_answers import *
 
 
 class FLACON:
@@ -216,64 +216,64 @@ class MainMenu(TGHandler):
                                                                      resize_keyboard=True))
         return self.DRAW_PRIZES
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def draw_jetson(self, api: TelegramBotApi, user: TGUser, update):
-        if not user.is_admin:
-            update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
-            return self.MAIN_MENU
-        text = update.message.text
-        logger.info('ADMIN {} have choosen {}'.format(user, text))
-        gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
-        df = gss_client.get_data('NVIDIA_JETSONE')
-        df = df.rename(columns=NVIDIA_MAPPER)
-        winners = df[(df.rnn_question == RNN_ANSWER)&(df.low_level_library_question == LOW_LEVEL_LIBRARY_ANSWER)&
-                     (df.decrease_dimension_question == DECREASE_DIMENSION_ANSWER) & (df.name != 'Тест')]
-        update.message.reply_text('Количество пользователей давших правильный ответ: {}'
-                                  .format(winners.email.nunique()))
-        if winners.shape[0] > 3:
-            winners = winners.sample(3)
-
-        who_win = 'Победители: '
-        for row in winners[['name', 'surname', 'email', 'tel']].itertuples():
-            who_win = who_win + '\n Имя: {}, Фамилия: {}, email: {}, tel: {}'.format(row[1], row[2], row[3],
-                                                                                     row[4])
-        update.message.reply_text(who_win)
-
-        fail_count = 0
-        fail_list = []
-        winner_tg_ids = []
-        for winner in winners.email.unique():
-            try:
-                nvidia_winner = TGUser.objects.filter(last_checked_email__iexact=winner).first()
-                winner_tg_ids.append(nvidia_winner.tg_id)
-                api.bot.send_message(nvidia_winner.tg_id, TEXT_JETSON_WIN)
-                logger.info('email {} has received notification'.format(winner))
-            except:
-                logger.info('email {} has NOT received notification'.format(winner))
-                fail_count += 1
-                fail_list.append(winner)
-        if fail_count != 0:
-            update.message.reply_text('C ' + ' '.join(fail_list) + 'мы не смогли связаться',
-                                      reply_markup=self.define_keyboard(user))
-        update.message.reply_text('Выполнено.',
-                                  reply_markup=self.define_keyboard(user))
-
-        def broadcast_loosers(api, admin, loosers):
-            total = 0
-            errors = 0
-            for loser in loosers:
-                total += 1
-                try:
-                    api.bot.send_message(loser.tg_id, TEXT_JETSON_NOT_SUCCEED)
-                    time.sleep(0.1)
-                except:
-                    errors += 1
-            api.bot.send_message(admin.tg_id, "NVIDIA Jetsor\n" + TEXT_BROADCAST_DONE.format(total, errors))
-
-        losers = TGUser.objects.filter(in_nvidia_jetsone=True).exclude(tg_id__in=winner_tg_ids)
-        TGHandler.add_task(broadcast_loosers, api, user, losers)
-
-        return self.MAIN_MENU
+    # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    # def draw_jetson(self, api: TelegramBotApi, user: TGUser, update):
+    #     if not user.is_admin:
+    #         update.message.reply_text(TEXT_NOT_ADMIN, reply_markup=self.define_keyboard(user))
+    #         return self.MAIN_MENU
+    #     text = update.message.text
+    #     logger.info('ADMIN {} have choosen {}'.format(user, text))
+    #     gss_client = GoogleSpreadsheet(client_secret_path='./backend/tgbot/client_secret.json')
+    #     df = gss_client.get_data('NVIDIA_JETSONE')
+    #     df = df.rename(columns=NVIDIA_MAPPER)
+    #     winners = df[(df.rnn_question == RNN_ANSWER)&(df.low_level_library_question == LOW_LEVEL_LIBRARY_ANSWER)&
+    #                  (df.decrease_dimension_question == DECREASE_DIMENSION_ANSWER) & (df.name != 'Тест')]
+    #     update.message.reply_text('Количество пользователей давших правильный ответ: {}'
+    #                               .format(winners.email.nunique()))
+    #     if winners.shape[0] > 3:
+    #         winners = winners.sample(3)
+    #
+    #     who_win = 'Победители: '
+    #     for row in winners[['name', 'surname', 'email', 'tel']].itertuples():
+    #         who_win = who_win + '\n Имя: {}, Фамилия: {}, email: {}, tel: {}'.format(row[1], row[2], row[3],
+    #                                                                                  row[4])
+    #     update.message.reply_text(who_win)
+    #
+    #     fail_count = 0
+    #     fail_list = []
+    #     winner_tg_ids = []
+    #     for winner in winners.email.unique():
+    #         try:
+    #             nvidia_winner = TGUser.objects.filter(last_checked_email__iexact=winner).first()
+    #             winner_tg_ids.append(nvidia_winner.tg_id)
+    #             api.bot.send_message(nvidia_winner.tg_id, TEXT_JETSON_WIN)
+    #             logger.info('email {} has received notification'.format(winner))
+    #         except:
+    #             logger.info('email {} has NOT received notification'.format(winner))
+    #             fail_count += 1
+    #             fail_list.append(winner)
+    #     if fail_count != 0:
+    #         update.message.reply_text('C ' + ' '.join(fail_list) + 'мы не смогли связаться',
+    #                                   reply_markup=self.define_keyboard(user))
+    #     update.message.reply_text('Выполнено.',
+    #                               reply_markup=self.define_keyboard(user))
+    #
+    #     def broadcast_loosers(api, admin, loosers):
+    #         total = 0
+    #         errors = 0
+    #         for loser in loosers:
+    #             total += 1
+    #             try:
+    #                 api.bot.send_message(loser.tg_id, TEXT_JETSON_NOT_SUCCEED)
+    #                 time.sleep(0.1)
+    #             except:
+    #                 errors += 1
+    #         api.bot.send_message(admin.tg_id, "NVIDIA Jetsor\n" + TEXT_BROADCAST_DONE.format(total, errors))
+    #
+    #     losers = TGUser.objects.filter(in_nvidia_jetsone=True).exclude(tg_id__in=winner_tg_ids)
+    #     TGHandler.add_task(broadcast_loosers, api, user, losers)
+    #
+    #     return self.MAIN_MENU
 
     def create_state(self):
         state = {self.MAIN_MENU: [
