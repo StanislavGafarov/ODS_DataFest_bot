@@ -40,9 +40,9 @@ class TGHandler(object):
         self.DRAW_PRIZES = 997
 
         admin_buttons = [
-            [BUTTON_REFRESH_SCHEDULE],
-            [BUTTON_SEND_INVITES],
-            [BUTTON_DRAW_PRIZES],
+            # [BUTTON_REFRESH_SCHEDULE],
+            # [BUTTON_SEND_INVITES],
+            # [BUTTON_DRAW_PRIZES],
             [BUTTON_POST_NEWS],
         ]
         auth_buttons = [

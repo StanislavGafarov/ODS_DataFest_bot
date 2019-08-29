@@ -16,8 +16,8 @@ from backend.tgbot.utils import logger, Decorators
 
 
 class FLACON:
-    location = Location(latitude=55.805120, longitude=37.584590)
-    map = 'https://datafest.ru/static/img/design/nav-c.jpg'
+    location = Location(latitude=55.797111, longitude=37.537886)
+    # map = 'https://datafest.ru/static/img/design/nav-c.jpg'
 
 
 class MainMenu(TGHandler):
@@ -77,10 +77,10 @@ class MainMenu(TGHandler):
     def show_path(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
-        api.bot.send_location(user.tg_id, location=FLACON.location)
-        api.bot.send_photo(user.tg_id, photo=FLACON.map,
-                           caption=f"{TEXT_SHOW_PATH_MAP_CAPTION}. {TEXT_SHOW_PATH_MORE_INFO}",
-                           reply_markup=self.define_keyboard(user))
+        api.bot.send_location(user.tg_id, location=FLACON.location, reply_markup=self.define_keyboard(user))
+        # api.bot.send_photo(user.tg_id, photo=FLACON.map,
+        #                    caption=f"{TEXT_SHOW_PATH_MAP_CAPTION}. {TEXT_SHOW_PATH_MORE_INFO}",
+        #                    reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
     # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)

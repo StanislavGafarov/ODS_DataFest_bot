@@ -107,8 +107,8 @@ TEXT_UNKNOWN_COMMAND = "Пожалуйста, воспользуйтесь кн�
 # Main menu
 BUTTON_CHECK_REGISTRATION = 'Проверить статус регистрации'
 BUTTON_AUTHORISATION = 'Авторизоваться'
-BUTTON_SCHEDULE = 'Программа феста'
-BUTTON_NEWS = 'Новости феста'
+BUTTON_SCHEDULE = 'Программа major'
+BUTTON_NEWS = 'Новости'
 BUTTON_SHOW_PATH = 'Как добраться / Карта'
 BUTTON_JETSON = 'Я хочу Jetson!'
 
