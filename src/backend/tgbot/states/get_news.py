@@ -35,7 +35,8 @@ class GetNews(TGHandler):
         logger.info('User {} have chosen {} '.format(user, text))
         # сначала последние
         news_list = News.objects.filter(target_group__in=[NewsGroup.all_users(), NewsGroup.news_subscription()]).order_by('-id')
-        if news_list is None:
+        logger.info('news_list:', news_list)
+        if not news_list:
             update.message.reply_text(TEXT_NO_NEWS, reply_markup=self.define_keyboard(user))
             return self.MAIN_MENU
 
