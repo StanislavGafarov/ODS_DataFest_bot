@@ -83,14 +83,14 @@ class MainMenu(TGHandler):
                            reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def want_jetson(self, api: TelegramBotApi, user: TGUser, update):
-        text = update.message.text
-        logger.info('User {} have chosen {} '.format(user, text))
-        user.in_nvidia_jetsone = True
-        user.save()
-        update.message.reply_text(TEXT_JETSON, reply_markup=self.define_keyboard(user))
-        return self.MAIN_MENU
+    # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    # def want_jetson(self, api: TelegramBotApi, user: TGUser, update):
+    #     text = update.message.text
+    #     logger.info('User {} have chosen {} '.format(user, text))
+    #     user.in_nvidia_jetsone = True
+    #     user.save()
+    #     update.message.reply_text(TEXT_JETSON, reply_markup=self.define_keyboard(user))
+    #     return self.MAIN_MENU
     # AUTHORIZED
     # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
     # def on_major(self, api: TelegramBotApi, user: TGUser, update):
@@ -107,28 +107,28 @@ class MainMenu(TGHandler):
     #             update.message.reply_text(TEXT_MAJOR_CODE, reply_markup=ReplyKeyboardRemove())
     #             return self.ON_MAJOR
 
-    @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
-    def participate_random_prize(self, api: TelegramBotApi, user: TGUser, update):
-        text = update.message.text
-        logger.info('User {} have chosen {} '.format(user, text))
-        if not user.is_authorized:
-            update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
-            return self.MAIN_MENU
-        # ON Major
-        # if not user.on_major:
-        #     update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
-        #     return self.MAIN_MENU
-        if user.merch_size is None:
-            update.message.reply_text(TEXT_CHOOSE_YOUR_SIZE, reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD,
-                                                                                              one_time_keyboard=True,
-                                                                                              resize_keyboard=True))
-            return self.CHOOSEN_SIZE
-        else:
-            custom_keyboard = [[BUTTON_CHANGE_SIZE, BUTTON_FULL_BACK]]
-            update.message.reply_text(TEXT_KNOW_SIZE.format(user.merch_size)
-                                      , reply_markup=ReplyKeyboardMarkup(custom_keyboard, one_time_keyboard=True,
-                                                                         resize_keyboard=True))
-            return self.CHANGE_SIZE
+    # @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user)
+    # def participate_random_prize(self, api: TelegramBotApi, user: TGUser, update):
+    #     text = update.message.text
+    #     logger.info('User {} have chosen {} '.format(user, text))
+    #     if not user.is_authorized:
+    #         update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
+    #         return self.MAIN_MENU
+    #     # ON Major
+    #     # if not user.on_major:
+    #     #     update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
+    #     #     return self.MAIN_MENU
+    #     if user.merch_size is None:
+    #         update.message.reply_text(TEXT_CHOOSE_YOUR_SIZE, reply_markup=ReplyKeyboardMarkup(self.SIZE_KEYBOARD,
+    #                                                                                           one_time_keyboard=True,
+    #                                                                                           resize_keyboard=True))
+    #         return self.CHOOSEN_SIZE
+    #     else:
+    #         custom_keyboard = [[BUTTON_CHANGE_SIZE, BUTTON_FULL_BACK]]
+    #         update.message.reply_text(TEXT_KNOW_SIZE.format(user.merch_size)
+    #                                   , reply_markup=ReplyKeyboardMarkup(custom_keyboard, one_time_keyboard=True,
+    #                                                                      resize_keyboard=True))
+    #         return self.CHANGE_SIZE
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def participate_random_beer(self, api: TelegramBotApi,  user: TGUser, update, random_beer_user: RandomBeerUser):
@@ -138,9 +138,9 @@ class MainMenu(TGHandler):
         # if not user.on_major:
         #     update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
         #     return self.MAIN_MENU
-        if not user.is_authorized:
-            update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
-            return self.MAIN_MENU
+        # if not user.is_authorized:
+        #     update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
+        #     return self.MAIN_MENU
         if random_beer_user.accept_rules:
             update.message.reply_text(TEXT_RANDOM_BEER_MENU
                                       .format(random_beer_user.tg_nickname, random_beer_user.ods_nickname,
@@ -277,21 +277,21 @@ class MainMenu(TGHandler):
 
     def create_state(self):
         state = {self.MAIN_MENU: [
-            self.rhandler(BUTTON_CHECK_REGISTRATION, self.check_registration_status),
-            self.rhandler(BUTTON_AUTHORISATION, self.authorization),
+            # self.rhandler(BUTTON_CHECK_REGISTRATION, self.check_registration_status),
+            # self.rhandler(BUTTON_AUTHORISATION, self.authorization),
             self.rhandler(BUTTON_NEWS, self.get_news),
             self.rhandler(BUTTON_SCHEDULE, self.get_schedule),
             self.rhandler(BUTTON_SHOW_PATH, self.show_path),
 
             # self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.ready_but_muted),
-            self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
+            # self.rhandler(BUTTON_PARTICIPATE_IN_RANDOM_PRIZE, self.participate_random_prize),
             # self.rhandler(BUTTON_RANDOM_BEER, self.ready_but_muted),
             self.rhandler(BUTTON_RANDOM_BEER, self.participate_random_beer),
 
 
-            self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
-            self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
-            self.rhandler(BUTTON_DRAW_PRIZES, self.draw_prizes),
+            # self.rhandler(BUTTON_REFRESH_SCHEDULE, self.not_ready_yet),
+            # self.rhandler(BUTTON_SEND_INVITES, self.refresh_invites_and_notify),
+            # self.rhandler(BUTTON_DRAW_PRIZES, self.draw_prizes),
             # self.rhandler(BUTTON_DRAW_PRIZES, self.not_ready_yet),
             self.rhandler(BUTTON_POST_NEWS, self.create_broadcast),
 

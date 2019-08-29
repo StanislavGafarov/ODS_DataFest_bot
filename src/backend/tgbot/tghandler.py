@@ -50,15 +50,17 @@ class TGHandler(object):
             [BUTTON_SCHEDULE],
             [BUTTON_NEWS,
              BUTTON_SHOW_PATH],
-            [BUTTON_PARTICIPATE_IN_RANDOM_PRIZE],
+            # [BUTTON_PARTICIPATE_IN_RANDOM_PRIZE],
             [BUTTON_RANDOM_BEER]
         ]
         unauth_buttons = [
-            [BUTTON_CHECK_REGISTRATION],
-            [BUTTON_AUTHORISATION],
+            # [BUTTON_CHECK_REGISTRATION],
+            # [BUTTON_AUTHORISATION],
+            [BUTTON_RANDOM_BEER],
             [BUTTON_SCHEDULE,
-             BUTTON_NEWS],
-            [BUTTON_SHOW_PATH]
+             BUTTON_SHOW_PATH],
+            [BUTTON_NEWS],
+
         ]
         self.SIZE_KEYBOARD = [[BUTTON_XS_SIZE, BUTTON_S_SIZE, BUTTON_M_SIZE, BUTTON_L_SIZE],
                               [BUTTON_XL_SIZE, BUTTON_XXL_SIZE, BUTTON_FULL_BACK]]

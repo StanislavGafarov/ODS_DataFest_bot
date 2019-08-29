@@ -22,8 +22,13 @@ class CustomConversationHandler(TGHandler):
         return states
 
     def create_handler(self):
-        states = self.get_states(MainMenu, CheckRegistrationStatus, Authorization, GetNews, Broadcasting
-                                 , RandomFreePrizes, RandomBeer
+        states = self.get_states(MainMenu,
+                                 # CheckRegistrationStatus,
+                                 # Authorization,
+                                 GetNews,
+                                 Broadcasting,
+                                 # RandomFreePrizes,
+                                 RandomBeer
                                  # , OnMajor
                                  )
         conv_handler = ConversationHandler(
