@@ -36,8 +36,9 @@ class GetNews(TGHandler):
         # сначала последние
         news_list = News.objects.filter(target_group__in=[NewsGroup.all_users(), NewsGroup.news_subscription()]).order_by('-id')
         if not news_list:
-            update.message.reply_text(TEXT_NO_NEWS, reply_markup=self.define_keyboard(user))
-            return self.MAIN_MENU
+            keyboard = ReplyKeyboardMarkup([[BUTTON_FULL_BACK]], one_time_keyboard=True, resize_keyboard=True)
+            update.message.reply_text(TEXT_NO_NEWS, reply_markup=keyboard)
+            return self.GET_NEWS
 
 
         news_pages = Paginator(news_list, 1)
