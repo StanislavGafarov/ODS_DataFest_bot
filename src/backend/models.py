@@ -230,7 +230,7 @@ class RandomBeerUser(models.Model):
     accept_rules = models.BooleanField(default=False)
     is_busy = models.BooleanField(default=False)
     email = models.TextField(null=True, default=None)
-
+    random_beer_join_date = models.DateTimeField(null=True, default=None)
 
 
 

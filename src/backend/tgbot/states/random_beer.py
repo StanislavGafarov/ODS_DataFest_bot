@@ -1,4 +1,5 @@
 import random
+from datetime import datetime
 
 from telegram import ReplyKeyboardRemove
 from telegram.ext import run_async, MessageHandler, Filters, CommandHandler
@@ -17,9 +18,11 @@ class RandomBeer(TGHandler):
         text = update.message.text
         logger.info(' {} '.format(text))
         user.in_random_beer = True
+
         user.save()
         logger.info('User {} have accepted random beer rules'.format(user))
         random_beer_user.accept_rules = True
+        random_beer_user.random_beer_join_date = datetime.now().date()
         random_beer_user.save()
         update.message.reply_text(TEXT_RULES_ACCEPTED_NEED_TG_NICK, reply_markup=ReplyKeyboardRemove())
         return self.RANDOM_BEER_TG_NICK
@@ -196,11 +199,16 @@ class RandomBeer(TGHandler):
                 return self.RANDOM_BEER_MENU
 
     def get_match(self, random_beer_user: RandomBeerUser):
+        # по хорошему бы интервал (для datafest-a) и в настройки
+        fest_date = datetime(year=2019, month=9, day=28)
+
         posible_pair_list = RandomBeerUser.objects.filter(accept_rules=True)\
                 .exclude(is_busy=True).exclude(random_beer_try=10).exclude(tg_user_id=random_beer_user.tg_user_id)\
                 .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
                 .exclude(tg_nickname=None, ods_nickname=None, social_network_link=None) \
-                .exclude(tg_user_id=random_beer_user.prev_pair).values_list('tg_user_id', flat=True)
+                .exclude(tg_user_id=random_beer_user.prev_pair).values_list('tg_user_id', flat=True)\
+                .exclude(random_beer_join_date=None)\
+                .exclude(random_beer_join_date=fest_date)
         return random.choice(posible_pair_list)
 
     def send_notification(self, user, data, api):
