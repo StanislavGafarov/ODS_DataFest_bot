@@ -63,7 +63,7 @@ class RandomBeerUserAdmin(admin.ModelAdmin):
                     'accept_rules', 'is_busy']
     search_fields = ['accept_rules', 'is_busy', 'email']
 
-    actions = ['zero_beer']
+    actions = ['zero_beer', 'all_bisy']
 
     def zero_beer(self, request, queryset):
         queryset.update(random_beer_try=0)
