@@ -68,3 +68,7 @@ class RandomBeerUserAdmin(admin.ModelAdmin):
     def zero_beer(self, request, queryset):
         queryset.update(random_beer_try=0)
     zero_beer.short_description = "Zero random beer meeting count"
+
+    def all_bisy(self, request, queryset):
+        queryset.update(is_busy = True)
+    all_bisy.short_description = "Set random beer users to busy"
