@@ -110,7 +110,7 @@ TEXT_YOU_BANNED = 'Ты видимо сделал, что-то очень пло
 # Main menu
 BUTTON_CHECK_REGISTRATION = 'Проверить статус регистрации'
 BUTTON_AUTHORISATION = 'Авторизоваться'
-BUTTON_SCHEDULE = 'Программа major 📝'
+BUTTON_SCHEDULE = 'Программа Data Fest Siberia² 📝'
 BUTTON_NEWS = 'Новости 📰'
 BUTTON_SHOW_PATH = 'Как добраться / Карта 🗺'
 BUTTON_JETSON = 'Я хочу Jetson!'
