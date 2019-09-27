@@ -15,9 +15,9 @@ from backend.tgbot.utils import logger, Decorators
 # from backend.tgbot.states.nvidia_answers import *
 
 
-class FLACON:
-    location = Location(latitude=55.797111, longitude=37.537886)
-    text = 'Moscow Data Science Major проходит в офисе Mail.ru Group:'
+class FEST_EVENT:
+    location = Location(latitude=55.029295, longitude=82.925996)
+    text = 'Площадка конференции: Поток, лекторий бар'
     # map = 'https://datafest.ru/static/img/design/nav-c.jpg'
 
 
@@ -78,9 +78,9 @@ class MainMenu(TGHandler):
     def show_path(self, api: TelegramBotApi, user: TGUser, update):
         text = update.message.text
         logger.info('User {} have chosen {} '.format(user, text))
-        api.bot.send_location(user.tg_id, location=FLACON.location)
-        update.message.reply_text(FLACON.text, reply_markup=self.define_keyboard(user))
-        # api.bot.send_photo(user.tg_id, photo=FLACON.map,
+        api.bot.send_location(user.tg_id, location=FEST_EVENT.location)
+        update.message.reply_text(FEST_EVENT.text, reply_markup=self.define_keyboard(user))
+        # api.bot.send_photo(user.tg_id, photo=FEST_EVENT.map,
         #                    caption=f"{TEXT_SHOW_PATH_MAP_CAPTION}. {TEXT_SHOW_PATH_MORE_INFO}",
         #                    reply_markup=self.define_keyboard(user))
         return self.MAIN_MENU
