@@ -45,6 +45,8 @@ class RandomBeer(TGHandler):
     def get_tg_nick(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
         prev_field_val = random_beer_user.tg_nickname
         tg_nick = update.message.text
+        if '@' not in tg_nick:
+            tg_nick = '@'+tg_nick
         random_beer_user.tg_nickname = tg_nick
         random_beer_user.save()
         logger.info('User {} fill tg_nickname with {} '.format(user, tg_nick))
@@ -153,6 +155,9 @@ class RandomBeer(TGHandler):
 
     @Decorators.composed(run_async, Decorators.save_msg, Decorators.with_user, Decorators.with_random_beer_user)
     def find_match(self, api: TelegramBotApi, user: TGUser, update, random_beer_user: RandomBeerUser):
+        if user.is_banned:
+            update.message.reply_text(TEXT_YOU_BANNED, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
         # TODO: Refactor monkey code here
         text = update.message.text
         logger.info('User {} have choosen {}'.format(user, text))

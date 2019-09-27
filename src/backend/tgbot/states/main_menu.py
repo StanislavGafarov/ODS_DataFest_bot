@@ -137,9 +137,9 @@ class MainMenu(TGHandler):
         text = update.message.text
         logger.info('User {} have choosen {}'.format(user, text))
         # ON Major
-        # if not user.on_major:
-        #     update.message.reply_text(TEXT_NOT_READY_YET, reply_markup=self.define_keyboard(user))
-        #     return self.MAIN_MENU
+        if user.is_banned:
+            update.message.reply_text(TEXT_YOU_BANNED, reply_markup=self.define_keyboard(user))
+            return self.MAIN_MENU
         # if not user.is_authorized:
         #     update.message.reply_text(TEXT_NOT_AUTHORIZED, reply_markup=self.define_keyboard(user))
         #     return self.MAIN_MENU
