@@ -22,7 +22,7 @@ class RandomBeer(TGHandler):
         user.save()
         logger.info('User {} have accepted random beer rules'.format(user))
         random_beer_user.accept_rules = True
-        random_beer_user.random_beer_join_date = datetime.now().date()
+        # random_beer_user.random_beer_join_date = datetime.now().date()
         random_beer_user.save()
         update.message.reply_text(TEXT_RULES_ACCEPTED_NEED_TG_NICK, reply_markup=ReplyKeyboardRemove())
         return self.RANDOM_BEER_TG_NICK
@@ -212,8 +212,8 @@ class RandomBeer(TGHandler):
                 .exclude(tg_nickname='-', ods_nickname='-', social_network_link='-') \
                 .exclude(tg_nickname=None, ods_nickname=None, social_network_link=None) \
                 .exclude(tg_user_id=random_beer_user.prev_pair).values_list('tg_user_id', flat=True)\
-                .exclude(random_beer_join_date=None)\
-                .exclude(random_beer_join_date=fest_date)
+                # .exclude(random_beer_join_date=None)\
+                # .exclude(random_beer_join_date=fest_date)
         return random.choice(posible_pair_list)
 
     def send_notification(self, user, data, api):
