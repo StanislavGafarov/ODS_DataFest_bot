@@ -16,8 +16,8 @@ from backend.tgbot.utils import logger, Decorators
 
 
 class FEST_EVENT:
-    location = Location(latitude=55.029295, longitude=82.925996)
-    text = 'Площадка конференции: Поток, лекторий бар'
+    location = Location(latitude=55.7406634, longitude=37.5309324)
+    text = 'Data Ёлка проходит в офисе Сбербанка (Сбербанк Agile Home)'
     # map = 'https://datafest.ru/static/img/design/nav-c.jpg'
 
 
