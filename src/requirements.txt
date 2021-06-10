@@ -1,4 +1,4 @@
-django==2.1.5
+django==2.2.24
 cached-property==1.5.1
 python-telegram-bot[socks]==11.1.0
 pyopenssl==18.0.0
